@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Public;
+namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
@@ -11,6 +11,6 @@ class LandingController extends Controller
     public function index()
     {
 
-        return view('public.landing');
+        return view('front.landing');
     }
 }

@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: styling global */
+html {
+    scroll-behavior: smooth;
+}
+
+[x-cloak] { display: none !important; }
+
+.form-label-required::after {
+    content: " *";
+    color: red;
+    font-weight: bold;
+}
+
+.input-primary {
+    @apply mt-1 w-full px-4 py-3 rounded-xl
+    bg-white dark:bg-gray-800
+    border border-gray-300 dark:border-gray-700
+    text-gray-800 dark:text-white
+    focus:ring-primary focus:border-primary;
+}
+
+.input-file {
+    @apply mt-1 block w-full text-sm
+    file:mr-4 file:py-2 file:px-4
+    file:rounded-xl file:border-0
+    file:bg-primary file:text-white
+    hover:file:bg-azwara-medium
+    bg-white dark:bg-gray-800
+    border border-gray-300 dark:border-gray-700
+    rounded-xl cursor-pointer;
+}
+
+.btn-primary {
+    @apply py-3 rounded-xl font-bold text-white
+    bg-gradient-to-r from-primary to-azwara-medium
+    hover:shadow-xl hover:scale-[1.02] transition;
+}
+
+/* Sidebar & Menu */
+@layer components {
+
+    .menu-item {
+        @apply flex items-center gap-3
+               px-4 py-2.5 rounded-xl
+               cursor-pointer font-medium text-sm
+               text-azwara-darkest dark:text-azwara-light
+               hover:bg-azwara-light/30
+               dark:hover:bg-azwara-darkest
+               transition-colors duration-200;
+    }
+
+    .menu-item svg {
+        @apply w-5 h-5 flex-shrink-0
+               text-azwara-medium
+               transition-colors duration-200;
+    }
+
+    /* Hover → icon ikut berubah */
+    .menu-item:hover svg {
+        @apply text-primary;
+    }
+
+    /* ACTIVE STATE (opsional, tapi disaranin) */
+    .menu-item.active {
+        @apply bg-azwara-light/40
+               dark:bg-azwara-darkest
+               text-primary;
+    }
+
+    .menu-item.active svg {
+        @apply text-primary;
+    }
+}
+
+/* Sidebar desktop behavior */
+@media (min-width: 768px) {
+    #sidebar {
+        transform: translateX(0) !important;
+    }
+    .sidebar-closed-desktop {
+        transform: translateX(-100%) !important;
+    }
+}
+
+/* ============================================
+   SELECT2 — MATCH TAILWIND INPUT STYLE
+   ============================================ */
+
+/* WRAPPER */
+.select2-container .select2-selection--single {
+    @apply w-full px-4 py-3 h-[48px] rounded-xl
+           bg-white dark:bg-gray-800
+           border border-gray-300 dark:border-gray-700
+           text-gray-800 dark:text-white
+           flex items-center;
+}
+
+/* TEXT */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    @apply text-gray-800 dark:text-white leading-6;
+    padding-left: 0 !important;
+}
+
+/* ARROW */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 100%;
+    right: 12px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    @apply border-gray-500 dark:border-gray-300;
+}
+
+/* ON FOCUS */
+.select2-container--default.select2-container--focus
+.select2-selection--single {
+    @apply border-primary ring-1 ring-primary;
+}
+
+/* DROPDOWN */
+.select2-dropdown {
+    @apply bg-white dark:bg-gray-800
+           border border-gray-300 dark:border-gray-700
+           rounded-xl shadow-lg;
+}
+
+/* SEARCH BOX */
+.select2-search--dropdown .select2-search__field {
+    @apply px-3 py-2 rounded-lg
+           bg-white dark:bg-gray-800
+           border border-gray-300 dark:border-gray-700
+           text-gray-800 dark:text-white;
+}
+
+/* OPTION NORMAL */
+.select2-results__option {
+    @apply px-3 py-2 text-gray-800 dark:text-white;
+}
+
+/* OPTION HOVER */
+.select2-results__option--highlighted {
+    @apply bg-primary text-white;
+}
+
+/* OPTION SELECTED */
+.select2-results__option[aria-selected=true] {
+    @apply bg-azwara-medium text-white;
+}
