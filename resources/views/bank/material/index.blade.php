@@ -24,7 +24,7 @@
                 placeholder="Cari materi..."
                 value="{{ request('q') }}"
                 class="flex-1 px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700
-                       bg-white dark:bg-azwara-darkest text-gray-800 dark:text-gray-100
+                       bg-azwara-lightest dark:bg-azwara-darkest text-gray-800 dark:text-gray-100
                        focus:ring-2 focus:ring-primary/40 focus:outline-none w-full sm:w-64">
 
             <button type="submit"
@@ -70,7 +70,7 @@
 <div class="space-y-4">
 
     @forelse ($materials as $m)
-        <div class="w-full bg-white dark:bg-azwara-darker border border-gray-200 dark:border-azwara-darkest
+        <div class="w-full bg-azwara-lightest dark:bg-azwara-darker border border-gray-200 dark:border-azwara-darkest
                     rounded-xl p-5 sm:p-6 shadow-sm hover:shadow-lg transition">
 
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -128,7 +128,7 @@
         </div>
     @empty
 
-        <div class="w-full text-center py-12 bg-white dark:bg-azwara-darker
+        <div class="w-full text-center py-12 bg-azwara-lightest dark:bg-azwara-darker
                     rounded-xl border border-gray-200 dark:border-azwara-darkest">
             <p class="text-gray-600 dark:text-gray-300">Belum ada materi dalam kategori ini.</p>
         </div>

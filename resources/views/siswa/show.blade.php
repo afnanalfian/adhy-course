@@ -29,7 +29,7 @@
 
         {{-- Card --}}
         <div
-            class="bg-white dark:bg-azwara-darker
+            class="bg-azwara-lightest dark:bg-azwara-darker
                    border border-gray-200 dark:border-azwara-darkest
                    rounded-3xl shadow-xl dark:shadow-black/30
                    p-6 sm:p-8">
@@ -82,7 +82,7 @@
             {{-- Info --}}
             <div class="grid sm:grid-cols-2 gap-4 text-sm">
                 <div
-                    class="rounded-xl bg-gray-50 dark:bg-azwara-darkest/50
+                    class="rounded-xl bg-white dark:bg-azwara-darkest/50
                            px-4 py-3">
                     <p class="text-gray-500 dark:text-gray-400">Provinsi</p>
                     <p class="font-semibold text-gray-900 dark:text-gray-100">
@@ -91,7 +91,7 @@
                 </div>
 
                 <div
-                    class="rounded-xl bg-gray-50 dark:bg-azwara-darkest/50
+                    class="rounded-xl bg-white dark:bg-azwara-darkest/50
                            px-4 py-3">
                     <p class="text-gray-500 dark:text-gray-400">Kab / Kota</p>
                     <p class="font-semibold text-gray-900 dark:text-gray-100">

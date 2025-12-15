@@ -8,6 +8,7 @@ use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\TentorController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\MeetingMaterialController;
 use App\Http\Controllers\MeetingPostTestController;
 use App\Http\Controllers\MeetingPostTestAttemptController;
 use App\Http\Controllers\MeetingAttendanceController;
@@ -146,72 +147,95 @@ Route::middleware(['auth', 'verified'])->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    // ADMIN & TENTOR
+    //ADMIN & TENTOR
     Route::middleware(['role:admin|tentor'])->group(function () {
+        // CREATE & EDIT MEETING
+        Route::get('/course/{course}/meetings/create',[MeetingController::class, 'create'])->name('meeting.create');
+        Route::post('/course/{course}/meetings',[MeetingController::class, 'store'])->name('meeting.store');
+        Route::get('/meetings/{meeting}/edit',[MeetingController::class, 'edit'])->name('meeting.edit');
+        Route::put('/meetings/{meeting}', [MeetingController::class, 'update'])->name('meeting.update');
 
-        // CREATE MEETING (di dalam course)
-        Route::get('/course/{course}/meetings/create',[MeetingController::class, 'create'] )->name('meeting.create');
-        Route::post('/course/{course}/meetings/store', [MeetingController::class, 'store'] )->name('meeting.store');
-        // START / FINISH / CANCEL
-        Route::post('/meetings/{meeting}/start', [MeetingController::class, 'start'])->name('meeting.start');
-        Route::post('/meetings/{meeting}/finish', [MeetingController::class, 'finish'])->name('meeting.finish');
-        Route::post('/meetings/{meeting}/cancel',[MeetingController::class, 'cancel'] )->name('meeting.cancel');
-        // DELETE MEETING
-        Route::delete('/meetings/{meeting}/delete', [MeetingController::class, 'destroy'] )->name('meeting.delete');
+        // MEETING STATE
+        Route::post('/meetings/{meeting}/start',[MeetingController::class, 'start'])->name('meeting.start');
+        Route::post('/meetings/{meeting}/finish',[MeetingController::class, 'finish'])->name('meeting.finish');
+        Route::post('/meetings/{meeting}/cancel',[MeetingController::class, 'cancel'])->name('meeting.cancel');
+
+        // DELETE (SOFT DELETE)
+        Route::delete('/meetings/{meeting}',[MeetingController::class, 'destroy'])->name('meeting.destroy');
     });
 
     // ALL ROLES (ADMIN / TENTOR / SISWA)
     Route::middleware(['role:admin|tentor|siswa'])->group(function () {
-        Route::get('/meetings/{meeting}', [MeetingController::class, 'show'])->name('meeting.show');
-        Route::get('/meetings/{meeting}/join-zoom', [MeetingController::class, 'joinZoom'])->name('meeting.joinZoom');
+        // VIEW MEETING
+        Route::get('/meetings/{meeting}',[MeetingController::class, 'show'])->name('meeting.show');
 
+        // JOIN ZOOM
+        Route::get('/meetings/{meeting}/join-zoom',[MeetingController::class, 'joinZoom'])->name('meeting.joinZoom');
     });
 
     /*
     |--------------------------------------------------------------------------
-    | MEETING POST TEST ROUTES
+    | MEETING ATTENDANCE
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:admin|tentor'])->group(function () {
+        Route::get('/meetings/{meeting}/attendance',[MeetingAttendanceController::class, 'index'])->name('meeting.attendance.index');
+        Route::post('/meetings/{meeting}/attendance',[MeetingAttendanceController::class, 'store'])->name('meeting.attendance.store');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | MEETING MATERIAL (PDF)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:admin|tentor'])->group(function () {
+        Route::post('/meetings/{meeting}/material',[MeetingMaterialController::class, 'store'])->name('meeting.material.store');
+        Route::delete('/meetings/{meeting}/material',[MeetingMaterialController::class, 'destroy'])->name('meeting.material.destroy');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | MEETING VIDEO (BUNNY STREAM)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:admin|tentor'])->group(function () {
+        Route::post('/meetings/{meeting}/video',[MeetingVideoController::class, 'store'])->name('meeting.video.store');
+        Route::delete('/meetings/{meeting}/video',[MeetingVideoController::class, 'destroy'])->name('meeting.video.destroy');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | MEETING POST TEST
     |--------------------------------------------------------------------------
     */
 
-    // ADMIN & TENTOR
+    //ADMIN & TENTOR
     Route::middleware(['role:admin|tentor'])->group(function () {
-        Route::post('/meetings/{meeting}/post-test', [MeetingPostTestController::class, 'store']  )->name('posttest.store');
-        Route::get('/post-tests/{postTest}/edit',  [MeetingPostTestController::class, 'edit']  )->name('posttest.edit');
-        Route::post('/post-tests/{postTest}/questions',  [MeetingPostTestController::class, 'attachQuestions'] )->name('posttest.questions.attach');
-        Route::post('/post-tests/{postTest}/launch', [MeetingPostTestController::class, 'launch'] )->name('posttest.launch');
-        Route::post('/post-tests/{postTest}/close', [MeetingPostTestController::class, 'close']  )->name('posttest.close');
+        Route::post('/meetings/{meeting}/post-test',[MeetingPostTestController::class, 'store'])->name('posttest.store');
+        Route::get('/post-tests/{postTest}/edit',[MeetingPostTestController::class, 'edit'])->name('posttest.edit');
+        Route::post('/post-tests/{postTest}/questions',[MeetingPostTestController::class, 'attachQuestions'])->name('posttest.questions.attach');
+        Route::post('/post-tests/{postTest}/launch',[MeetingPostTestController::class, 'launch'])->name('posttest.launch');
+        Route::post('/post-tests/{postTest}/close',[MeetingPostTestController::class, 'close'])->name('posttest.close');
     });
 
-    // SISWA
+    /*
+    | SISWA (ATTEMPT)
+    */
     Route::middleware(['role:admin|siswa'])->group(function () {
-        Route::post('/post-tests/{postTest}/start', [MeetingPostTestAttemptController::class, 'start'])->name('posttest.attempt.start');
-        Route::get('/post-test-attempts/{attempt}', [MeetingPostTestAttemptController::class, 'show'])->name('posttest.attempt.show');
+        Route::post('/post-tests/{postTest}/start',[MeetingPostTestAttemptController::class, 'start'])->name('posttest.attempt.start');
+        Route::get('/post-test-attempts/{attempt}',[MeetingPostTestAttemptController::class, 'show'])->name('posttest.attempt.show');
         Route::post('/post-test-attempts/{attempt}/answer',[MeetingPostTestAttemptController::class, 'saveAnswer'])->name('posttest.answer.save');
         Route::post('/post-test-attempts/{attempt}/submit',[MeetingPostTestAttemptController::class, 'submit'])->name('posttest.submit');
-        Route::get('/post-test-attempts/{attempt}/result', [MeetingPostTestAttemptController::class, 'result'])->name('posttest.result');
+        Route::get('/post-test-attempts/{attempt}/result',[MeetingPostTestAttemptController::class, 'result'])->name('posttest.result');
     });
-    /*
-    |--------------------------------------------------------------------------
-    | MEETING ATTENDANCE ROUTES
-    |--------------------------------------------------------------------------
-    */
 
-    Route::middleware(['role:admin|tentor'])->group(function () {
-        Route::get('/meetings/{meeting}/attendance',  [MeetingAttendanceController::class, 'index'])->name('meeting.attendance.index');
-        Route::post('/meetings/{meeting}/attendance', [MeetingAttendanceController::class, 'store'] )->name('meeting.attendance.store');
-    });
 
     /*
     |--------------------------------------------------------------------------
-    | MEETING VIDEO ROUTES (BUNNY STREAM) & BUNNY WEBHOOK
+    | BUNNY WEBHOOK
     |--------------------------------------------------------------------------
     */
-
-    Route::middleware(['role:admin|tentor'])->group(function () {
-        Route::post('/meetings/{meeting}/video', [MeetingVideoController::class, 'store'])->name('meeting.video.store');
-        Route::delete('/meetings/{meeting}/video',[MeetingVideoController::class, 'destroy'])->name('meeting.video.destroy');
-        Route::post('/webhooks/bunny', [BunnyWebhookController::class, 'handle'])->name('webhooks.bunny');
-    });
+    Route::post('/webhooks/bunny',[BunnyWebhookController::class, 'handle'])->name('webhooks.bunny');
 
     /*
     |--------------------------------------------------------------------------

@@ -1,4 +1,9 @@
-<header class="w-full bg-azwara-lighter dark:bg-azwara-darker shadow-sm px-6 py-4 flex justify-between items-center">
+<header
+    class="w-full h-16
+           bg-azwara-lighter dark:bg-azwara-darker
+           shadow-sm px-6
+           flex justify-between items-center
+           sticky top-0 z-30">
 
     {{-- Hamburger button (desktop & mobile) --}}
     <button

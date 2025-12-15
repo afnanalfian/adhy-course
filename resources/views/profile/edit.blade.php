@@ -27,7 +27,7 @@
             </a>
         </div>
         <div
-            class="bg-white dark:bg-azwara-darker
+            class="bg-azwara-lightest dark:bg-azwara-darker
                    border border-gray-200 dark:border-azwara-darkest
                    rounded-3xl
                    shadow-xl dark:shadow-black/30

@@ -7,7 +7,7 @@
 
         {{-- Card --}}
         <div
-            class="relative bg-white dark:bg-azwara-darker
+                class="relative bg-azwara-lightest dark:bg-azwara-darker
                    rounded-3xl shadow-xl dark:shadow-black/30
                    border border-gray-200 dark:border-azwara-darkest
                    p-6 sm:p-8">

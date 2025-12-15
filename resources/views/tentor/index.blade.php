@@ -13,7 +13,7 @@
             <input type="text" name="q" value="{{ $q ?? '' }}"
                    placeholder="Cari nama / course"
                    class="w-full sm:w-80 px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-700
-                          bg-white dark:bg-azwara-darkest
+                          bg-azwara-lightest dark:bg-azwara-darkest
                           text-gray-700 dark:text-gray-200
                           focus:ring-2 focus:ring-primary focus:outline-none" />
 
@@ -37,7 +37,7 @@
 
     @foreach ($tentor as $t)
         <a href="{{ route('tentor.show', $t->id) }}"
-           class="group block rounded-2xl bg-white dark:bg-azwara-darker border border-gray-200 dark:border-gray-700
+           class="group block rounded-2xl bg-azwara-lightest dark:bg-azwara-darker border border-gray-200 dark:border-gray-700
                   p-5 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200">
 
             {{-- FOTO + NAMA --}}

@@ -4,58 +4,54 @@ namespace App\Http\Controllers;
 
 use App\Models\Meeting;
 use App\Models\MeetingAttendance;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class MeetingAttendanceController extends Controller
 {
     /**
-     * Show attendance page
+     * Show attendance form (create / edit)
      */
     public function index(Meeting $meeting)
     {
-        // ambil siswa dari course
-        $students = $meeting->course
-            ->purchases()
-            ->where('status', 'paid')
-            ->with('user')
-            ->get()
-            ->pluck('user');
+        // Ambil hanya user dengan role siswa
+        $students = User::role('siswa')
+            ->orderBy('name')
+            ->get();
 
-        // attendance existing
-        $attendance = MeetingAttendance::where('meeting_id', $meeting->id)
+        // Ambil absensi yang sudah ada (jika ada)
+        $attendances = $meeting->attendances()
+            ->whereIn('user_id', $students->pluck('id'))
             ->get()
             ->keyBy('user_id');
 
-        return view('meetings.attendance', compact(
-            'meeting',
-            'students',
-            'attendance'
-        ));
+        return view('meetings.attendance', [
+            'meeting'     => $meeting,
+            'students'    => $students,
+            'attendances' => $attendances,
+        ]);
     }
 
     /**
-     * Save attendance
+     * Store / update attendance
      */
     public function store(Request $request, Meeting $meeting)
     {
-        $request->validate([
-            'attendances' => 'array',
-        ]);
+        $students = User::role('siswa')->get();
 
-        foreach ($request->attendances ?? [] as $userId => $isPresent) {
+        foreach ($students as $student) {
             MeetingAttendance::updateOrCreate(
                 [
                     'meeting_id' => $meeting->id,
-                    'user_id'    => $userId,
+                    'user_id'    => $student->id,
                 ],
                 [
-                    'is_present' => (bool) $isPresent,
-                    'marked_by'  => auth()->user()->id,
-                    'marked_at'  => now(),
+                    'is_present' => isset($request->attendances[$student->id]),
                 ]
             );
         }
+
         toast('success', 'Absensi berhasil disimpan');
-        return back();
+        return redirect()->route('meeting.show', $meeting);
     }
 }

@@ -12,7 +12,7 @@
 </head>
 
 <body
-    class="flex min-h-screen overflow-x-hidden
+    class="flex h-screen overflow-hidden
            bg-gradient-to-br from-azwara-lighter via-azwara-medium/20 to-white
            dark:bg-brand-gradient
            bg-fixed bg-no-repeat bg-cover bg-[length:200%_200%]
@@ -20,10 +20,10 @@
 
     @include('layouts.partials.sidebar')
 
-    <div class="flex-1 min-h-screen flex flex-col relative z-10">
+    <div class="flex-1 flex flex-col h-screen relative z-10">
         @include('layouts.partials.header')
 
-        <main class="p-6">
+        <main class="flex-1 p-6 overflow-y-auto">
             @yield('content')
         </main>
 

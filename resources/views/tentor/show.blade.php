@@ -21,7 +21,7 @@
 
         {{-- CARD --}}
         <div class="rounded-2xl shadow-lg border border-gray-200/70 dark:border-gray-700/50
-                    bg-white dark:bg-azwara-darker p-5 sm:p-6">
+                    bg-azwara-lightest dark:bg-azwara-darker p-5 sm:p-6">
 
         {{-- HEADER --}}
         <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-5">
@@ -72,14 +72,14 @@
         </h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm mb-6">
-            <div class="p-3 rounded-lg bg-gray-100 dark:bg-azwara-darkest/40">
+            <div class="p-3 rounded-lg bg-white dark:bg-azwara-darkest/40">
                 <p class="text-gray-500 text-xs">Provinsi</p>
                 <p class="font-semibold text-gray-900 dark:text-gray-200">
                     {{ $teacher->user->province->name ?? '-' }}
                 </p>
             </div>
 
-            <div class="p-3 rounded-lg bg-gray-100 dark:bg-azwara-darkest/40">
+            <div class="p-3 rounded-lg bg-white dark:bg-azwara-darkest/40">
                 <p class="text-gray-500 text-xs">Kab / Kota</p>
                 <p class="font-semibold text-gray-900 dark:text-gray-200">
                     {{ $teacher->user->regency->name ?? '-' }}

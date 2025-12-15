@@ -19,8 +19,13 @@ class MeetingController extends Controller
         $meeting->load([
             'material',
             'video',
-            'postTest',
+            'postTest.questions',
             'creator',
+            'attendances' => function ($q) {
+                $q->whereHas('user.roles', function ($r) {
+                    $r->where('name', 'siswa');
+                })->with('user');
+            },
         ]);
 
         return view('meetings.show', compact('meeting'));
@@ -61,6 +66,41 @@ class MeetingController extends Controller
 
         toast('success', 'Meeting berhasil dibuat');
         return redirect()->route('course.show', $course->slug);
+    }
+    public function edit(Meeting $meeting)
+    {
+        return view('meetings.edit', [
+            'meeting' => $meeting,
+            // format agar cocok dengan <input type="datetime-local">
+            'scheduledAt' => optional($meeting->scheduled_at)
+                ->timezone('Asia/Jakarta')
+                ->format('Y-m-d\TH:i'),
+        ]);
+    }
+    public function update(Request $request, Meeting $meeting)
+    {
+        $request->validate([
+            'title'        => 'required|string|max:255',
+            'scheduled_at' => 'required|date',
+            'zoom_link'    => 'nullable|url',
+        ]);
+
+        $meeting->update([
+            'title'        => $request->title,
+            'slug'         => $meeting->slug
+                                ?? Str::slug($request->title) . '-' . uniqid(),
+            'scheduled_at' => Carbon::createFromFormat(
+                'Y-m-d\TH:i',
+                $request->scheduled_at,
+                'Asia/Jakarta'
+            ),
+            'zoom_link'    => $request->zoom_link,
+        ]);
+
+        toast('success', 'Meeting berhasil diperbarui');
+
+        return redirect()
+            ->route('meeting.show', $meeting);
     }
 
     /**
@@ -113,9 +153,24 @@ class MeetingController extends Controller
      */
     public function destroy(Meeting $meeting)
     {
+        // Cegah hapus jika masih punya relasi penting
+        if (
+            $meeting->material ||
+            $meeting->video ||
+            $meeting->postTest
+        ) {
+            toast(
+                'error',
+                'Meeting tidak dapat dihapus karena masih memiliki materi, video, atau post test.'
+            );
+
+            return back();
+        }
+
         $meeting->delete();
 
         toast('warning', 'Meeting telah dihapus');
+
         return redirect()
             ->route('course.show', $meeting->course->slug);
     }
@@ -132,7 +187,6 @@ class MeetingController extends Controller
         $scheduledAt = $meeting->scheduled_at->timezone('Asia/Jakarta');
         $joinAllowedAt = $scheduledAt->copy()->subMinutes(30);
         $now = Carbon::now('Asia/Jakarta');
-
         // 3. Belum waktunya join
         if ($now->lt($joinAllowedAt)) {
             toast(

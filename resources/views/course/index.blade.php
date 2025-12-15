@@ -24,7 +24,7 @@
                 placeholder="Cari course..."
                 value="{{ $q ?? '' }}"
                 class="flex-1 px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700
-                    bg-white dark:bg-azwara-darkest text-gray-800 dark:text-gray-100
+                    bg-azwara-lightest dark:bg-azwara-darkest text-gray-800 dark:text-gray-100
                     focus:ring-2 focus:ring-primary/40 focus:outline-none w-full sm:w-64" />
 
             <button type="submit"
@@ -48,7 +48,7 @@
 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
     @forelse($courses as $c)
         <article
-            class="group bg-white dark:bg-azwara-darker rounded-2xl shadow-md overflow-hidden
+            class="group bg-azwara-lightest dark:bg-azwara-darker rounded-2xl shadow-md overflow-hidden
                     border border-gray-100 dark:border-azwara-darkest hover:shadow-xl transition">
 
             <a href="{{ route('course.show', $c->slug) }}" class="block">

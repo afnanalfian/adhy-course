@@ -45,7 +45,7 @@
 <div class="space-y-6">
 
 @forelse ($questions as $index => $q)
-    <div class="bg-white dark:bg-azwara-darker border border-gray-200 dark:border-azwara-darkest
+    <div class="bg-azwara-lightest dark:bg-azwara-darker border border-gray-200 dark:border-azwara-darkest
                 rounded-xl p-6 shadow-sm">
 
         {{-- HEADER --}}

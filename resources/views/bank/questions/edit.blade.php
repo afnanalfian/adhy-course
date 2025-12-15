@@ -10,7 +10,7 @@
     @method('PUT')
 
     {{-- HEADER --}}
-    <div class="bg-white dark:bg-azwara-darker rounded-xl shadow p-6">
+    <div class="bg-azwara-lightest dark:bg-azwara-darker rounded-xl shadow p-6">
         <h1 class="text-2xl font-bold text-secondary dark:text-azwara-lighter">
             Edit Soal
         </h1>
@@ -20,11 +20,11 @@
     </div>
 
     {{-- TIPE SOAL --}}
-    <div class="bg-white text-secondary dark:bg-azwara-darker dark:text-azwara-lighter rounded-xl shadow p-6 space-y-2">
+    <div class="bg-azwara-lightest text-secondary dark:bg-azwara-darker dark:text-azwara-lighter rounded-xl shadow p-6 space-y-2">
         <label class="font-semibold">Tipe Soal</label>
         <select id="question-type" name="type"
                 class="w-full rounded-lg border p-2
-                       bg-white dark:bg-secondary/40
+                       bg-azwara-lightest dark:bg-secondary/40
                        text-slate-800 dark:text-white">
                 <option value="mcq" {{ $question->type === 'mcq' ? 'selected' : '' }}>
                     Pilihan Ganda (1 Benar)
@@ -39,14 +39,14 @@
     </div>
 
     {{-- SOAL --}}
-    <div class="bg-white text-secondary dark:bg-azwara-darker dark:text-azwara-lighter rounded-xl shadow p-6 space-y-4">
+    <div class="bg-azwara-lightest text-secondary dark:bg-azwara-darker dark:text-azwara-lighter rounded-xl shadow p-6 space-y-4">
         <h2 class="text-lg font-semibold">Soal</h2>
 
         <textarea id="question-text"
                 name="question_text"
                 rows="4"
                 class="w-full rounded-lg border p-3
-                        bg-white dark:bg-secondary/30
+                        bg-azwara-lightest dark:bg-secondary/30
                         text-slate-800 dark:text-white">
         {{ old('question_text', $question->question_text) }}
         </textarea>
@@ -80,7 +80,7 @@
     </div>
 
     {{-- OPSI JAWABAN --}}
-    <div class="bg-white text-secondary dark:bg-azwara-darker dark:text-azwara-lighter rounded-xl shadow p-6 space-y-4">
+    <div class="bg-azwara-lightest text-secondary dark:bg-azwara-darker dark:text-azwara-lighter rounded-xl shadow p-6 space-y-4">
         <h2 class="text-lg font-semibold">Opsi Jawaban</h2>
 
         <div id="options-wrapper" class="space-y-4 hidden"></div>
@@ -92,13 +92,15 @@
     </div>
 
     {{-- PEMBAHASAN / EXPLANATION --}}
-    <div class="bg-white text-secondary dark:bg-azwara-darker dark:text-azwara-lighter rounded-xl shadow p-6 space-y-4">
+    <div class="bg-azwara-lightest text-secondary dark:bg-azwara-darker dark:text-azwara-lighter rounded-xl shadow p-6 space-y-4">
         <h2 class="text-lg font-semibold">Pembahasan</h2>
 
         <textarea id="explanation-text"
                 name="explanation"
                 rows="4"
-                class="w-full rounded-lg border p-3">
+                class="w-full rounded-lg border p-3
+                        bg-azwara-lightest dark:bg-secondary/30
+                        text-slate-800 dark:text-white">
         {{ old('explanation', $question->explanation) }}
         </textarea>
 
@@ -161,7 +163,7 @@
 
     <div class="absolute bottom-6 left-1/2 -translate-x-1/2
                 w-full max-w-xl
-                bg-white dark:bg-secondary/90
+                bg-azwara-lightest dark:bg-secondary/90
                 border border-slate-200 dark:border-white/10
                 rounded-2xl shadow-xl
                 p-5 space-y-4
@@ -180,7 +182,7 @@
 
         <div id="math-editor"
              class="border rounded-lg p-3 min-h-[70px] text-lg
-                    bg-white text-slate-800
+                    bg-azwara-lightest text-slate-800
                     dark:bg-secondary/30 dark:text-white
                     border-slate-300 dark:border-white/20
                     focus-within:ring-2 focus-within:ring-primary/40">
@@ -200,7 +202,7 @@
                         type="button"
                         class="px-4 py-1.5 rounded-lg
                                bg-slate-200 text-slate-700
-                               dark:bg-white/10 dark:text-white">
+                               dark:bg-azwara-lightest/10 dark:text-white">
                     Batal
                 </button>
             </div>
@@ -391,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <textarea name="options[]"
                     class="option-text w-full rounded-lg border p-2
-                           bg-white dark:bg-secondary/30
+                           bg-azwara-lightest dark:bg-secondary/30
                            text-slate-800 dark:text-white"
                     placeholder="Teks opsi..."></textarea>
 

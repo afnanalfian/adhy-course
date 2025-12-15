@@ -21,7 +21,7 @@
 </head>
 
 <body
-  class="min-h-screen flex flex-col
+  class="h-screen overflow-hidden flex flex-col
          bg-gradient-to-br from-azwara-lighter via-white to-azwara-light/30
          dark:bg-brand-gradient bg-fixed
          text-azwara-darker dark:text-azwara-lighter
@@ -30,10 +30,11 @@
 
     {{-- Navbar --}}
     <nav class="w-full
-                bg-white/80 dark:bg-azwara-darkest/80
+                bg-azwara-lightest dark:bg-azwara-darkest/80
                 backdrop-blur
                 border-b border-azwara-light/30
-                shadow-sm py-4">
+                shadow-sm py-4
+                sticky top-0 z-50">
         <div class="container mx-auto px-4 flex items-center justify-between">
 
             {{-- Logo --}}
@@ -86,18 +87,18 @@
     </nav>
 
     {{-- Page content --}}
-    <main class="flex-1">
+    <main class="flex-1 overflow-y-auto">
         @yield('content')
+        {{-- Footer --}}
+        <footer
+        class="py-6 text-center text-sm
+                text-gray-600 dark:text-gray-400
+                border-t border-azwara-light/30
+                backdrop-blur-sm">
+        © {{ date('Y') }} Azwara Learning
+        </footer>
     </main>
     @include('layouts.partials.toast')
-    {{-- Footer --}}
-    <footer
-    class="py-6 text-center text-sm
-            text-gray-600 dark:text-gray-400
-            border-t border-azwara-light/30
-            backdrop-blur-sm">
-    © {{ date('Y') }} Azwara Learning
-    </footer>
     @stack('scripts')
 </body>
 </html>

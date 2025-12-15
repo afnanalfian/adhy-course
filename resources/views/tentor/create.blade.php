@@ -28,7 +28,7 @@
         Tambah Tentor
     </h1>
 
-    <div class="bg-white dark:bg-azwara-darker border border-gray-200 dark:border-azwara-darkest
+    <div class="bg-azwara-lightest dark:bg-azwara-darker border border-gray-200 dark:border-azwara-darkest
                 rounded-3xl shadow-xl p-6 sm:p-8">
 
         <form method="POST" action="{{ route('tentor.store') }}" class="space-y-6">

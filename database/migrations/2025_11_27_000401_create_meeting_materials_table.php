@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->foreignId('meeting_id')->constrained()->cascadeOnDelete();
             $table->string('file_path');
             $table->string('original_name');
+            $table->timestamps();
         });
     }
 

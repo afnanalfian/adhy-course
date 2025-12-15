@@ -19,7 +19,7 @@
                 class="w-full sm:w-80
                        rounded-xl
                        border-gray-300 dark:border-gray-700
-                       bg-white dark:bg-azwara-darker
+                       bg-azwara-lightest dark:bg-azwara-darker
                        text-sm text-azwara-darkest dark:text-azwara-lighter
                        focus:ring-primary focus:border-primary"
             >
@@ -34,7 +34,7 @@
 
     {{-- Table Card --}}
     <div
-        class="bg-white dark:bg-azwara-darker
+        class="bg-azwara-lightest dark:bg-azwara-darker
                border border-gray-200 dark:border-azwara-darkest
                rounded-2xl
                shadow-lg dark:shadow-black/40
@@ -43,8 +43,8 @@
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead
-                    class="bg-gray-50 dark:bg-azwara-darkest
-                           text-gray-600 dark:text-azwara-light">
+                    class="bg-primary dark:bg-azwara-darkest
+                           text-white dark:text-azwara-light">
                     <tr>
                         <th class="px-6 py-4 text-left font-semibold">Siswa</th>
                         <th class="px-6 py-4 text-center font-semibold">Status</th>
@@ -66,7 +66,7 @@
                         <tr
                             onclick="window.location='{{ route('siswa.show', $u->id) }}'"
                             class="cursor-pointer
-                                   hover:bg-gray-50 dark:hover:bg-azwara-darkest
+                                   hover:bg-azwara-lighter dark:hover:bg-azwara-darkest
                                    transition">
 
                             {{-- Siswa --}}

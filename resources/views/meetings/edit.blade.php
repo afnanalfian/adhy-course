@@ -1,33 +1,21 @@
 @extends('layouts.app')
 
 @section('content')
-{{-- Back --}}
-<a href="{{ route('course.show',$course->slug) }}"
-    class="inline-flex items-center gap-2 text-sm font-medium
-            text-gray-700 dark:text-gray-300 hover:text-primary transition">
+<div class="max-w-4xl mx-auto space-y-8">
 
-    <svg xmlns="http://www.w3.org/2000/svg"
-            class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M15 19l-7-7 7-7" />
-    </svg>
-    Kembali
-</a>
-<div class="max-w-4xl mx-auto space-y-6">
     {{-- HEADER --}}
     <div>
         <h1 class="text-2xl font-bold text-azwara-darker dark:text-azwara-lighter">
-            Tambah Pertemuan
+            Edit Pertemuan
         </h1>
         <p class="mt-1 text-gray-600 dark:text-gray-300">
-            Buat jadwal pertemuan baru untuk course
-            <span class="font-medium">{{ $course->title }}</span>
+            Perbarui jadwal dan informasi pertemuan
+            <span class="font-medium">{{ $meeting->course->title }}</span>
         </p>
     </div>
 
     {{-- FORM --}}
-    <form action="{{ route('meeting.store', $course) }}"
+    <form action="{{ route('meeting.update', $meeting) }}"
           method="POST"
           class="space-y-6
                  bg-azwara-lightest dark:bg-secondary/80
@@ -35,6 +23,7 @@
                  border border-azwara-light/30 dark:border-white/10">
 
         @csrf
+        @method('PUT')
 
         {{-- TITLE --}}
         <div>
@@ -45,7 +34,7 @@
 
             <input type="text"
                    name="title"
-                   value="{{ old('title') }}"
+                   value="{{ old('title', $meeting->title) }}"
                    required
                    class="w-full rounded-lg
                           border-gray-300
@@ -63,14 +52,14 @@
             </label>
 
             <input type="datetime-local"
-                name="scheduled_at"
-                value="{{ old('scheduled_at') }}"
-                class="w-full rounded-lg
-                        border-gray-300
-                        dark:border-white/10
-                        bg-azwara-lightest dark:bg-secondary
-                        dark:text-white
-                        focus:ring-primary focus:border-primary">
+                   name="scheduled_at"
+                   value="{{ old('scheduled_at', $scheduledAt) }}"
+                   class="w-full rounded-lg
+                          border-gray-300
+                          dark:border-white/10
+                          bg-azwara-lightest dark:bg-secondary
+                          dark:text-white
+                          focus:ring-primary focus:border-primary">
 
             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Waktu menggunakan zona WIB (UTC+7)
@@ -86,7 +75,7 @@
 
             <input type="url"
                    name="zoom_link"
-                   value="{{ old('zoom_link') }}"
+                   value="{{ old('zoom_link', $meeting->zoom_link) }}"
                    placeholder="https://zoom.us/..."
                    class="w-full rounded-lg
                           border-gray-300
@@ -100,7 +89,7 @@
         <div class="flex items-center justify-end gap-3 pt-4 border-t
                     border-gray-200 dark:border-white/10">
 
-            <a href="{{ route('course.show', $course->slug) }}"
+            <a href="{{ route('course.show', $meeting->course->slug) }}"
                class="px-4 py-2 rounded-lg
                       text-gray-600 dark:text-gray-300
                       hover:bg-gray-100 dark:hover:bg-azwara-lightest/5">
@@ -112,7 +101,7 @@
                            bg-primary text-white
                            hover:bg-primary/90
                            transition">
-                Simpan Pertemuan
+                Simpan Perubahan
             </button>
         </div>
     </form>

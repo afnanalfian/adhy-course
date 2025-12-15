@@ -21,7 +21,7 @@
             </a>
         </div>
 
-        <div class="bg-white dark:bg-azwara-darker/80 border border-gray-200 dark:border-azwara-darkest/50
+        <div class="bg-azwara-lightest dark:bg-azwara-darker/80 border border-gray-200 dark:border-azwara-darkest/50
                     rounded-2xl shadow-lg p-5 sm:p-6 backdrop-blur">
 
             {{-- Header --}}

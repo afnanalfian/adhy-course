@@ -6,9 +6,9 @@
 
     <div
         class="w-full max-w-md mx-auto
-            p-6 sm:p-8
+            p-5 sm:p-8
             rounded-3xl shadow-xl
-            bg-white dark:bg-azwara-darker
+            bg-azwara-lightest dark:bg-azwara-darker
             border border-azwara-light/30
             transition-colors">
 
