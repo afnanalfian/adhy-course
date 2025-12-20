@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Services\BunnyVideoService;
 
 class MeetingVideo extends Model
 {
@@ -12,16 +11,9 @@ class MeetingVideo extends Model
 
     protected $fillable = [
         'meeting_id',
-        'bunny_video_id',
-        'library_id',
+        'youtube_video_id',
         'title',
-        'thumbnail_url',
-        'duration',
-        'status',
-    ];
-
-    protected $casts = [
-        'duration' => 'integer',
+        'youtube_thumbnail_url',
     ];
 
     /*
@@ -34,36 +26,14 @@ class MeetingVideo extends Model
         return $this->belongsTo(Meeting::class);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | State helpers
-    |--------------------------------------------------------------------------
-    */
-    public function isReady(): bool
-    {
-        return $this->status === 'ready';
-    }
-
-    public function isProcessing(): bool
-    {
-        return in_array($this->status, ['uploading', 'processing']);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Computed attributes
-    |--------------------------------------------------------------------------
-    */
-
     /**
      * Signed embed URL (ONLY when ready)
      */
-    public function getEmbedUrlAttribute(): ?string
+    public function getYoutubeEmbedUrlAttribute(): ?string
     {
-        if (! $this->isReady()) {
-            return null;
-        }
+        if (! $this->youtube_video_id) return null;
 
-        return BunnyVideoService::signedEmbed($this->bunny_video_id);
+        return "https://www.youtube.com/embed/{$this->youtube_video_id}?modestbranding=1&rel=0&showinfo=0&iv_load_policy=3";
     }
+
 }

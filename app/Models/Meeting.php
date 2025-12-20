@@ -50,26 +50,4 @@ class Meeting extends Model
         return $this->hasOne(MeetingVideo::class);
     }
 
-    /* ================= HELPERS ================= */
-
-    public function isUpcoming(): bool
-    {
-        return $this->status === 'upcoming';
-    }
-
-    public function isLive(): bool
-    {
-        return $this->status === 'live';
-    }
-
-    public function isDone(): bool
-    {
-        return $this->status === 'done';
-    }
-    public function canUploadVideo(): bool
-    {
-        return $this->status === 'done'
-            && !$this->video;
-    }
-
 }

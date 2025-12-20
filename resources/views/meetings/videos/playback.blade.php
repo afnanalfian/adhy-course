@@ -11,7 +11,7 @@
                 {{ $meeting->title }}
             </h1>
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                Rekaman Pembelajaran
+                Rekaman Pembelajaran (YouTube)
             </p>
         </div>
 
@@ -22,57 +22,27 @@
                    px-4 py-2 rounded-lg
                    bg-gray-200 dark:bg-gray-700
                    text-gray-800 dark:text-gray-200
-                   hover:bg-gray-300 dark:hover:bg-gray-600
-                   transition">
+                   hover:bg-gray-300 dark:hover:bg-gray-600">
             ← Kembali ke Meeting
         </a>
     </div>
 
     {{-- Video Card --}}
     <div
-        class="bg-black/90
+        class="bg-black
                rounded-2xl overflow-hidden
                shadow-xl">
 
-        @if ($video->status === 'ready')
+        <div class="relative w-full aspect-video">
+            <iframe
+                src="{{ $embedUrl }}"
+                class="absolute inset-0 w-full h-full"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+            </iframe>
+        </div>
 
-            {{-- Bunny Embed --}}
-            <div class="relative w-full aspect-video">
-                <iframe
-                    src="{{ $embedUrl }}"
-                    class="absolute inset-0 w-full h-full"
-                    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                    allowfullscreen>
-                </iframe>
-            </div>
-
-        @elseif ($video->status === 'processing')
-
-            {{-- Processing --}}
-            <div class="aspect-video flex items-center justify-center text-center p-6">
-                <div class="space-y-3">
-                    <div class="text-yellow-400 text-lg">⏳</div>
-                    <p class="text-gray-200">
-                        Video sedang diproses.<br>
-                        Silakan kembali beberapa saat lagi.
-                    </p>
-                </div>
-            </div>
-
-        @else
-
-            {{-- Failed --}}
-            <div class="aspect-video flex items-center justify-center text-center p-6">
-                <div class="space-y-3">
-                    <div class="text-red-400 text-lg">⚠️</div>
-                    <p class="text-gray-200">
-                        Video gagal diproses.<br>
-                        Silakan hubungi admin.
-                    </p>
-                </div>
-            </div>
-
-        @endif
     </div>
 
     {{-- Video Meta --}}
@@ -84,18 +54,17 @@
 
         <div>
             <span class="block text-xs uppercase tracking-wide text-gray-500">
-                Durasi
+                Judul Video
             </span>
-            {{ $video->duration ? gmdate('H:i:s', $video->duration) : '-' }}
+            {{ $video->title }}
         </div>
 
         <div>
             <span class="block text-xs uppercase tracking-wide text-gray-500">
-                Status
+                Platform
             </span>
-            {{ ucfirst($video->status) }}
+            YouTube
         </div>
-
     </div>
 
 </div>

@@ -4,17 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Meeting;
 use App\Models\MeetingVideo;
-use App\Services\BunnyVideoService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 
 class MeetingVideoController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
-    | CREATE (form)
+    | CREATE (form tambah video)
     |--------------------------------------------------------------------------
     */
     public function create(Meeting $meeting)
@@ -26,7 +22,7 @@ class MeetingVideoController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | STORE (upload to Bunny)
+    | STORE (simpan youtube video id)
     |--------------------------------------------------------------------------
     */
     public function store(Request $request, Meeting $meeting)
@@ -38,48 +34,30 @@ class MeetingVideoController extends Controller
         );
 
         $request->validate([
-            'video' => 'required|file|mimes:mp4,mov|max:2048000',
+            'youtube_video_id' => 'required|string'
         ]);
 
-        try {
-            // Upload ke Bunny (EXTERNAL)
-            $result = BunnyVideoService::upload(
-                $request->file('video'),
-                $meeting->title
-            );
+        MeetingVideo::create([
+            'meeting_id'        => $meeting->id,
+            'title'             => $meeting->title,
+            'youtube_video_id'  => $request->youtube_video_id,
+        ]);
 
-            // Simpan DB (LOCAL)
-            DB::transaction(function () use ($meeting, $result) {
-                MeetingVideo::create([
-                    'meeting_id'     => $meeting->id,
-                    'bunny_video_id' => $result['guid'],
-                    'library_id'     => config('services.bunny.library_id'),
-                    'title'          => $meeting->title,
-                    'status'         => 'uploading',
-                ]);
-            });
-
-            return redirect()
-                ->route('meeting.show', $meeting)
-                ->with('success', 'Video berhasil diupload & sedang diproses');
-
-        } catch (\Throwable $e) {
-            report($e);
-
-            return back()->withErrors('Upload video gagal');
-        }
+        return redirect()
+            ->route('meeting.show', $meeting)
+            ->with('success', 'Video berhasil ditambahkan');
     }
 
     /*
     |--------------------------------------------------------------------------
-    | EDIT (replace video)
+    | EDIT (form edit video title + id)
     |--------------------------------------------------------------------------
     */
     public function edit(Meeting $meeting)
     {
         abort_if($meeting->video === null, 404);
 
-        return view('meeting-videos.edit', [
+        return view('meetings.videos.edit', [
             'meeting' => $meeting,
             'video'   => $meeting->video,
         ]);
@@ -87,7 +65,7 @@ class MeetingVideoController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | UPDATE
+    | UPDATE (update metadata)
     |--------------------------------------------------------------------------
     */
     public function update(Request $request, Meeting $meeting)
@@ -96,11 +74,13 @@ class MeetingVideoController extends Controller
         abort_if(! $video, 404);
 
         $request->validate([
-            'title' => 'required|string|max:255',
+            'title'             => 'required|string|max:255',
+            'youtube_video_id'  => 'required|string',
         ]);
 
         $video->update([
-            'title' => $request->title,
+            'title'             => $request->title,
+            'youtube_video_id'  => $request->youtube_video_id,
         ]);
 
         return redirect()
@@ -108,10 +88,9 @@ class MeetingVideoController extends Controller
             ->with('success', 'Metadata video diperbarui');
     }
 
-
     /*
     |--------------------------------------------------------------------------
-    | DESTROY (delete from Bunny + DB)
+    | DESTROY (hapus video dari database)
     |--------------------------------------------------------------------------
     */
     public function destroy(Meeting $meeting)
@@ -119,39 +98,25 @@ class MeetingVideoController extends Controller
         $video = $meeting->video;
         abort_if(! $video, 404);
 
-        DB::beginTransaction();
+        $video->delete();
 
-        try {
-            BunnyVideoService::delete($video->bunny_video_id);
-            $video->delete();
-
-            DB::commit();
-
-            return redirect()
-                ->route('meeting.show', $meeting)
-                ->with('success', 'Video berhasil dihapus');
-
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            report($e);
-
-            return back()->withErrors('Gagal menghapus video');
-        }
+        return redirect()
+            ->route('meeting.show', $meeting)
+            ->with('success', 'Video berhasil dihapus');
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | PLAYBACK (tampilkan youtube player)
+    |--------------------------------------------------------------------------
+    */
     public function playback(Meeting $meeting)
     {
         $video = $meeting->video;
-
         abort_if(! $video, 404);
-        abort_if($video->status !== 'ready', 423);
-        // abort_if(! Auth::user()->can('view', $meeting), 403);
 
-        $embedUrl = BunnyVideoService::embedUrl(
-            $video->library_id,
-            $video->bunny_video_id,
-            Auth::id()
-        );
+        // generate embed url
+        $embedUrl = "https://www.youtube.com/embed/{$video->youtube_video_id}?modestbranding=1&rel=0&showinfo=0";
 
         return view('meetings.videos.playback', compact(
             'meeting',
@@ -159,5 +124,4 @@ class MeetingVideoController extends Controller
             'embedUrl'
         ));
     }
-
 }

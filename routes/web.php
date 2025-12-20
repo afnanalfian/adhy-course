@@ -203,15 +203,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // ADMIN / TENTOR
     Route::middleware(['role:admin|tentor'])->group(function () {
-        // Form upload video (prepare)
+        // Form upload video
         Route::get('/meetings/{meeting}/video/create',[MeetingVideoController::class, 'create'])->name('meetings.video.create');
-        // Store video (create record + Bunny)
+        // Store video
         Route::post('/meetings/{meeting}/video',[MeetingVideoController::class, 'store'])->name('meetings.video.store');
-        // Edit metadata (optional)
+        // Edit metadata
         Route::get('/meetings/{meeting}/video/edit',[MeetingVideoController::class, 'edit'])->name('meetings.video.edit');
-        // Update metadata (optional)
+        // Update metadata
         Route::put('/meetings/{meeting}/video',[MeetingVideoController::class, 'update'])->name('meetings.video.update');
-        // Delete video (hapus Bunny + DB)
+        // Delete video 
         Route::delete('/meetings/{meeting}/video',[MeetingVideoController::class, 'destroy'])->name('meetings.video.destroy');
     });
     // STUDENT / GENERAL USER

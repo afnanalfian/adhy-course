@@ -8,22 +8,22 @@
     <div class="flex items-center justify-between">
         <div>
             <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                Upload Rekaman Pembelajaran
+                Tambah Rekaman Pembelajaran
             </h1>
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                Meeting: <span class="font-medium">{{ $meeting->title }}</span>
+                Meeting:
+                <span class="font-medium">{{ $meeting->title }}</span>
             </p>
         </div>
 
-        {{-- Back Button --}}
+        {{-- Back --}}
         <a
             href="{{ route('meeting.show', $meeting) }}"
             class="inline-flex items-center gap-2
                    px-4 py-2 rounded-lg
                    bg-gray-200 dark:bg-gray-700
                    text-gray-800 dark:text-gray-200
-                   hover:bg-gray-300 dark:hover:bg-gray-600
-                   transition">
+                   hover:bg-gray-300 dark:hover:bg-gray-600">
             ← Kembali
         </a>
     </div>
@@ -38,10 +38,13 @@
         {{-- Info --}}
         <div class="space-y-1">
             <p class="text-sm text-gray-700 dark:text-gray-300">
-                Silakan upload rekaman video hasil pertemuan Zoom.
+                Masukkan <strong>YouTube Video ID</strong> dari rekaman pembelajaran.
             </p>
             <p class="text-xs text-gray-500 dark:text-gray-400">
-                Format yang didukung: MP4 / MOV • Maksimal 2 GB
+                Contoh URL:
+                <code class="px-1 rounded bg-gray-100 dark:bg-gray-700">
+                    https://www.youtube.com/watch?v=<strong>dQw4w9WgXcQ</strong>
+                </code>
             </p>
         </div>
 
@@ -49,34 +52,31 @@
         <form
             action="{{ route('meetings.video.store', $meeting) }}"
             method="POST"
-            enctype="multipart/form-data"
             class="space-y-6">
 
             @csrf
 
-            {{-- File Input --}}
+            {{-- YouTube ID --}}
             <div>
                 <label
-                    for="video"
+                    for="youtube_video_id"
                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    File Video
+                    YouTube Video ID
                 </label>
 
                 <input
-                    type="file"
-                    name="video"
-                    id="video"
-                    accept="video/mp4,video/quicktime"
+                    type="text"
+                    name="youtube_video_id"
+                    id="youtube_video_id"
+                    value="{{ old('youtube_video_id') }}"
+                    placeholder="contoh: dQw4w9WgXcQ"
                     required
-                    class="block w-full
-                           text-sm text-gray-700 dark:text-gray-200
-                           file:mr-4 file:py-2 file:px-4
-                           file:rounded-lg file:border-0
-                           file:bg-primary file:text-white
-                           hover:file:bg-primary/90
-                           cursor-pointer">
+                    class="block w-full rounded-lg
+                           border-gray-300 dark:border-gray-600
+                           dark:bg-gray-700 dark:text-gray-200
+                           focus:ring-primary focus:border-primary">
 
-                @error('video')
+                @error('youtube_video_id')
                     <p class="mt-2 text-sm text-red-600">
                         {{ $message }}
                     </p>
@@ -84,15 +84,16 @@
             </div>
 
             {{-- Actions --}}
-            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div
+                class="flex justify-end gap-3 pt-4
+                       border-t border-gray-200 dark:border-gray-700">
 
                 <a
                     href="{{ route('meeting.show', $meeting) }}"
                     class="px-4 py-2 rounded-lg
                            bg-gray-200 dark:bg-gray-700
                            text-gray-800 dark:text-gray-200
-                           hover:bg-gray-300 dark:hover:bg-gray-600
-                           transition">
+                           hover:bg-gray-300 dark:hover:bg-gray-600">
                     Batal
                 </a>
 
@@ -100,9 +101,8 @@
                     type="submit"
                     class="px-6 py-2 rounded-lg
                            bg-primary text-white
-                           hover:bg-primary/90
-                           transition">
-                    Upload Video
+                           hover:bg-primary/90">
+                    Simpan Video
                 </button>
 
             </div>
