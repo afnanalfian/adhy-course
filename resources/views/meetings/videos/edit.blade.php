@@ -17,7 +17,7 @@
 
         {{-- Back --}}
         <a
-            href="{{ route('meetings.show', $meeting) }}"
+            href="{{ route('meeting.show', $meeting) }}"
             class="inline-flex items-center gap-2
                    px-4 py-2 rounded-lg
                    bg-gray-200 dark:bg-gray-700

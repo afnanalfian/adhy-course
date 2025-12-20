@@ -60,7 +60,7 @@ class MeetingVideoController extends Controller
             });
 
             return redirect()
-                ->route('meetings.show', $meeting)
+                ->route('meeting.show', $meeting)
                 ->with('success', 'Video berhasil diupload & sedang diproses');
 
         } catch (\Throwable $e) {
@@ -87,7 +87,7 @@ class MeetingVideoController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | UPDATE 
+    | UPDATE
     |--------------------------------------------------------------------------
     */
     public function update(Request $request, Meeting $meeting)
@@ -104,7 +104,7 @@ class MeetingVideoController extends Controller
         ]);
 
         return redirect()
-            ->route('meetings.show', $meeting)
+            ->route('meeting.show', $meeting)
             ->with('success', 'Metadata video diperbarui');
     }
 
@@ -128,7 +128,7 @@ class MeetingVideoController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('meetings.show', $meeting)
+                ->route('meeting.show', $meeting)
                 ->with('success', 'Video berhasil dihapus');
 
         } catch (\Throwable $e) {
