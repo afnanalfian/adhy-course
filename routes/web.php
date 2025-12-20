@@ -215,7 +215,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/meetings/{meeting}/video',[MeetingVideoController::class, 'destroy'])->name('meetings.video.destroy');
     });
     // STUDENT / GENERAL USER
-    Route::get('/meetings/{meeting}',[MeetingController::class, 'show'])->name('meetings.show');
     Route::get('/meetings/{meeting}/video/playback',[MeetingVideoController::class, 'playback'])->name('meetings.video.playback');
 
     /*
