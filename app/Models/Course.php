@@ -35,14 +35,4 @@ class Course extends Model
     {
         return $this->hasMany(QuestionCategory::class);
     }
-
-    public function tryouts()
-    {
-        return $this->hasMany(Tryout::class);
-    }
-
-    public function dailyQuizzes()
-    {
-        return $this->hasMany(DailyQuiz::class);
-    }
 }

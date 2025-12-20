@@ -10,6 +10,7 @@
         "laravel/framework": "^11.0",
         "laravel/sanctum": "4.0",
         "laravel/tinker": "^2.9",
+        "league/flysystem-aws-s3-v3": "3.0",
         "livewire/livewire": "^3.7",
         "php-flasher/flasher-sweetalert-laravel": "^2.3",
         "php-flasher/flasher-toastr": "^2.3",

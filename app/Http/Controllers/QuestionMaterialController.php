@@ -77,5 +77,15 @@ class QuestionMaterialController extends Controller
 
         return redirect()->route('bank.category.materials.index', $category);
     }
+    public function ajaxByCategory($category)
+    {
+        $category = QuestionCategory::withTrashed()->findOrFail($category);
+
+        return $category->materials()
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+    }
+
 }
 

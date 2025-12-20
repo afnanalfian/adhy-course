@@ -1,25 +1,32 @@
 <x-toggle-section title="🧪 Post Test">
 
-    {{-- ================== BELUM ADA POST TEST ================== --}}
-    @if(!$meeting->postTest)
+    @php
+        $exam = $meeting->exam;
+    @endphp
 
-        <div class="rounded-xl p-6
+    {{-- ================================================= --}}
+    {{-- BELUM ADA POST TEST --}}
+    {{-- ================================================= --}}
+    @if(!$exam)
+
+        <div class="rounded-2xl p-6
                     bg-white dark:bg-secondary
-                    border border-dashed border-gray-300 dark:border-white/20
+                    border border-dashed border-gray-300 dark:border-white/10
                     text-center space-y-4">
 
-            <p class="text-gray-500 dark:text-gray-400">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
                 Post Test belum tersedia untuk pertemuan ini.
             </p>
 
             @role('admin|tentor')
                 <form method="POST"
-                      action="{{ route('posttest.store', $meeting) }}">
+                      action="{{ route('meetings.posttest.store', $meeting) }}">
                     @csrf
-                    <button class="px-6 py-3 rounded-xl
-                                   bg-primary text-white
-                                   hover:bg-primary/90
-                                   font-semibold">
+                    <button
+                        class="inline-flex items-center justify-center
+                               px-6 py-3 rounded-xl
+                               bg-primary text-white font-semibold
+                               hover:bg-primary/90 transition">
                         ➕ Buat Post Test
                     </button>
                 </form>
@@ -27,58 +34,31 @@
         </div>
 
     @else
-        @php
-            $postTest = $meeting->postTest;
-        @endphp
 
-        {{-- ================== HEADER ================== --}}
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between
-                    gap-4 mb-6 mt-6">
+        {{-- ================================================= --}}
+        {{-- INFO --}}
+        {{-- ================================================= --}}
+        <div class="grid grid-cols-2 gap-4 mt-6 mb-6">
 
-            <div class="flex items-center gap-3">
-
-                <div>
-
-                    @if($postTest->status === 'inactive')
-                        <span class="text-sm text-amber-600 font-medium">
-                            ⏳ Belum dimulai
-                        </span>
-                    @elseif($postTest->status === 'active')
-                        <span class="text-sm text-green-600 font-medium">
-                            ▶️ Sedang berlangsung
-                        </span>
-                    @else
-                        <span class="text-sm text-red-600 font-medium">
-                            ✅ Selesai
-                        </span>
-                    @endif
-                </div>
-            </div>
-
-        </div>
-
-        {{-- ================== INFO CARDS ================== --}}
-        <div class="grid grid-cols-2 gap-4 mb-6">
-
-            <div class="rounded-xl p-4
+            <div class="rounded-2xl p-4
                         bg-white dark:bg-secondary
                         border border-gray-200 dark:border-white/10">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                <p class="text-xs text-gray-500 dark:text-gray-400">
                     Durasi
                 </p>
-                <p class="text-lg font-semibold text-gray-800 dark:text-white">
-                    {{ $postTest->duration_minutes ?? '-' }} menit
+                <p class="text-lg font-semibold text-gray-900 dark:text-white">
+                    {{ $exam->duration_minutes ?? '-' }} menit
                 </p>
             </div>
 
-            <div class="rounded-xl p-4
+            <div class="rounded-2xl p-4
                         bg-white dark:bg-secondary
                         border border-gray-200 dark:border-white/10">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                <p class="text-xs text-gray-500 dark:text-gray-400">
                     Jumlah Soal
                 </p>
-                <p class="text-lg font-semibold text-gray-800 dark:text-white">
-                    {{ $postTest->questions->count() }} soal
+                <p class="text-lg font-semibold text-gray-900 dark:text-white">
+                    {{ $exam->questions->count() }} soal
                 </p>
             </div>
 
@@ -90,9 +70,9 @@
             {{-- ================== ADMIN / TENTOR ================== --}}
             @role('admin|tentor')
 
-                @if($postTest->status === 'inactive')
+                @if($exam->status === 'inactive')
 
-                    <a href="{{ route('posttest.edit', $postTest) }}"
+                    <a href="{{ route('exams.edit', $exam) }}"
                        class="px-5 py-3 rounded-xl
                               bg-amber-500 text-white
                               hover:bg-amber-600
@@ -101,7 +81,7 @@
                     </a>
 
                     <form method="POST"
-                          action="{{ route('posttest.launch', $postTest) }}">
+                          action="{{ route('exams.activate', $exam) }}">
                         @csrf
                         <button class="px-5 py-3 rounded-xl
                                        bg-primary text-white
@@ -111,10 +91,10 @@
                         </button>
                     </form>
 
-                @elseif($postTest->status === 'active')
+                @elseif($exam->status === 'active')
 
                     <form method="POST"
-                          action="{{ route('posttest.close', $postTest) }}"
+                          action="{{ route('exams.close', $exam) }}"
                           class="sweet-confirm"
                           data-message="Yakin ingin menutup post test?">
                         @csrf
@@ -126,7 +106,7 @@
                         </button>
                     </form>
 
-                    <a href="{{ route('posttest.result.admin', $postTest) }}"
+                    <a href="{{ route('exams.result.admin', $exam) }}"
                         class="px-5 py-3 rounded-xl
                             bg-gray-200 dark:bg-gray-600
                             text-gray-800 dark:text-white
@@ -136,7 +116,7 @@
                     </a>
 
                 @else
-                    <a href="{{ route('posttest.result.admin', $postTest) }}"
+                    <a href="{{ route('exams.result.admin', $exam) }}"
                        class="px-5 py-3 rounded-xl
                               bg-gray-200 dark:bg-gray-600
                               text-gray-800 dark:text-white
@@ -163,7 +143,7 @@
                         </p>
                     </div>
 
-                    <a href="{{ route('posttest.result', $attempt) }}"
+                    <a href="{{ route('exams.result.student', $exam) }}"
                         class="px-5 py-3 rounded-xl
                             bg-gray-200 dark:bg-gray-600
                             text-gray-800 dark:text-white
@@ -174,11 +154,11 @@
 
                 @else
 
-                    @if($postTest->status === 'active')
+                    @if($exam->status === 'active')
 
                         @if(!$attempt)
                             <form method="POST"
-                                  action="{{ route('posttest.attempt.start', $postTest) }}">
+                                  action="{{ route('exams.start', $exam) }}">
                                 @csrf
                                 <button class="px-5 py-3 rounded-xl
                                                bg-primary text-white
@@ -188,7 +168,7 @@
                                 </button>
                             </form>
                         @else
-                            <a href="{{ route('posttest.attempt.show', $attempt) }}"
+                            <a href="{{ route('exams.attempt', $exam) }}"
                                class="px-5 py-3 rounded-xl
                                       bg-primary text-white
                                       hover:bg-primary/90

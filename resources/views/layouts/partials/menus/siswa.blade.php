@@ -19,7 +19,7 @@
   </svg>
   Course
 </a>
-<a class="menu-item">
+<a href="{{ route('tryouts.index') }}" class="menu-item">
   <!-- Tryout (clipboard-document-check) -->
   <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -29,7 +29,7 @@
   Tryout
 </a>
 
-<a class="menu-item">
+<a href="{{ route('quizzes.index') }}" class="menu-item">
   <!-- Daily Quiz (question-mark-circle) -->
   <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">

@@ -1,8 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Models\QuestionCategory;
-use App\Models\QuestionMaterial;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Front\LandingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -11,11 +10,12 @@ use App\Http\Controllers\TentorController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\MeetingMaterialController;
-use App\Http\Controllers\MeetingPostTestController;
-use App\Http\Controllers\MeetingPostTestAttemptController;
+use App\Http\Controllers\ExamController;
+use App\Http\Controllers\ExamQuestionController;
+use App\Http\Controllers\ExamAttemptController;
+use App\Http\Controllers\ExamResultController;
 use App\Http\Controllers\MeetingAttendanceController;
 use App\Http\Controllers\MeetingVideoController;
-use App\Http\Controllers\BunnyWebHookController;
 use App\Http\Controllers\QuestionCategoryController;
 use App\Http\Controllers\QuestionMaterialController;
 use App\Http\Controllers\QuestionController;
@@ -32,35 +32,6 @@ Route::get('/', [LandingController::class, 'index'])->name('home');
 |--------------------------------------------------------------------------
 */
 require __DIR__.'/auth.php';
-Route::middleware(['auth', 'role:admin|tentor'])
-    ->get('/ajax/categories/{category}/materials', function ($category) {
-
-        $category = QuestionCategory::withTrashed()->findOrFail($category);
-
-        return response()->json(
-            $category->materials()
-                ->orderBy('name')
-                ->get(['id', 'name'])
-        );
-    })
-    ->name('ajax.categories.materials');
-Route::middleware(['auth', 'role:admin|tentor'])
-    ->get('/ajax/post-tests/{postTest}/questions/by-material/{material}',
-        function (
-            \Illuminate\Http\Request $request,
-            $postTest,
-            $material
-        ) {
-            $postTest = \App\Models\MeetingPostTest::findOrFail($postTest);
-
-            $material = QuestionMaterial::withTrashed()
-                ->findOrFail($material);
-
-            return app(MeetingPostTestController::class)
-                ->questionsByMaterial($request, $postTest, $material);
-        }
-    )
-    ->name('ajax.posttests.questions.byMaterial');
 
 /*
 |--------------------------------------------------------------------------
@@ -185,11 +156,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/course/{course}/meetings',[MeetingController::class, 'store'])->name('meeting.store');
         Route::get('/meetings/{meeting}/edit',[MeetingController::class, 'edit'])->name('meeting.edit');
         Route::put('/meetings/{meeting}', [MeetingController::class, 'update'])->name('meeting.update');
+        Route::post('meetings/{meeting}/posttest',[MeetingController::class, 'storePostTest'])->name('meetings.posttest.store');
 
         // MEETING STATE
         Route::post('/meetings/{meeting}/start',[MeetingController::class, 'start'])->name('meeting.start');
         Route::post('/meetings/{meeting}/finish',[MeetingController::class, 'finish'])->name('meeting.finish');
-        Route::post('/meetings/{meeting}/cancel',[MeetingController::class, 'cancel'])->name('meeting.cancel');
 
         // DELETE (SOFT DELETE)
         Route::delete('/meetings/{meeting}',[MeetingController::class, 'destroy'])->name('meeting.destroy');
@@ -226,56 +197,72 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | MEETING VIDEO (BUNNY STREAM)
+    | MEETING VIDEOS
     |--------------------------------------------------------------------------
     */
+
+    // ADMIN / TENTOR
     Route::middleware(['role:admin|tentor'])->group(function () {
-        Route::post('/meetings/{meeting}/video',[MeetingVideoController::class, 'store'])->name('meeting.video.store');
-        Route::delete('/meetings/{meeting}/video',[MeetingVideoController::class, 'destroy'])->name('meeting.video.destroy');
+        // Form upload video (prepare)
+        Route::get('/meetings/{meeting}/video/create',[MeetingVideoController::class, 'create'])->name('meetings.video.create');
+        // Store video (create record + Bunny)
+        Route::post('/meetings/{meeting}/video',[MeetingVideoController::class, 'store'])->name('meetings.video.store');
+        // Edit metadata (optional)
+        Route::get('/meetings/{meeting}/video/edit',[MeetingVideoController::class, 'edit'])->name('meetings.video.edit');
+        // Update metadata (optional)
+        Route::put('/meetings/{meeting}/video',[MeetingVideoController::class, 'update'])->name('meetings.video.update');
+        // Delete video (hapus Bunny + DB)
+        Route::delete('/meetings/{meeting}/video',[MeetingVideoController::class, 'destroy'])->name('meetings.video.destroy');
     });
+    // STUDENT / GENERAL USER
+    Route::get('/meetings/{meeting}',[MeetingController::class, 'show'])->name('meetings.show');
+    Route::get('/meetings/{meeting}/video/playback',[MeetingVideoController::class, 'playback'])->name('meetings.video.playback');
 
     /*
     |--------------------------------------------------------------------------
-    | MEETING POST TEST
+    | EXAMS ROUTE
     |--------------------------------------------------------------------------
     */
-
-    //ADMIN & TENTOR
-    Route::middleware(['role:admin|tentor'])->group(function () {
-        Route::post('/meetings/{meeting}/post-test',[MeetingPostTestController::class, 'store'])->name('posttest.store');
-        Route::get('/post-tests/{postTest}/edit',[MeetingPostTestController::class, 'edit'])->name('posttest.edit');
-        Route::post('/post-tests/{postTest}/duration',[MeetingPostTestController::class, 'updateDuration'])->name('posttest.duration.update');
-        Route::post('/post-tests/{postTest}/questions',[MeetingPostTestController::class, 'attachQuestions'])->name('posttest.questions.attach');
-        Route::post('/post-tests/{postTest}/launch',[MeetingPostTestController::class, 'launch'])->name('posttest.launch');
-        Route::post('/post-tests/{postTest}/close',[MeetingPostTestController::class, 'close'])->name('posttest.close');
-        Route::get('/post-tests/{postTest}/questions/by-material/{material}',[MeetingPostTestController::class, 'questionsByMaterial'])->name('posttest.questions.byMaterial');
-        Route::delete('/post-tests/{postTest}/questions/{question}',[MeetingPostTestController::class, 'detachQuestion'])->name('posttest.questions.detach');
-        Route::get('/post-tests/{postTest}/result-admin',[MeetingPostTestController::class, 'resultAdmin'])->name('posttest.result.admin');
+    Route::get('/tryouts', [ExamController::class, 'indexTryout'])->name('tryouts.index');
+    Route::get('/quizzes', [ExamController::class, 'indexQuiz'])->name('quizzes.index');
+    Route::get('/exams/{exam}', [ExamController::class, 'show'])->name('exams.show');
+    Route::middleware('role:admin|tentor')->group(function () {
+        Route::resource('exams', ExamController::class)->except(['show']);
+        Route::post('exams/{exam}/activate', [ExamController::class, 'activate'])->name('exams.activate');
+        Route::post('exams/{exam}/close', [ExamController::class, 'close'])->name('exams.close');
+        // RESULT ADMIN
+        Route::get('exams/{exam}/results',[ExamResultController::class, 'admin'])->name('exams.result.admin');
+        // AJAX Question Picker
+        Route::prefix('ajax/{exam}/questions')->group(function () {
+            Route::get('by-material/{material}', [ExamQuestionController::class, 'byMaterial'])->name('ajax.exams.questions.byMaterial');
+            Route::post('attach', [ExamQuestionController::class, 'attach'])->name('ajax.exams.questions.attach');
+            Route::post('detach', [ExamQuestionController::class, 'detach'])->name('ajax.exams.questions.detach');
+        });
     });
-    /*
-    | SISWA (ATTEMPT)
-    */
-    Route::middleware(['role:admin|siswa'])->group(function () {
-        Route::post('/post-tests/{postTest}/start',[MeetingPostTestAttemptController::class, 'start'])->name('posttest.attempt.start');
-        Route::get('/post-test-attempts/{attempt}',[MeetingPostTestAttemptController::class, 'show'])->name('posttest.attempt.show');
-        Route::post('/post-test-attempts/{attempt}/answer',[MeetingPostTestAttemptController::class, 'saveAnswer'])->name('posttest.answer.save');
-        Route::post('/post-test-attempts/{attempt}/submit',[MeetingPostTestAttemptController::class, 'submit'])->name('posttest.submit');
-        Route::get('/post-test-attempts/{attempt}/result',[MeetingPostTestAttemptController::class, 'result'])->name('posttest.result');
+    Route::middleware('role:siswa')->group(function () {
+        // Attempt
+        Route::post('exams/{exam}/start', [ExamAttemptController::class, 'start'])->name('exams.start');
+        Route::get('exams/{exam}/attempt', [ExamAttemptController::class, 'attempt'])->name('exams.attempt');
+        Route::post('exams/{exam}/submit', [ExamAttemptController::class, 'submit'])->name('exams.submit');
+        Route::post('exams/{exam}/answer',[ExamAttemptController::class, 'saveAnswer'])->name('exams.answer.save');
+        // RESULT SISWA
+        Route::get('exams/{exam}/result',[ExamResultController::class, 'student'])->name('exams.result.student');
     });
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | BUNNY WEBHOOK
-    |--------------------------------------------------------------------------
-    */
-    Route::post('/webhooks/bunny',[BunnyWebhookController::class, 'handle'])->name('webhooks.bunny');
 
     /*
     |--------------------------------------------------------------------------
     | BANK SOAL (QUESTIONS) ROUTES
     |--------------------------------------------------------------------------
     */
+    Route::middleware(['auth', 'role:admin|tentor'])
+    ->prefix('ajax')
+    ->group(function () {
+
+        Route::get(
+            'categories/{category}/materials',
+            [QuestionMaterialController::class, 'ajaxByCategory']
+        )->name('ajax.categories.materials');
+    });
     Route::middleware(['role:admin|tentor'])->prefix('bank-soal')->name('bank.')->group(function () {
 
         // KATEGORI SOAL
@@ -312,3 +299,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
+Route::get('/_test-b2', function () {
+    Storage::disk('b2')->put(
+        'test/hello.txt',
+        'Hello from Laravel'
+    );
+
+    return 'OK';
+});

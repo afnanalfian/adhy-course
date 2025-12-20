@@ -52,21 +52,6 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(PurchasedMeeting::class);
     }
-
-    public function tryoutResults()
-    {
-        return $this->hasMany(TryoutResult::class);
-    }
-
-    public function dailyQuizResults()
-    {
-        return $this->hasMany(DailyQuizResult::class);
-    }
-
-    public function postTestResults()
-    {
-        return $this->hasMany(MeetingPostTestResult::class);
-    }
     public function sendEmailVerificationNotification()
     {
         $this->notify(new \App\Notifications\CustomVerifyEmail);

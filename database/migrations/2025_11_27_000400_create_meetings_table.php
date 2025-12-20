@@ -16,7 +16,7 @@ class CreateMeetingsTable extends Migration
             $table->dateTime('scheduled_at')->nullable();
             $table->timestamp('started_at')->nullable();
             $table->string('zoom_link')->nullable();
-            $table->enum('status', ['upcoming','live','done','cancelled'])->default('upcoming');
+            $table->enum('status', ['upcoming','live','done'])->default('upcoming');
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null'); // tentor/admin yang buat
             $table->timestamps();
             $table->softDeletes();

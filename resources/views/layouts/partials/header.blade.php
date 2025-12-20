@@ -20,7 +20,7 @@
     {{-- Logo --}}
     <a href="{{ route('dashboard.redirect') }}"
     class="text-xl font-bold text-azwara-darker dark:text-white tracking-wide">
-        Azwara<span class="text-primary">Learning</span>
+        {{-- Azwara<span class="text-primary">Learning</span> --}}
     </a>
 
     <div class="flex items-center gap-6">

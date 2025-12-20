@@ -60,3 +60,8 @@
 </div>
 
 @endsection
+@push('scripts')
+<script>
+    window.BUNNY_STREAM_KEY = "{{ config('bunny.api_key') }}";
+</script>
+@endpush

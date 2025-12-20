@@ -36,9 +36,10 @@ class Meeting extends Model
     {
         return $this->hasOne(MeetingMaterial::class);
     }
-    public function postTest()
+    public function exam()
     {
-        return $this->hasOne(MeetingPostTest::class);
+        return $this->morphOne(Exam::class, 'owner')
+            ->where('type', 'post_test');
     }
     public function attendances()
     {
@@ -65,4 +66,10 @@ class Meeting extends Model
     {
         return $this->status === 'done';
     }
+    public function canUploadVideo(): bool
+    {
+        return $this->status === 'done'
+            && !$this->video;
+    }
+
 }

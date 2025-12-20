@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Meeting;
+use App\Models\Exam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -12,15 +13,15 @@ class MeetingController extends Controller
 {
     /**
      * Show meeting detail
-     * (materi, video, status, post test)
+     * (materi, video, attendance, post test)
      */
     public function show(Meeting $meeting)
     {
         $meeting->load([
             'material',
             'video',
-            'postTest.questions',
-            'postTest.attempts',
+            'exam.questions',
+            'exam.attempts',
             'creator',
             'attendances' => function ($q) {
                 $q->whereHas('user.roles', function ($r) {
@@ -31,13 +32,16 @@ class MeetingController extends Controller
 
         $attempt = null;
 
-        // hanya hitung attempt kalau user login + siswa + ada post test
+        // hitung attempt hanya jika:
+        // - login
+        // - siswa
+        // - meeting punya post test
         if (
             auth()->check() &&
             auth()->user()->hasRole('siswa') &&
-            $meeting->postTest
+            $meeting->exam
         ) {
-            $attempt = $meeting->postTest
+            $attempt = $meeting->exam
                 ->attempts()
                 ->where('user_id', auth()->id())
                 ->first();
@@ -60,38 +64,39 @@ class MeetingController extends Controller
     public function store(Request $request, Course $course)
     {
         $request->validate([
-            'title'     => 'required|string|max:255',
-            'scheduled_at'  => 'required|date_format:Y-m-d\TH:i',
-            'zoom_link' => 'nullable|url',
+            'title'        => 'required|string|max:255',
+            'scheduled_at' => 'required|date_format:Y-m-d\TH:i',
+            'zoom_link'    => 'nullable|url',
         ]);
 
         $meeting = Meeting::create([
-            'course_id' => $course->id,
-            'title'     => $request->title,
-            'slug'      => Str::slug($request->title) . '-' . uniqid(),
-            'scheduled_at'  => Carbon::createFromFormat(
-                                'Y-m-d\TH:i',
-                                $request->scheduled_at,
-                                'Asia/Jakarta'
-                        ),
-            'zoom_link' => $request->zoom_link,
-            'status'    => 'upcoming',
-            'created_by'=> auth()->user()->id,
+            'course_id'    => $course->id,
+            'title'        => $request->title,
+            'slug'         => Str::slug($request->title) . '-' . uniqid(),
+            'scheduled_at' => Carbon::createFromFormat(
+                'Y-m-d\TH:i',
+                $request->scheduled_at,
+                'Asia/Jakarta'
+            ),
+            'zoom_link'    => $request->zoom_link,
+            'status'       => 'upcoming',
+            'created_by'   => auth()->id(),
         ]);
 
         toast('success', 'Meeting berhasil dibuat');
         return redirect()->route('course.show', $course->slug);
     }
+
     public function edit(Meeting $meeting)
     {
         return view('meetings.edit', [
-            'meeting' => $meeting,
-            // format agar cocok dengan <input type="datetime-local">
+            'meeting'     => $meeting,
             'scheduledAt' => optional($meeting->scheduled_at)
                 ->timezone('Asia/Jakarta')
                 ->format('Y-m-d\TH:i'),
         ]);
     }
+
     public function update(Request $request, Meeting $meeting)
     {
         $request->validate([
@@ -114,25 +119,25 @@ class MeetingController extends Controller
 
         toast('success', 'Meeting berhasil diperbarui');
 
-        return redirect()
-            ->route('meeting.show', $meeting);
+        return redirect()->route('meeting.show', $meeting);
     }
 
     /**
-     * Start meeting (tentor klik "Mulai")
+     * Start meeting
      */
     public function start(Meeting $meeting)
     {
         $meeting->update([
-            'status'   => 'live',
+            'status'     => 'live',
             'started_at' => now(),
         ]);
+
         toast('success', 'Meeting dimulai');
         return back();
     }
 
     /**
-     * Finish meeting (tentor klik "Selesai")
+     * Finish meeting
      */
     public function finish(Meeting $meeting)
     {
@@ -143,43 +148,26 @@ class MeetingController extends Controller
         $meeting->update([
             'status' => 'done',
         ]);
+
         toast('success', 'Meeting selesai');
         return back();
     }
 
     /**
-     * Cancel meeting (optional)
-     */
-    public function cancel(Meeting $meeting)
-    {
-        if ($meeting->status === 'done') {
-            abort(403, 'Meeting sudah selesai');
-        }
-
-        $meeting->update([
-            'status' => 'cancelled',
-        ]);
-        toast('info', 'Meeting dibatalkan');
-        return back();
-    }
-
-    /**
-     * Delete meeting (soft delete)
+     * Delete meeting
      */
     public function destroy(Meeting $meeting)
     {
-        // Cegah hapus jika masih punya relasi penting
         if (
             $meeting->material ||
             $meeting->video ||
-            $meeting->postTest ||
+            $meeting->exam ||   // ⬅️ GANTI DI SINI
             $meeting->attendances
         ) {
             toast(
                 'error',
                 'Meeting tidak dapat dihapus karena masih memiliki absensi, materi, video, atau post test.'
             );
-
             return back();
         }
 
@@ -191,19 +179,20 @@ class MeetingController extends Controller
             ->route('course.show', $meeting->course->slug);
     }
 
+    /**
+     * Join Zoom
+     */
     public function joinZoom(Meeting $meeting)
     {
-        // 1. Belum ada link zoom
         if (empty($meeting->zoom_link)) {
             toast('warning', 'Belum ada link Zoom untuk pertemuan ini');
             return back();
         }
 
-        // 2. Hitung waktu join (30 menit sebelum jadwal)
         $scheduledAt = $meeting->scheduled_at->timezone('Asia/Jakarta');
         $joinAllowedAt = $scheduledAt->copy()->subMinutes(30);
         $now = Carbon::now('Asia/Jakarta');
-        // 3. Belum waktunya join
+
         if ($now->lt($joinAllowedAt)) {
             toast(
                 'error',
@@ -212,12 +201,34 @@ class MeetingController extends Controller
                 ' WIB - Tanggal ' .
                 $scheduledAt->format('d/m/Y')
             );
-
             return back();
         }
 
-        // 4. Sudah boleh join
         return redirect()->away($meeting->zoom_link);
     }
 
+    /**
+     * ===============================
+     * POST TEST (EXAM) CREATOR
+     * ===============================
+     */
+    public function storePostTest(Meeting $meeting)
+    {
+        if ($meeting->exam) {
+            toast('error', 'Post Test sudah ada');
+            return back();
+        }
+
+        $exam = Exam::create([
+            'type'         => 'post_test',
+            'status'       => 'inactive',
+            'owner_type'   => Meeting::class,
+            'owner_id'     => $meeting->id,
+            'created_by'   => auth()->id(),
+        ]);
+
+        toast('success', 'Post Test berhasil dibuat');
+
+        return redirect()->route('exams.edit', $exam);
+    }
 }

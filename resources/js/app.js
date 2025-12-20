@@ -7,11 +7,11 @@ import './toast';
 import Alpine from 'alpinejs'
 import collapse from '@alpinejs/collapse'
 
-import postTestQuestionPicker from './components/posttest-question-picker'
+import examQuestionPicker from './components/exam-question-picker'
 
 // expose ke global SEBELUM Alpine.start()
 window.Alpine = Alpine
-window.postTestQuestionPicker = postTestQuestionPicker
+window.examQuestionPicker = examQuestionPicker
 
 Alpine.plugin(collapse)
 Alpine.start()
