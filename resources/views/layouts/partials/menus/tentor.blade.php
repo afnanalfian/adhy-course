@@ -8,7 +8,7 @@
   Dashboard
 </a>
 
-<a href="{{ route('siswa.index') }}" class="menu-item">
+<a href="{{ route('siswa.index') }}" href="{{ route('siswa.index') }}" class="menu-item">
   <!-- Siswa (academic-cap) -->
   <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -18,7 +18,7 @@
   Siswa
 </a>
 
-<a class="menu-item">
+<a href="{{ route('course.index') }}" class="menu-item">
   <!-- Course (book-closed) -->
   <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">

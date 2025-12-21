@@ -7,13 +7,22 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class OrderItem extends Model
+class Payment extends Model
 {
     protected $fillable = [
         'order_id',
-        'product_id',
-        'qty',
-        'price',
+        'method',
+        'qris_image',
+        'proof_image',
+        'paid_at',
+        'verified_at',
+        'verified_by',
+        'status',
+    ];
+
+    protected $casts = [
+        'paid_at' => 'datetime',
+        'verified_at' => 'datetime',
     ];
 
     /* ================= RELATIONS ================= */
@@ -23,8 +32,8 @@ class OrderItem extends Model
         return $this->belongsTo(Order::class);
     }
 
-    public function product()
+    public function verifier()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(User::class, 'verified_by');
     }
 }

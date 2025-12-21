@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Pagination\Paginator;
+use App\Observers\OrderObserver;
+use App\Models\Order;
 use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
@@ -25,5 +27,6 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
         Paginator::useTailwind();
         Carbon::setLocale('id');
+        Order::observe(OrderObserver::class);
     }
 }

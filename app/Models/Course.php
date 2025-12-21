@@ -26,11 +26,6 @@ class Course extends Model
         return $this->hasMany(Meeting::class)->orderBy('scheduled_at');;
     }
 
-    public function packages()
-    {
-        return $this->hasMany(Package::class);
-    }
-
     public function questionCategories()
     {
         return $this->hasMany(QuestionCategory::class);

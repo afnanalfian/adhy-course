@@ -2,23 +2,48 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\Front\LandingController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SiswaController;
-use App\Http\Controllers\TentorController;
-use App\Http\Controllers\CourseController;
-use App\Http\Controllers\MeetingController;
-use App\Http\Controllers\MeetingMaterialController;
-use App\Http\Controllers\ExamController;
-use App\Http\Controllers\ExamQuestionController;
-use App\Http\Controllers\ExamAttemptController;
-use App\Http\Controllers\ExamResultController;
-use App\Http\Controllers\MeetingAttendanceController;
-use App\Http\Controllers\MeetingVideoController;
-use App\Http\Controllers\QuestionCategoryController;
-use App\Http\Controllers\QuestionMaterialController;
-use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\Front\{
+    LandingController,
+    DashboardController
+};
+
+use App\Http\Controllers\User\{
+    ProfileController,
+    SiswaController,
+    TentorController
+};
+
+use App\Http\Controllers\Course\{
+    CourseController,
+    MeetingController,
+    MeetingMaterialController,
+    MeetingAttendanceController,
+    MeetingVideoController
+};
+
+use App\Http\Controllers\Exam\{
+    ExamController,
+    ExamQuestionController,
+    ExamAttemptController,
+    ExamResultController
+};
+
+use App\Http\Controllers\Question\{
+    QuestionCategoryController,
+    QuestionMaterialController,
+    QuestionController
+};
+
+use App\Http\Controllers\Purchase\{
+    CartController,
+    CheckoutController,
+    DiscountController,
+    OrderController,
+    PaymentSettingController,
+    ProductBonusController,
+    ProductController,
+    ProductPricingController
+};
 
 /*
 |--------------------------------------------------------------------------
@@ -211,7 +236,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/meetings/{meeting}/video/edit',[MeetingVideoController::class, 'edit'])->name('meetings.video.edit');
         // Update metadata
         Route::put('/meetings/{meeting}/video',[MeetingVideoController::class, 'update'])->name('meetings.video.update');
-        // Delete video 
+        // Delete video
         Route::delete('/meetings/{meeting}/video',[MeetingVideoController::class, 'destroy'])->name('meetings.video.destroy');
     });
     // STUDENT / GENERAL USER
@@ -253,7 +278,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     | BANK SOAL (QUESTIONS) ROUTES
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['auth', 'role:admin|tentor'])
+    Route::middleware(['role:admin|tentor'])
     ->prefix('ajax')
     ->group(function () {
 
@@ -295,14 +320,71 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/questions/{question}',[QuestionController::class, 'update'])->name('question.update');
         Route::delete('/questions/{question}',[QuestionController::class, 'destroy'])->name('question.delete');
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | PURCHASE ROUTES
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('role:siswa')->group(function () {
+        //CART
+        Route::get('/cart', [CartController::class, 'show'])->name('cart.show');
+        Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+        Route::patch('/cart/item/{cartItem}', [CartController::class, 'updateQty'])->name('cart.update');
+        Route::delete('/cart/item/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
+
+        //CHECKOUT
+        Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout.process');
+        Route::get('/checkout/{order}', [CheckoutController::class, 'show'])->name('checkout.show');
+        Route::post('/checkout/{order}/upload-proof', [CheckoutController::class, 'uploadProof'])->name('checkout.upload');
+        Route::get('/checkout/{order}/waiting', [CheckoutController::class, 'waiting'])->name('checkout.waiting');
+
+        //PRODUCT
+        Route::get('/products', [ProductController::class, 'index'])->name('purchase.products.index');
+        Route::get('/products/courses', [ProductController::class, 'courses'])->name('purchase.products.courses');
+        Route::get('/products/meetings', [ProductController::class, 'meetings'])->name('purchase.products.meetings');
+        Route::get('/products/tryouts', [ProductController::class, 'tryouts'])->name('purchase.products.tryouts');
+        Route::get('/products/course/{course}', [ProductController::class, 'showCourse'])->name('purchase.products.course.show');
+        Route::get('/purchase/products/browse',[ProductController::class, 'browse'])->name('purchase.products.browse');
+    });
+
+    Route::middleware('role:admin')->group(function () {
+        //ORDER
+        Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+        Route::post('/orders/{order}/approve', [OrderController::class, 'approve'])->name('orders.approve');
+        Route::post('/orders/{order}/reject', [OrderController::class, 'reject'])->name('orders.reject');
+
+        //PRICING
+        Route::get('/pricing', [ProductPricingController::class, 'index'])->name('pricing.index');
+        Route::get('/pricing/create', [ProductPricingController::class, 'create'])->name('pricing.create');
+        Route::post('/pricing', [ProductPricingController::class, 'store'])->name('pricing.store');
+        Route::get('/pricing/{pricingRule}/edit', [ProductPricingController::class, 'edit'])->name('pricing.edit');
+        Route::put('/pricing/{pricingRule}', [ProductPricingController::class, 'update'])->name('pricing.update');
+        Route::delete('/pricing/{pricingRule}', [ProductPricingController::class, 'destroy'])->name('pricing.destroy');
+        Route::patch('/pricing/{pricingRule}/toggle', [ProductPricingController::class, 'toggle'])->name('pricing.toggle');
+
+        //BONUSES
+        Route::get('/bonuses', [ProductBonusController::class, 'index'])->name('bonuses.index');
+
+        Route::get('/bonuses/{product}/edit', [ProductBonusController::class, 'edit'])->name('bonuses.edit');
+
+        Route::put('/bonuses/{product}', [ProductBonusController::class, 'update'])->name('bonuses.update');
+
+        Route::delete('/bonuses/item/{productBonus}', [ProductBonusController::class, 'destroy'])->name('bonuses.destroy');
+
+        //DISCOUNT
+        Route::get('/discounts', [DiscountController::class, 'index'])->name('discounts.index');
+        Route::get('/discounts/create', [DiscountController::class, 'create'])->name('discounts.create');
+        Route::post('/discounts', [DiscountController::class, 'store'])->name('discounts.store');
+        Route::get('/discounts/{discount}/edit', [DiscountController::class, 'edit'])->name('discounts.edit');
+        Route::put('/discounts/{discount}', [DiscountController::class, 'update'])->name('discounts.update');
+        Route::delete('/discounts/{discount}', [DiscountController::class, 'destroy'])->name('discounts.destroy');
+        Route::patch('/discounts/{discount}/toggle', [DiscountController::class, 'toggle'])->name('discounts.toggle');
+
+        //PAYMENT
+        Route::get('/payment-settings', [PaymentSettingController::class, 'edit'])->name('payment.settings.edit');
+        Route::post('/payment-settings', [PaymentSettingController::class, 'update'])->name('payment.settings.update');
+    });
 });
 
-
-Route::get('/_test-b2', function () {
-    Storage::disk('b2')->put(
-        'test/hello.txt',
-        'Hello from Laravel'
-    );
-
-    return 'OK';
-});

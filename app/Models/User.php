@@ -47,11 +47,21 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsTo(Regency::class);
     }
-
-    public function purchasedMeetings()
+    public function cart()
     {
-        return $this->hasMany(PurchasedMeeting::class);
+        return $this->hasOne(Cart::class)->where('status', 'active');
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function entitlements()
+    {
+        return $this->hasMany(UserEntitlement::class);
+    }
+
     public function sendEmailVerificationNotification()
     {
         $this->notify(new \App\Notifications\CustomVerifyEmail);

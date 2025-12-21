@@ -7,24 +7,21 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class OrderItem extends Model
+class OrderDiscount extends Model
 {
     protected $fillable = [
         'order_id',
-        'product_id',
-        'qty',
-        'price',
+        'discount_id',
+        'amount',
     ];
-
-    /* ================= RELATIONS ================= */
 
     public function order()
     {
         return $this->belongsTo(Order::class);
     }
 
-    public function product()
+    public function discount()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Discount::class);
     }
 }

@@ -40,15 +40,64 @@
   Course
 </a>
 
-<a class="menu-item">
-  <!-- Purchasing (shopping-cart) -->
-  <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
-       viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-    <path stroke-linecap="round" stroke-linejoin="round"
-          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.6 8h13.2L17 13H7z"/>
-  </svg>
-  Purchasing
-</a>
+{{-- Menu Pembelian dengan Dropdown (ADMIN) --}}
+<div x-data="{ open: false }" class="relative">
+    <button @click="open = !open" class="menu-item w-full text-left flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <!-- Purchasing (shopping-cart) -->
+            <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.6 8h13.2L17 13H7z"/>
+            </svg>
+            Pembelian
+        </div>
+        <!-- Arrow icon -->
+        <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform duration-200"
+             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <div x-show="open" @click.outside="open = false"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 transform -translate-y-2"
+         x-transition:enter-end="opacity-100 transform translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 transform translate-y-0"
+         x-transition:leave-end="opacity-0 transform -translate-y-2"
+         class="ml-6 mt-1 space-y-1 border-l border-gray-300 dark:border-gray-600 pl-3">
+
+        <a href="{{ route('orders.index') }}" class="menu-subitem flex items-center gap-2">
+            <span class="w-1 h-1 rounded-full bg-current"></span>
+            Order Masuk
+            @if($pendingOrdersCount ?? 0 > 0)
+                <span class="badge ml-auto">{{ $pendingOrdersCount }}</span>
+            @endif
+        </a>
+
+        <a href="{{ route('pricing.index') }}" class="menu-subitem flex items-center gap-2">
+            <span class="w-1 h-1 rounded-full bg-current"></span>
+            Pricing
+        </a>
+
+        <a href="{{ route('discounts.index') }}" class="menu-subitem flex items-center gap-2">
+            <span class="w-1 h-1 rounded-full bg-current"></span>
+            Discount
+        </a>
+
+        <a href="{{ route('bonuses.index') }}" class="menu-subitem flex items-center gap-2">
+            <span class="w-1 h-1 rounded-full bg-current"></span>
+            Bonus Produk
+        </a>
+
+        <a href="{{ route('payment.settings.edit') }}" class="menu-subitem flex items-center gap-2">
+            <span class="w-1 h-1 rounded-full bg-current"></span>
+            Payment Setting
+        </a>
+    </div>
+</div>
 
 <a href="{{ route('bank.category.index') }}" class="menu-item">
   <!-- Bank Soal (archive-box) -->

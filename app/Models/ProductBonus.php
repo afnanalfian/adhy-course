@@ -7,21 +7,13 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class OrderItem extends Model
+class ProductBonus extends Model
 {
     protected $fillable = [
-        'order_id',
         'product_id',
-        'qty',
-        'price',
+        'bonus_type',
+        'bonus_id',
     ];
-
-    /* ================= RELATIONS ================= */
-
-    public function order()
-    {
-        return $this->belongsTo(Order::class);
-    }
 
     public function product()
     {

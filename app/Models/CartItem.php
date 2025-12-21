@@ -7,20 +7,20 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class OrderItem extends Model
+class CartItem extends Model
 {
     protected $fillable = [
-        'order_id',
+        'cart_id',
         'product_id',
         'qty',
-        'price',
+        'price_snapshot',
     ];
 
     /* ================= RELATIONS ================= */
 
-    public function order()
+    public function cart()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Cart::class);
     }
 
     public function product()

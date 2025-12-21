@@ -7,17 +7,11 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Order extends Model
+class Cart extends Model
 {
     protected $fillable = [
         'user_id',
-        'total_amount',
         'status',
-        'expires_at',
-    ];
-
-    protected $casts = [
-        'expires_at' => 'datetime',
     ];
 
     /* ================= RELATIONS ================= */
@@ -29,16 +23,6 @@ class Order extends Model
 
     public function items()
     {
-        return $this->hasMany(OrderItem::class);
-    }
-
-    public function payment()
-    {
-        return $this->hasOne(Payment::class);
-    }
-
-    public function discounts()
-    {
-        return $this->hasMany(OrderDiscount::class);
+        return $this->hasMany(CartItem::class);
     }
 }
