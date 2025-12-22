@@ -12,6 +12,7 @@ class CreateProductablesTable extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->morphs('productable');
+            $table->timestamps();
         });
     }
 

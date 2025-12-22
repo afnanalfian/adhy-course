@@ -13,7 +13,7 @@
             </p>
         </div>
 
-        <a href="{{ route('purchase.pricing.create') }}"
+        <a href="{{ route('pricing.create') }}"
            class="bg-primary hover:bg-azwara-medium
                   text-white font-semibold px-5 py-2.5 rounded-xl transition">
             + Tambah Rule
@@ -36,7 +36,7 @@
             </thead>
 
             <tbody class="divide-y dark:divide-azwara-darker">
-                @forelse($pricingRules as $rule)
+                @forelse($rules as $rule)
                     <tr>
                         <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
                             {{ $rule->product_type }}
@@ -63,12 +63,33 @@
                             </span>
                         </td>
 
-                        <td class="px-6 py-4 text-right space-x-3">
-                            <a href="{{ route('purchase.pricing.edit', $rule) }}"
-                               class="text-primary font-semibold hover:underline">
+                        <td class="px-6 py-4 text-right space-x-3 whitespace-nowrap">
+
+                            {{-- EDIT --}}
+                            <a href="{{ route('pricing.edit', $rule) }}"
+                            class="text-primary font-semibold hover:underline">
                                 Edit
                             </a>
+
+                            {{-- TOGGLE ACTIVE --}}
+                            <form method="POST"
+                                action="{{ route('pricing.toggle', $rule) }}"
+                                class="inline sweet-confirm"
+                                data-message="Yakin ingin mengubah status pricing rule ini?">
+                                @csrf
+                                @method('PATCH')
+
+                                <button type="submit"
+                                        class="font-semibold
+                                            {{ $rule->is_active
+                                                    ? 'text-red-600 hover:underline'
+                                                    : 'text-green-600 hover:underline' }}">
+                                    {{ $rule->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                                </button>
+                            </form>
+
                         </td>
+
                     </tr>
                 @empty
                     <tr>

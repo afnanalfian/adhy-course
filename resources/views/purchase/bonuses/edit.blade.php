@@ -13,7 +13,7 @@
     </div>
 
     <form method="POST"
-          action="{{ route('purchase.bonuses.update', $product) }}"
+          action="{{ route('bonuses.update', $product) }}"
           class="space-y-6 p-6 rounded-2xl border
                  dark:border-azwara-darker
                  bg-white dark:bg-azwara-darkest">
@@ -22,10 +22,11 @@
 
         {{-- QUIZ --}}
         <div class="flex items-start gap-3">
-            <input type="checkbox" name="bonuses[]"
-                   value="quiz"
-                   @checked($product->hasBonus('quiz'))
-                   class="rounded text-primary focus:ring-primary mt-1">
+            <input type="checkbox" name="bonuses[quiz][bonus_type]"
+                value="quiz"
+                @checked($product->hasBonus('quiz'))
+                class="rounded text-primary focus:ring-primary mt-1">
+
             <div>
                 <p class="font-medium text-gray-900 dark:text-white">
                     Akses Quiz
@@ -38,10 +39,11 @@
 
         {{-- TRYOUT --}}
         <div class="flex items-start gap-3">
-            <input type="checkbox" name="bonuses[]"
-                   value="tryout"
-                   @checked($product->hasBonus('tryout'))
-                   class="rounded text-primary focus:ring-primary mt-1">
+            <input type="checkbox" name="bonuses[tryout][bonus_type]"
+                value="tryout"
+                @checked($product->hasBonus('tryout'))
+                class="rounded text-primary focus:ring-primary mt-1">
+
             <div>
                 <p class="font-medium text-gray-900 dark:text-white">
                     Semua Tryout
@@ -53,7 +55,7 @@
         </div>
 
         <div class="pt-4 flex justify-end gap-3">
-            <a href="{{ route('purchase.bonuses.index') }}"
+            <a href="{{ route('bonuses.index') }}"
                class="px-5 py-2.5 rounded-xl border
                       text-gray-700 dark:text-gray-300">
                 Batal

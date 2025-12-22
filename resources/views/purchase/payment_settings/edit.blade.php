@@ -13,21 +13,22 @@
     </div>
 
     <form method="POST"
-          action="{{ route('purchase.payment.settings.update') }}"
+          action="{{ route('payment.settings.update') }}"
           enctype="multipart/form-data"
           class="space-y-6 p-6 rounded-2xl border
                  dark:border-azwara-darker
                  bg-white dark:bg-azwara-darkest">
+
         @csrf
 
-        {{-- QRIS IMAGE --}}
+        {{-- QRIS IMAGE DISPLAY --}}
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 QRIS
             </label>
 
-            @if($paymentSetting?->qris_image)
-                <img src="{{ asset('storage/' . $paymentSetting->qris_image) }}"
+            @if($settings['qris_image'] ?? null)
+                <img src="{{ asset('storage/' . $settings['qris_image']) }}"
                      class="mt-3 max-w-xs rounded-xl border">
             @endif
 
@@ -40,15 +41,40 @@
                           hover:file:bg-azwara-medium">
         </div>
 
-        {{-- INSTRUCTION --}}
+        {{-- PAYMENT INSTRUCTION --}}
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Instruksi Pembayaran
             </label>
-            <textarea name="instruction" rows="4"
+
+            <textarea name="payment_instruction" rows="4"
                       class="mt-1 w-full rounded-xl border-gray-300
                              dark:bg-azwara-darkest dark:border-azwara-darker
-                             focus:ring-primary focus:border-primary">{{ old('instruction', $paymentSetting?->instruction) }}</textarea>
+                             focus:ring-primary focus:border-primary">{{ old('payment_instruction', $settings['payment_instruction'] ?? '') }}</textarea>
+        </div>
+
+        {{-- PAYMENT METHOD --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Metode Pembayaran Aktif
+            </label>
+
+            <select name="active_payment_method"
+                    class="w-full rounded-xl border-gray-300
+                           dark:bg-azwara-darkest dark:border-azwara-darker
+                           focus:ring-primary focus:border-primary">
+
+                <option value="manual_qris"
+                    @selected(($settings['active_payment_method'] ?? '') === 'manual_qris')>
+                    Manual QRIS
+                </option>
+
+                <option value="midtrans"
+                    @selected(($settings['active_payment_method'] ?? '') === 'midtrans')>
+                    Midtrans (Online)
+                </option>
+
+            </select>
         </div>
 
         <div class="pt-4 flex justify-end">

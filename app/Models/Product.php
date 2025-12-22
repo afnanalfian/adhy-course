@@ -3,9 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Product extends Model
 {
@@ -18,9 +15,9 @@ class Product extends Model
 
     /* ================= RELATIONS ================= */
 
-    public function productable()
+    public function productables()
     {
-        return $this->morphTo();
+        return $this->hasMany(Productable::class);
     }
 
     public function cartItems()
@@ -36,5 +33,33 @@ class Product extends Model
     public function bonuses()
     {
         return $this->hasMany(ProductBonus::class);
+    }
+    public function hasBonus(string $type, $id = null): bool
+    {
+        return $this->bonuses()
+            ->where('bonus_type', $type)
+            ->when($id, fn($q) => $q->where('bonus_id', $id))
+            ->exists();
+    }
+    /* ================= PRICING RULE DISPLAY ================= */
+    function price_for_tryout()
+    {
+        $rule = PricingRule::where('product_type', 'tryout')
+            ->where('is_active', true)
+            ->orderBy('min_qty')
+            ->first();
+
+        return $rule?->fixed_price ?? 0;
+    }
+
+    function price_range_meeting()
+    {
+        $min = PricingRule::where('product_type', 'meeting')->min('price_per_unit');
+        $max = PricingRule::where('product_type', 'meeting')->max('price_per_unit');
+
+        return [
+            'min' => $min ?? 0,
+            'max' => $max ?? 0,
+        ];
     }
 }

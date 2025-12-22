@@ -82,7 +82,7 @@
                             bg-white dark:bg-azwara-darkest space-y-4">
 
                     <form method="POST"
-                          action="{{ route('purchase.orders.approve', $order) }}">
+                          action="{{ route('orders.approve', $order) }}">
                         @csrf
                         <button type="submit"
                                 class="w-full bg-green-600 hover:bg-green-700
@@ -92,7 +92,7 @@
                     </form>
 
                     <form method="POST"
-                          action="{{ route('purchase.orders.reject', $order) }}">
+                          action="{{ route('orders.reject', $order) }}">
                         @csrf
                         <button type="submit"
                                 class="w-full bg-red-600 hover:bg-red-700

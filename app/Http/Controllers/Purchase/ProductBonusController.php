@@ -50,15 +50,14 @@ class ProductBonusController extends Controller
     public function update(Request $request, Product $product)
     {
         $data = $request->validate([
-            'bonuses'                 => 'array',
-            'bonuses.*.bonus_type'    => 'required|in:tryout,quiz,course',
-            'bonuses.*.bonus_id'      => 'nullable|integer',
+            'bonuses' => 'array',
+            'bonuses.*.bonus_type' => 'required|string',
+            'bonuses.*.bonus_id' => 'nullable',
         ]);
 
-        // hapus bonus lama
+        // Hapus bonus lama
         $product->bonuses()->delete();
 
-        // simpan bonus baru
         foreach ($data['bonuses'] ?? [] as $bonus) {
             ProductBonus::create([
                 'product_id' => $product->id,
@@ -67,9 +66,9 @@ class ProductBonusController extends Controller
             ]);
         }
 
+        toast('success', 'Bonus product berhasil diperbarui');
         return redirect()
-            ->route('bonuses.index')
-            ->with('success', 'Bonus product berhasil diperbarui');
+            ->route('bonuses.index');
     }
 
     /**
@@ -78,7 +77,7 @@ class ProductBonusController extends Controller
     public function destroy(ProductBonus $productBonus)
     {
         $productBonus->delete();
-
-        return back()->with('success', 'Bonus berhasil dihapus');
+        toast('info', 'Bonus berhasil dihapus');
+        return back();
     }
 }

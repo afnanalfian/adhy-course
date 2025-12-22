@@ -30,4 +30,8 @@ class Course extends Model
     {
         return $this->hasMany(QuestionCategory::class);
     }
+    public function product()
+    {
+        return $this->morphOne(Productable::class, 'productable')->with('product');
+    }
 }

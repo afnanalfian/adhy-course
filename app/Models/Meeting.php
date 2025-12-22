@@ -49,5 +49,8 @@ class Meeting extends Model
     {
         return $this->hasOne(MeetingVideo::class);
     }
-
+    public function product()
+    {
+        return $this->morphOne(Productable::class, 'productable')->with('product');
+    }
 }

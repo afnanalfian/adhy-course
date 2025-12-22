@@ -3,9 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 class Discount extends Model
 {
@@ -30,9 +28,43 @@ class Discount extends Model
 
     public function targets()
     {
-        return $this->morphToMany(
-            Model::class,
+        return $this->morphedByMany(
+            Product::class,
             'discountable'
         );
+    }
+    public function isGlobal(): bool
+    {
+        return ! $this->discountables()->exists();
+    }
+    public function getIsCurrentlyActiveAttribute(): bool
+    {
+        if (! $this->is_active) {
+            return false;
+        }
+
+        $now = Carbon::now();
+
+        if ($this->starts_at && $now->lt($this->starts_at)) {
+            return false;
+        }
+
+        if ($this->ends_at && $now->gt($this->ends_at)) {
+            return false;
+        }
+
+        if ($this->quota !== null && $this->used >= $this->quota) {
+            return false;
+        }
+
+        return true;
+    }
+    public function getTypeLabelAttribute(): string
+    {
+        return match ($this->type) {
+            'percentage' => 'PERSENTASE',
+            'fixed'      => 'POTONGAN TETAP',
+            default      => strtoupper($this->type),
+        };
     }
 }

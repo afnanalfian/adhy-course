@@ -16,10 +16,8 @@ class CheckoutController extends Controller
     /**
      * Proses checkout (cart → order)
      */
-    public function checkout(
-        Request $request,
-        CheckoutService $checkoutService
-    ) {
+    public function checkout(Request $request, CheckoutService $checkoutService)
+    {
         $cart = Cart::where('user_id', $request->user()->id)
             ->where('status', 'active')
             ->with('items')
@@ -29,6 +27,7 @@ class CheckoutController extends Controller
 
         return redirect()->route('checkout.show', $order);
     }
+
 
     /**
      * Halaman pembayaran (QRIS)
@@ -40,8 +39,8 @@ class CheckoutController extends Controller
 
         $order->load('items.product');
 
-        $qrisImage = PaymentSetting::where('key', 'qris_image')->value('value');
-        $instruction = PaymentSetting::where('key', 'payment_instruction')->value('value');
+        $qrisImage    = PaymentSetting::where('key', 'qris_image')->value('value');
+        $instruction  = PaymentSetting::where('key', 'payment_instruction')->value('value');
 
         return view('purchase.checkout.show', compact(
             'order',
@@ -50,21 +49,20 @@ class CheckoutController extends Controller
         ));
     }
 
+
     /**
      * Upload bukti pembayaran
      */
-    public function uploadProof(
-        Order $order,
-        Request $request
-    ) {
+    public function uploadProof(Order $order, Request $request)
+    {
         abort_if($order->user_id !== $request->user()->id, 403);
         abort_if($order->status !== 'pending', 403);
 
-        $data = $request->validate([
+        $validated = $request->validate([
             'proof_image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $path = $data['proof_image']->store(
+        $path = $validated['proof_image']->store(
             'payments/proofs',
             'public'
         );
@@ -82,8 +80,9 @@ class CheckoutController extends Controller
             ->with('success', 'Bukti pembayaran berhasil diupload');
     }
 
+
     /**
-     * Halaman menunggu verifikasi
+     * Halaman menunggu verifikasi admin
      */
     public function waiting(Order $order, Request $request)
     {

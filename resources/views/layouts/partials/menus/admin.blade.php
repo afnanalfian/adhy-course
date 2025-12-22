@@ -77,6 +77,11 @@
             @endif
         </a>
 
+        <a href="{{ route('products.index') }}" class="menu-subitem flex items-center gap-2">
+            <span class="w-1 h-1 rounded-full bg-current"></span>
+            Produk
+        </a>
+
         <a href="{{ route('pricing.index') }}" class="menu-subitem flex items-center gap-2">
             <span class="w-1 h-1 rounded-full bg-current"></span>
             Pricing

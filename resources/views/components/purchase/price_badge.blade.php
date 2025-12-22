@@ -1,6 +1,6 @@
 @props([
     'label',
-    'variant' => 'primary', 
+    'variant' => 'primary',
 ])
 
 @php

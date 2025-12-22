@@ -4,15 +4,11 @@ namespace App\Http\Controllers\Purchase;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    /**
-     * List order masuk (admin)
-     */
     public function index()
     {
         $orders = Order::with(['user', 'payment'])
@@ -23,9 +19,6 @@ class OrderController extends Controller
         return view('purchase.orders.index', compact('orders'));
     }
 
-    /**
-     * Detail order + bukti bayar
-     */
     public function show(Order $order)
     {
         $order->load([
@@ -38,25 +31,26 @@ class OrderController extends Controller
     }
 
     /**
-     * ACC pembayaran
-     * ➜ trigger OrderObserver
+     * ACC pembayaran (AMAN dari double verify)
      */
     public function approve(Request $request, Order $order)
     {
-        if ($order->status !== 'pending') {
-            return back()->withErrors('Order tidak bisa diverifikasi');
-        }
-
         DB::transaction(function () use ($order, $request) {
 
-            /** Update payment */
-            $order->payment->update([
+            $order = Order::where('id', $order->id)
+                ->lockForUpdate()
+                ->first();
+
+            if ($order->status !== 'pending') {
+                abort(409, 'Order sudah diproses');
+            }
+
+            $order->payment()->update([
                 'status'       => 'verified',
                 'verified_at'  => now(),
                 'verified_by'  => $request->user()->id,
             ]);
 
-            /** Update order */
             $order->update([
                 'status' => 'verified',
             ]);
@@ -72,13 +66,17 @@ class OrderController extends Controller
      */
     public function reject(Request $request, Order $order)
     {
-        if (! in_array($order->status, ['pending', 'paid'])) {
-            return back()->withErrors('Order tidak bisa ditolak');
-        }
-
         DB::transaction(function () use ($order) {
 
-            $order->payment->update([
+            $order = Order::where('id', $order->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! in_array($order->status, ['pending', 'paid'])) {
+                abort(409, 'Order tidak bisa ditolak');
+            }
+
+            $order->payment()->update([
                 'status' => 'rejected',
             ]);
 

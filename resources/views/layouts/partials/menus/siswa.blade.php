@@ -79,7 +79,7 @@
          x-transition:leave-end="opacity-0 transform -translate-y-2"
          class="ml-6 mt-1 space-y-1 border-l border-gray-300 dark:border-gray-600 pl-3">
 
-        <a href="{{ route('purchase.products.browse') }}" class="menu-subitem flex items-center gap-2">
+        <a href="{{ route('browse.index') }}" class="menu-subitem flex items-center gap-2">
             <span class="w-1 h-1 rounded-full bg-current"></span>
             Beli Course
         </a>
@@ -92,7 +92,7 @@
             @endif
         </a>
 
-        <a href="{{ route('purchase.products.index') }}" class="menu-subitem flex items-center gap-2">
+        <a href="# class="menu-subitem flex items-center gap-2">
             <span class="w-1 h-1 rounded-full bg-current"></span>
             Riwayat Pembelian
         </a>

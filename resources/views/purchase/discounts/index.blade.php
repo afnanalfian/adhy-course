@@ -13,7 +13,7 @@
             </p>
         </div>
 
-        <a href="{{ route('purchase.discounts.create') }}"
+        <a href="{{ route('discounts.create') }}"
            class="bg-primary hover:bg-azwara-medium
                   text-white font-semibold px-5 py-2.5 rounded-xl transition">
             + Tambah Discount
@@ -26,6 +26,7 @@
         <table class="min-w-full text-sm">
             <thead class="bg-gray-50 dark:bg-azwara-darker">
                 <tr class="text-left text-gray-600 dark:text-gray-300">
+                    <th class="px-6 py-4">Nama</th>
                     <th class="px-6 py-4">Kode</th>
                     <th class="px-6 py-4">Tipe</th>
                     <th class="px-6 py-4">Nilai</th>
@@ -38,12 +39,15 @@
             <tbody class="divide-y dark:divide-azwara-darker">
                 @forelse($discounts as $discount)
                     <tr class="hover:bg-gray-50 dark:hover:bg-azwara-darker/50">
+                        <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                            {{ $discount->name }}
+                        </td>
                         <td class="px-6 py-4 font-mono font-semibold text-gray-900 dark:text-white">
                             {{ $discount->code }}
                         </td>
 
                         <td class="px-6 py-4">
-                            {{ strtoupper($discount->type) }}
+                            {{ $discount->type_label }}
                         </td>
 
                         <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
@@ -62,17 +66,17 @@
 
                         <td class="px-6 py-4">
                             <span class="inline-flex px-3 py-1 rounded-lg text-xs font-semibold
-                                {{ $discount->is_active
+                                {{ $discount->is_currently_active
                                     ? 'bg-green-100 text-green-700'
                                     : 'bg-gray-100 text-gray-600' }}">
-                                {{ $discount->is_active ? 'AKTIF' : 'NONAKTIF' }}
+                                {{ $discount->is_currently_active ? 'AKTIF' : 'NONAKTIF' }}
                             </span>
                         </td>
 
                         <td class="px-6 py-4 text-right">
-                            <a href="{{ route('purchase.discounts.edit', $discount) }}"
+                            <a href="{{ route('discounts.show', $discount) }}"
                                class="text-primary font-semibold hover:underline">
-                                Edit
+                                Detail
                             </a>
                         </td>
                     </tr>
@@ -86,6 +90,8 @@
             </tbody>
         </table>
     </div>
-
+<div class="mt-6">
+    {{ $discounts->links() }}
+</div>
 </div>
 @endsection

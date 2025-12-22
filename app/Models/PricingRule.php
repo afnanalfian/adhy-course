@@ -3,9 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PricingRule extends Model
 {
@@ -17,4 +14,15 @@ class PricingRule extends Model
         'fixed_price',
         'is_active',
     ];
+    public function getPricingTypeAttribute(): string
+    {
+        return $this->price_per_unit !== null
+            ? 'per_unit'
+            : 'fixed';
+    }
+
+    public function getPriceAttribute(): float
+    {
+        return $this->price_per_unit ?? $this->fixed_price ?? 0;
+    }
 }

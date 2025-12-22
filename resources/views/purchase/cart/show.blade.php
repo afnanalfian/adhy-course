@@ -70,7 +70,7 @@
 
     {{-- SUMMARY --}}
     <div>
-        @include('purchase.components.cart_summary', [
+        @include('components.purchase.cart_summary', [
             'cart' => $cart,
             'showAction' => true,
         ])

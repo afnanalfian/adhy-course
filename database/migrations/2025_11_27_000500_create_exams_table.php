@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->enum('status', ['inactive','active','closed',])->default('inactive');
             $table->nullableMorphs('owner');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

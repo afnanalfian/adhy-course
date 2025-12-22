@@ -40,27 +40,80 @@ class ProductPricingController extends Controller
      */
     public function store(Request $request)
     {
+        /**
+         * =========================
+         * 1. VALIDASI REQUEST
+         * =========================
+         */
         $data = $request->validate([
-            'product_type'   => 'required|in:meeting,tryout,course_package,addon',
-            'min_qty'        => 'required|integer|min:1',
-            'max_qty'        => 'nullable|integer|gte:min_qty',
-            'price_per_unit' => 'nullable|numeric|min:0',
-            'fixed_price'    => 'nullable|numeric|min:0',
-            'is_active'      => 'boolean',
+            'product_type' => 'required|in:meeting,tryout,course_package,addon',
+            'pricing_type' => 'required|in:per_unit,fixed',
+            'min_qty'      => 'required|integer|min:1',
+            'max_qty'      => 'nullable|integer|gte:min_qty',
+            'price'        => 'required|numeric|min:0',
+            'is_active'    => 'sometimes|boolean',
         ]);
 
-        // validasi bisnis
-        if (! $data['price_per_unit'] && ! $data['fixed_price']) {
-            return back()
-                ->withErrors('Harus mengisi price per unit atau fixed price')
-                ->withInput();
+        /**
+         * =========================
+         * 2. VALIDASI OVERLAP QTY
+         * =========================
+         */
+        $min = $data['min_qty'];
+        $max = $data['max_qty'] ?? PHP_INT_MAX;
+
+        $overlap = PricingRule::where('product_type', $data['product_type'])
+            ->where('is_active', true)
+            ->where(function ($q) use ($min, $max) {
+                $q->where('min_qty', '<=', $max)
+                ->where(function ($q) use ($min) {
+                    $q->whereNull('max_qty')
+                        ->orWhere('max_qty', '>=', $min);
+                });
+            })
+            ->exists();
+
+        if ($overlap) {
+            toast('error','Range qty bertabrakan dengan pricing rule lain');
+            return back()->withInput();
         }
 
+        /**
+         * =========================
+         * 3. NORMALISASI DATA HARGA
+         * =========================
+         */
+        $data['price_per_unit'] = null;
+        $data['fixed_price']   = null;
+
+        if ($data['pricing_type'] === 'per_unit') {
+            $data['price_per_unit'] = $data['price'];
+        }
+
+        if ($data['pricing_type'] === 'fixed') {
+            $data['fixed_price'] = $data['price'];
+        }
+
+        unset($data['pricing_type'], $data['price']);
+
+        /**
+         * =========================
+         * 4. DEFAULT STATE
+         * =========================
+         */
+        $data['is_active'] = $data['is_active'] ?? true;
+
+        /**
+         * =========================
+         * 5. SIMPAN DATA
+         * =========================
+         */
         PricingRule::create($data);
 
+        toast('success', 'Pricing rule berhasil ditambahkan');
+
         return redirect()
-            ->route('purchase.pricing.index')
-            ->with('success', 'Pricing rule berhasil ditambahkan');
+            ->route('pricing.index');
     }
 
     /**
@@ -86,39 +139,95 @@ class ProductPricingController extends Controller
      */
     public function update(Request $request, PricingRule $pricingRule)
     {
+        /**
+         * =========================
+         * 1. VALIDASI REQUEST
+         * =========================
+         */
         $data = $request->validate([
-            'min_qty'        => 'required|integer|min:1',
-            'max_qty'        => 'nullable|integer|gte:min_qty',
-            'price_per_unit' => 'nullable|numeric|min:0',
-            'fixed_price'    => 'nullable|numeric|min:0',
-            'is_active'      => 'boolean',
+            'pricing_type' => 'required|in:per_unit,fixed',
+            'min_qty'      => 'required|integer|min:1',
+            'max_qty'      => 'nullable|integer|gte:min_qty',
+            'price'        => 'required|numeric|min:0',
+            'is_active'    => 'sometimes|boolean',
         ]);
 
-        if (! $data['price_per_unit'] && ! $data['fixed_price']) {
+        /**
+         * =========================
+         * 2. VALIDASI OVERLAP QTY
+         *    (exclude current rule)
+         * =========================
+         */
+        $min = $data['min_qty'];
+        $max = $data['max_qty'] ?? PHP_INT_MAX;
+
+        $overlap = PricingRule::where('product_type', $pricingRule->product_type)
+            ->where('id', '!=', $pricingRule->id)
+            ->where('is_active', true)
+            ->where(function ($q) use ($min, $max) {
+                $q->where('min_qty', '<=', $max)
+                ->where(function ($q) use ($min) {
+                    $q->whereNull('max_qty')
+                        ->orWhere('max_qty', '>=', $min);
+                });
+            })
+            ->exists();
+
+        if ($overlap) {
             return back()
-                ->withErrors('Harus mengisi price per unit atau fixed price')
+                ->withErrors([
+                    'min_qty' => 'Range qty bertabrakan dengan pricing rule lain',
+                ])
                 ->withInput();
         }
 
+        /**
+         * =========================
+         * 3. NORMALISASI DATA HARGA
+         * =========================
+         */
+        $data['price_per_unit'] = null;
+        $data['fixed_price']   = null;
+
+        if ($data['pricing_type'] === 'per_unit') {
+            $data['price_per_unit'] = $data['price'];
+        }
+
+        if ($data['pricing_type'] === 'fixed') {
+            $data['fixed_price'] = $data['price'];
+        }
+
+        unset($data['pricing_type'], $data['price']);
+
+        /**
+         * =========================
+         * 4. DEFAULT STATE
+         * =========================
+         */
+        $data['is_active'] = $data['is_active'] ?? false;
+
+        /**
+         * =========================
+         * 5. UPDATE
+         * =========================
+         */
         $pricingRule->update($data);
 
+        toast('success', 'Pricing rule berhasil diperbarui');
         return redirect()
-            ->route('purchase.pricing.index')
-            ->with('success', 'Pricing rule berhasil diperbarui');
+            ->route('pricing.index');
     }
 
     /**
-     * Nonaktifkan pricing rule
+     * Hapus pricing rule
      */
     public function destroy(PricingRule $pricingRule)
     {
-        $pricingRule->update([
-            'is_active' => false,
-        ]);
+        $pricingRule->delete();
 
+        toast('success', 'Pricing rule berhasil dihapus');
         return redirect()
-            ->route('purchase.pricing.index')
-            ->with('success', 'Pricing rule dinonaktifkan');
+            ->route('pricing.index');
     }
 
     /**
@@ -130,8 +239,9 @@ class ProductPricingController extends Controller
             'is_active' => ! $pricingRule->is_active,
         ]);
 
+        toast('success', 'Status pricing rule diperbarui');
+
         return redirect()
-            ->route('pricing.index')
-            ->with('success', 'Status pricing rule diperbarui');
+            ->route('pricing.index');
     }
 }

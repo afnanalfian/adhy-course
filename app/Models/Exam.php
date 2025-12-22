@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Exam extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'type',
         'title',
@@ -45,6 +47,10 @@ class Exam extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+    public function product()
+    {
+        return $this->morphOne(Productable::class, 'productable')->with('product');
     }
 
     /* ================= HELPERS ================= */

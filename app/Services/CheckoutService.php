@@ -1,58 +1,74 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
-use App\Services\PricingService;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use Exception;
 
 class CheckoutService
 {
     public function checkout(Cart $cart): Order
     {
         if ($cart->status !== 'active') {
-            throw new \Exception('Cart is not active');
+            throw new Exception('Cart bukan active');
         }
 
         if ($cart->items->isEmpty()) {
-            throw new \Exception('Cart is empty');
+            throw new Exception('Cart kosong');
         }
 
         return DB::transaction(function () use ($cart) {
 
-            /** Hitung ulang total (aman) */
-            $pricingService = app(PricingService::class);
-            $pricingResult  = $pricingService->calculateCartTotal($cart);
+            /**
+             * RELOAD CART ITEMS
+             * Pastikan snapshot sudah ada
+             */
+            $cart->load('items.product');
 
-            /** Buat order */
+            $total = 0;
+
+            foreach ($cart->items as $item) {
+                $total += ($item->price_snapshot * $item->qty);
+            }
+
+            /**
+             * CREATE ORDER
+             */
             $order = Order::create([
                 'user_id'      => $cart->user_id,
-                'total_amount'=> $pricingResult['total'],
+                'total_amount' => $total,
                 'status'       => 'pending',
-                'expires_at'   => Carbon::now()->addHours(2),
+                'expires_at'   => now()->addHours(2),
             ]);
 
-            /** Copy cart_items → order_items */
+            /**
+             * SNAPSHOT CART ITEMS → ORDER ITEMS
+             */
             foreach ($cart->items as $item) {
                 OrderItem::create([
-                    'order_id'  => $order->id,
-                    'product_id'=> $item->product_id,
-                    'qty'       => $item->qty,
-                    'price'     => $item->price_snapshot,
+                    'order_id'   => $order->id,
+                    'product_id' => $item->product_id,
+                    'qty'        => $item->qty,
+                    'price'      => $item->price_snapshot,
                 ]);
             }
 
-            /** Buat payment (manual QRIS) */
+            /**
+             * PAYMENT RECORD
+             */
             Payment::create([
                 'order_id' => $order->id,
                 'method'   => 'manual_qris',
                 'status'   => 'waiting',
             ]);
 
-            /** Tutup cart */
+            /**
+             * CLOSE CART
+             */
             $cart->update([
                 'status' => 'checked_out',
             ]);

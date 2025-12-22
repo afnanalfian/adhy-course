@@ -13,7 +13,7 @@
     </div>
 
     <form method="POST"
-          action="{{ route('purchase.pricing.store') }}"
+          action="{{ route('pricing.store') }}"
           class="space-y-6
                  p-6 rounded-2xl border dark:border-azwara-darker
                  bg-white dark:bg-azwara-darkest">
@@ -30,7 +30,8 @@
                            focus:ring-primary focus:border-primary">
                 <option value="meeting">Meeting</option>
                 <option value="tryout">Tryout</option>
-                <option value="course">Course</option>
+                <option value="course_package">Course</option>
+                <option value="addon">Addon</option>
             </select>
         </div>
 
@@ -39,7 +40,7 @@
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Tipe Harga
             </label>
-            <select name="pricing_type"
+            <select name="pricing_type" id="pricing_type"
                     class="mt-1 w-full rounded-xl border-gray-300
                            dark:bg-azwara-darkest dark:border-azwara-darker
                            focus:ring-primary focus:border-primary">
@@ -76,7 +77,7 @@
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Harga
             </label>
-            <input type="number" name="price" min="0"
+            <input type="number" name="price" id="price" min="0" step="0.01"
                    class="mt-1 w-full rounded-xl border-gray-300
                           dark:bg-azwara-darkest dark:border-azwara-darker
                           focus:ring-primary focus:border-primary">
@@ -93,7 +94,7 @@
         </div>
 
         <div class="pt-4 flex justify-end gap-3">
-            <a href="{{ route('purchase.pricing.index') }}"
+            <a href="{{ route('pricing.index') }}"
                class="px-5 py-2.5 rounded-xl border
                       text-gray-700 dark:text-gray-300">
                 Batal
@@ -111,3 +112,22 @@
 
 </div>
 @endsection
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const pricingType = document.getElementById('pricing_type');
+    const priceInput  = document.getElementById('price');
+
+    function updatePlaceholder() {
+        if (pricingType.value === 'per_unit') {
+            priceInput.placeholder = 'Harga per unit';
+        } else {
+            priceInput.placeholder = 'Harga total (fixed)';
+        }
+    }
+
+    pricingType.addEventListener('change', updatePlaceholder);
+    updatePlaceholder();
+});
+</script>
+@endpush

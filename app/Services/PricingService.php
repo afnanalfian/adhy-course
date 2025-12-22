@@ -1,14 +1,16 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Cart;
 use App\Models\PricingRule;
-use Illuminate\Support\Collection;
+use Exception;
 
 class PricingService
 {
     /**
-     * Hitung total harga cart
+     * Hitung TOTAL CART DAN SETIAP ITEM.
+     * cart_items.qty menentukan rule mana yang berlaku.
      */
     public function calculateCartTotal(Cart $cart): array
     {
@@ -16,23 +18,22 @@ class PricingService
         $grandTotal = 0;
 
         foreach ($cart->items as $item) {
-            $result = $this->calculateItem(
+
+            $unit = $this->determineUnitPrice(
                 $item->product->type,
                 $item->qty
             );
 
-            $itemTotal = $result['is_fixed']
-                ? $result['unit_price']
-                : $result['unit_price'] * $item->qty;
+            $lineTotal = $unit * $item->qty;
 
             $items[] = [
                 'product_id' => $item->product_id,
                 'qty'        => $item->qty,
-                'unit_price' => $result['unit_price'],
-                'total'      => $itemTotal,
+                'unit_price' => $unit,
+                'total'      => $lineTotal,
             ];
 
-            $grandTotal += $itemTotal;
+            $grandTotal += $lineTotal;
         }
 
         return [
@@ -41,10 +42,12 @@ class PricingService
         ];
     }
 
+
     /**
-     * Hitung harga per unit berdasarkan tipe & qty
+     * Tentukan harga per item
+     * berdasarkan PRICING_RULES.
      */
-    public function calculateItem(string $productType, int $qty): array
+    public function determineUnitPrice(string $productType, int $qty): float
     {
         $rule = PricingRule::where('product_type', $productType)
             ->where('is_active', true)
@@ -57,26 +60,28 @@ class PricingService
             ->first();
 
         if (! $rule) {
-            throw new \Exception("Pricing rule not found for {$productType}");
+            throw new Exception("Pricing rule missing for product type {$productType}");
         }
 
-        // Fixed price (course)
-        if ($rule->fixed_price !== null) {
-            return [
-                'unit_price' => $rule->fixed_price,
-                'is_fixed'   => true,
-                'rule_id'    => $rule->id,
-            ];
-        }
-
-        return [
-            'unit_price' => $rule->price_per_unit,
-            'rule_id'    => $rule->id,
-        ];
+        return $rule->fixed_price ?? $rule->price_per_unit;
     }
-    public function calculate(string $productType, int $qty): float
+
+
+    /**
+     * Harga full course berdasarkan jumlah meeting × rule kedalaman tertinggi
+     */
+    public function fullCoursePrice(int $meetingCount): float
     {
-        return $this->calculateItem($productType, $qty)['unit_price'];
-    }
+        $rule = PricingRule::where('product_type', 'course_package')
+            ->where('is_active', true)
+            ->orderBy('min_qty', 'asc')
+            ->first();
 
+        if (! $rule) {
+            throw new Exception("Pricing rule missing for course_package");
+        }
+
+        return $rule->fixed_price
+            ?? ($rule->price_per_unit * $meetingCount);
+    }
 }

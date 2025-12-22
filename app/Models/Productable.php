@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ProductBonus extends Model
+class Productable extends Model
 {
     protected $fillable = [
         'product_id',
-        'bonus_type',
-        'bonus_id',
+        'productable_type',
+        'productable_id',
     ];
 
     public function product()
@@ -17,8 +17,8 @@ class ProductBonus extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function tryout()
+    public function productable()
     {
-        return $this->belongsTo(Exam::class, 'bonus_id');
+        return $this->morphTo();
     }
 }

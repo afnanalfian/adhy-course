@@ -3,146 +3,188 @@
 namespace App\Http\Controllers\Purchase;
 
 use App\Http\Controllers\Controller;
-use App\Models\UserEntitlement;
+use App\Models\Product;
+use App\Models\Productable;
 use App\Models\Course;
 use App\Models\Meeting;
 use App\Models\Exam;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
     /**
-     * Dashboard purchase (ringkasan)
+     * Display a listing of products.
      */
-    public function index(Request $request)
+    public function index()
     {
-        $userId = $request->user()->id;
+        $products = Product::with('productable.productable')
+            ->orderBy('type')
+            ->orderBy('name')
+            ->paginate(10);
 
-        $summary = [
-            'courses'  => UserEntitlement::where('user_id', $userId)
-                ->where('entitlement_type', 'course')
-                ->count(),
-
-            'meetings' => UserEntitlement::where('user_id', $userId)
-                ->where('entitlement_type', 'meeting')
-                ->count(),
-
-            'tryouts'  => UserEntitlement::where('user_id', $userId)
-                ->where('entitlement_type', 'tryout')
-                ->count(),
-
-            'quiz'     => UserEntitlement::where('user_id', $userId)
-                ->where('entitlement_type', 'quiz')
-                ->exists(),
-        ];
-
-        return view('purchase.products.index', compact('summary'));
+        return view('purchase.products.index', compact('products'));
     }
 
     /**
-     * List course yang dimiliki user
+     * Show the form for creating a new product.
      */
-    public function courses(Request $request)
+    public function create()
     {
-        $userId = $request->user()->id;
-
-        $courseIds = UserEntitlement::where('user_id', $userId)
-            ->where('entitlement_type', 'course')
-            ->pluck('entitlement_id');
-
-        $courses = Course::whereIn('id', $courseIds)
-            ->whereNull('deleted_at')
-            ->get();
-
-        return view('purchase.products.courses', compact('courses'));
+        return view('purchase.products.create', [
+            'courses'  => Course::orderBy('name')->get(),
+            'meetings' => Meeting::orderBy('title')->get(),
+            'tryouts'  => Exam::where('type', 'tryout')->orderBy('title')->get(),
+        ]);
     }
 
     /**
-     * List meeting yang dimiliki user
+     * Store a newly created product.
      */
-    public function meetings(Request $request)
+    public function store(Request $request)
     {
-        $userId = $request->user()->id;
+        $validated = $request->validate([
+            'type' => [
+                'required',
+                Rule::in(['meeting', 'course_package', 'tryout', 'addon']),
+            ],
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'is_active' => 'boolean',
 
-        $meetingIds = UserEntitlement::where('user_id', $userId)
-            ->where('entitlement_type', 'meeting')
-            ->pluck('entitlement_id');
+            // productable (addon boleh null)
+            'productable_type' => 'nullable|string',
+            'productable_id'   => 'nullable|integer',
+        ]);
 
-        $meetings = Meeting::with('course')
-            ->whereIn('id', $meetingIds)
-            ->whereNull('deleted_at')
-            ->orderBy('scheduled_at')
-            ->get();
+        $product = Product::create([
+            'type'        => $validated['type'],
+            'name'        => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'is_active'   => $validated['is_active'] ?? true,
+        ]);
 
-        return view('purchase.products.meetings', compact('meetings'));
+        // addon tidak punya productable
+        if ($validated['type'] !== 'addon') {
+            Productable::create([
+                'product_id'       => $product->id,
+                'productable_type' => $this->mapProductableClass($validated['type']),
+                'productable_id'   => $validated['productable_id'],
+            ]);
+        }
+
+        toast('success', 'Product berhasil dibuat.');
+        return redirect()->route('products.index');
     }
 
     /**
-     * List tryout yang dimiliki user
+     * Show the form for editing the specified product.
      */
-    public function tryouts(Request $request)
+    public function edit(Product $product)
     {
-        $userId = $request->user()->id;
-
-        $tryoutIds = UserEntitlement::where('user_id', $userId)
-            ->where('entitlement_type', 'tryout')
-            ->pluck('entitlement_id');
-
-        $tryouts = Exam::where('type', 'tryout')
-            ->whereIn('id', $tryoutIds)
-            ->get();
-
-        return view('purchase.products.tryouts', compact('tryouts'));
+        return view('purchase.products.edit', [
+            'product'  => $product->load('productable.productable'),
+            'courses'  => Course::orderBy('name')->get(),
+            'meetings' => Meeting::orderBy('title')->get(),
+            'tryouts'  => Exam::where('type', 'tryout')->orderBy('title')->get(),
+        ]);
     }
 
     /**
-     * Detail course (opsional, kalau mau)
-     * Biasanya redirect ke halaman belajar
+     * Update the specified product.
      */
-    public function showCourse(Request $request, Course $course)
+    public function update(Request $request, Product $product)
     {
-        $hasAccess = UserEntitlement::where('user_id', $request->user()->id)
-            ->where('entitlement_type', 'course')
-            ->where('entitlement_id', $course->id)
-            ->exists();
+        $validated = $request->validate([
+            'type' => [
+                'required',
+                Rule::in(['meeting', 'course_package', 'tryout', 'addon']),
+            ],
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'is_active' => 'boolean',
 
-        abort_if(! $hasAccess, 403);
+            'productable_type' => 'nullable|string',
+            'productable_id'   => 'nullable|integer',
+        ]);
 
-        return redirect()->route('courses.show', $course->slug);
+        $product->update([
+            'type'        => $validated['type'],
+            'name'        => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'is_active'   => $validated['is_active'] ?? true,
+        ]);
+
+        // reset productable
+        $product->productable()?->delete();
+
+        if ($validated['type'] !== 'addon') {
+            Productable::create([
+                'product_id'       => $product->id,
+                'productable_type' => $this->mapProductableClass($validated['type']),
+                'productable_id'   => $validated['productable_id'],
+            ]);
+        }
+
+        toast('success', 'Product berhasil diperbarui.');
+        return redirect()->route('products.index');
     }
+
     /**
-     * Etalase pembelian (browse course & tryout)
+     * Remove the specified product.
      */
-    public function browse(Request $request)
+    public function destroy(Product $product)
     {
-        $userId = $request->user()->id;
+        if (
+            $product->cartItems()->exists() ||
+            $product->orderItems()->exists()
+        ) {
+            toast('error', 'Product tidak bisa dihapus karena sudah digunakan.');
+            return back();
+        }
 
-        // course yang sudah dimiliki (biar ga bisa dibeli lagi)
-        $ownedCourseIds = UserEntitlement::where('user_id', $userId)
-            ->where('entitlement_type', 'course')
-            ->pluck('entitlement_id')
-            ->toArray();
+        $product->delete();
 
-        // tryout yang sudah dimiliki
-        $ownedTryoutIds = UserEntitlement::where('user_id', $userId)
-            ->where('entitlement_type', 'tryout')
-            ->pluck('entitlement_id')
-            ->toArray();
-
-        $courses = Course::whereNull('deleted_at')
-            ->withCount('meetings')
-            ->get();
-
-        $tryouts = Exam::where('type', 'tryout')
-            ->whereNull('deleted_at')
-            ->get();
-
-        return view('purchase.products.browse', compact(
-            'courses',
-            'tryouts',
-            'ownedCourseIds',
-            'ownedTryoutIds'
-        ));
+        toast('warning', 'Product telah dihapus.');
+        return redirect()->route('products.index');
     }
 
+    /**
+     * Toggle active status.
+     */
+    public function toggleStatus(Product $product)
+    {
+        $product->update([
+            'is_active' => ! $product->is_active,
+        ]);
+
+        toast('success', 'Status product diperbarui.');
+        return back();
+    }
+
+    /**
+     * Ajax: get selectable productables by type.
+     */
+    public function productables(string $type)
+    {
+        return match ($type) {
+            'meeting' => Meeting::select('id', 'title')->get(),
+            'course_package' => Course::select('id', 'name')->get(),
+            'tryout' => Exam::where('type', 'tryout')->select('id', 'title')->get(),
+            default => collect(),
+        };
+    }
+
+    /**
+     * Map product type to morph class.
+     */
+    protected function mapProductableClass(string $type): string
+    {
+        return match ($type) {
+            'meeting'        => Meeting::class,
+            'course_package' => Course::class,
+            'tryout'         => Exam::class,
+            default          => throw new \InvalidArgumentException('Invalid productable type'),
+        };
+    }
 }

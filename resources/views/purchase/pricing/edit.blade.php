@@ -13,7 +13,7 @@
     </div>
 
     <form method="POST"
-          action="{{ route('purchase.pricing.update', $pricingRule) }}"
+          action="{{ route('pricing.update', $pricingRule) }}"
           class="space-y-6
                  p-6 rounded-2xl border dark:border-azwara-darker
                  bg-white dark:bg-azwara-darkest">
@@ -93,7 +93,7 @@
         </div>
 
         <div class="pt-4 flex justify-end gap-3">
-            <a href="{{ route('purchase.pricing.index') }}"
+            <a href="{{ route('pricing.index') }}"
                class="px-5 py-2.5 rounded-xl border
                       text-gray-700 dark:text-gray-300">
                 Batal
@@ -108,6 +108,20 @@
         </div>
 
     </form>
+            {{-- DELETE --}}
+            <form method="POST"
+                action="{{ route('pricing.destroy', $pricingRule) }}"
+                class="sweet-confirm"
+                data-message="Yakin ingin menghapus pricing rule ini secara permanen?">
+                @csrf
+                @method('DELETE')
 
+                <button type="submit"
+                        class="px-5 py-2.5 rounded-xl
+                            bg-red-600 hover:bg-red-700
+                            text-white font-semibold">
+                    Hapus Permanen
+                </button>
+            </form>
 </div>
 @endsection

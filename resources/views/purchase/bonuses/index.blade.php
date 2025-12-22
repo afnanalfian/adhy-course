@@ -49,7 +49,7 @@
                         </td>
 
                         <td class="px-6 py-4 text-right">
-                            <a href="{{ route('purchase.bonuses.edit', $product) }}"
+                            <a href="{{ route('bonuses.edit', $product) }}"
                                class="text-primary font-semibold hover:underline">
                                 Atur Bonus
                             </a>

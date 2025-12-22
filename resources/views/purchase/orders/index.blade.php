@@ -67,7 +67,7 @@
                         </td>
 
                         <td class="px-6 py-4 text-right">
-                            <a href="{{ route('purchase.orders.show', $order) }}"
+                            <a href="{{ route('orders.show', $order) }}"
                                class="text-primary hover:underline font-semibold">
                                 Detail
                             </a>

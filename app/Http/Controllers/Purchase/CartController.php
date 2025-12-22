@@ -19,15 +19,20 @@ class CartController extends Controller
     public function show(Request $request)
     {
         $cart = $this->getActiveCart($request->user()->id);
-
         $cart->load('items.product');
 
-        $subtotal = $cart->items->sum(function ($item) {
-            return $item->price_snapshot * $item->qty;
-        });
+        $subtotal = 0;
 
-        return view('purchase.cart.show', compact('cart', 'subtotal'));
+        foreach ($cart->items as $item) {
+            $subtotal += ($item->price_snapshot * $item->qty);
+        }
+
+        return view('purchase.cart.show', compact(
+            'cart',
+            'subtotal'
+        ));
     }
+
 
     /**
      * Add product ke cart
@@ -36,19 +41,18 @@ class CartController extends Controller
     {
         $userId = $request->user()->id;
 
-        // tidak boleh beli ulang
         if ($this->alreadyOwned($userId, $product)) {
             return back()->withErrors('Produk sudah kamu miliki.');
         }
 
         $cart = $this->getActiveCart($userId);
 
-        DB::beginTransaction();
+        DB::transaction(function () use ($request, $product, $cart, $pricingService) {
 
-        try {
             $qty = (int) $request->input('qty', 1);
 
-            $price = $pricingService->calculate(
+            // hitung harga satuan dulu
+            $unitPrice = $pricingService->determineUnitPrice(
                 $product->type,
                 $qty
             );
@@ -60,21 +64,16 @@ class CartController extends Controller
                 ],
                 [
                     'qty'            => $qty,
-                    'price_snapshot' => $price,
+                    'price_snapshot' => $unitPrice,
                 ]
             );
+        });
 
-            DB::commit();
-
-            return redirect()
-                ->route('cart.show')
-                ->with('success', 'Produk berhasil ditambahkan ke cart');
-
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            throw $e;
-        }
+        return redirect()
+            ->route('cart.show')
+            ->with('success', 'Produk berhasil ditambahkan ke cart');
     }
+
 
     /**
      * Update qty item di cart
@@ -90,18 +89,26 @@ class CartController extends Controller
             'qty' => 'required|integer|min:1'
         ])['qty'];
 
-        $price = $pricingService->calculate(
-        $cartItem->product->type,
-        $qty
-        );
+        DB::transaction(function () use ($cartItem, $qty, $pricingService) {
 
-        $cartItem->update([
-            'qty'            => $qty,
-            'price_snapshot' => $price,
-        ]);
+            $product = $cartItem->product;
+
+            // hitung harga baru
+            $unitPrice = $pricingService->determineUnitPrice(
+                $product->type,
+                $qty
+            );
+
+            // update qty + snapshot
+            $cartItem->update([
+                'qty'            => $qty,
+                'price_snapshot' => $unitPrice,
+            ]);
+        });
 
         return back()->with('success', 'Jumlah item diperbarui');
     }
+
 
     /**
      * Remove item dari cart
@@ -110,37 +117,43 @@ class CartController extends Controller
     {
         $this->authorizeCartItem($request->user()->id, $cartItem);
 
-        $cartItem->delete();
+        DB::transaction(function () use ($cartItem) {
+            $cartItem->delete();
+        });
 
         return back()->with('success', 'Item dihapus dari cart');
     }
 
+
+
     /* =======================================================
-       ================ INTERNAL HELPERS =====================
+       INTERNAL HELPERS
        ======================================================= */
 
     protected function getActiveCart(int $userId): Cart
     {
-        return Cart::firstOrCreate(
-            [
-                'user_id' => $userId,
-                'status'  => 'active',
-            ]
-        );
+        return Cart::firstOrCreate([
+            'user_id' => $userId,
+            'status'  => 'active',
+        ]);
     }
+
 
     protected function alreadyOwned(int $userId, Product $product): bool
     {
-        foreach ($product->productables as $productable) {
-            if (UserEntitlement::where('user_id', $userId)
-                ->where('entitlement_type', $this->mapType($product->type))
-                ->where('entitlement_id', $productable->productable_id)
-                ->exists()) {
-                return true;
-            }
+        $ids = $product->productables()->pluck('productable_id');
+
+        if ($ids->isEmpty()) {
+            return false;
         }
-        return false;
+
+        return UserEntitlement::where('user_id', $userId)
+            ->where('entitlement_type', $this->mapType($product->type))
+            ->whereIn('entitlement_id', $ids)
+            ->exists();
     }
+
+
     protected function mapType(string $type): string
     {
         return match ($type) {
