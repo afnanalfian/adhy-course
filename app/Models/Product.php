@@ -15,11 +15,14 @@ class Product extends Model
 
     /* ================= RELATIONS ================= */
 
+    public function productable()
+    {
+        return $this->hasOne(Productable::class);
+    }
     public function productables()
     {
         return $this->hasMany(Productable::class);
     }
-
     public function cartItems()
     {
         return $this->hasMany(CartItem::class);
@@ -41,7 +44,7 @@ class Product extends Model
             ->when($id, fn($q) => $q->where('bonus_id', $id))
             ->exists();
     }
-    /* ================= PRICING RULE DISPLAY ================= */
+    /* ================= PRICING RULE ================= */
     function price_for_tryout()
     {
         $rule = PricingRule::where('product_type', 'tryout')
