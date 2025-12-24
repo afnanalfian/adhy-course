@@ -18,7 +18,7 @@ class CreateUserEntitlementsTable extends Migration
             $table->timestamps();
 
             $table->index(['user_id','entitlement_type']);
-            $table->unique(['user_id', 'entitlement_type', 'entitlement_id'],'user_entitlements_unique');
+            $table->unique(['user_id', 'entitlement_type', 'id'],'user_entitlements_unique');
         });
     }
 
