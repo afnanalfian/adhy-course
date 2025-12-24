@@ -173,14 +173,14 @@ class BimbelAfnanSeeder extends Seeder
         // 1. Admin
         $admin = User::create([
             'name' => 'Admin Bimbel',
-            'email' => 'admin@bimbelafnan.com',
+            'email' => 'admin@bimbel.com',
             'email_verified_at' => now(),
             'password' => Hash::make('password'),
             'phone' => '081234567890',
             'avatar' => null,
             'is_active' => true,
-            'province_id' => 6, // Jawa Barat
-            'regency_id' => 67, // Kota Bandung
+            'province_id' => 73, // Jawa Barat
+            'regency_id' => 7309, // Kota Bandung
         ]);
         $admin->assignRole('admin');
         $users['admin'] = $admin;
@@ -203,8 +203,8 @@ class BimbelAfnanSeeder extends Seeder
                 'phone' => '0812' . rand(1000000, 9999999),
                 'avatar' => null,
                 'is_active' => true,
-                'province_id' => rand(1, 34),
-                'regency_id' => rand(1, 514),
+                'province_id' => 73,
+                'regency_id' => 7309,
             ]);
             $user->assignRole('siswa');
             $users['students'][] = $user;
