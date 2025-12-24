@@ -30,7 +30,7 @@ class UserEntitlementController extends Controller
             ->with([
                 'entitlements' => function ($q) {
                     $q->orderBy('entitlement_type')
-                      ->orderBy('entitlement_id');
+                      ->orderBy('id');
                 },
             ])
             ->orderBy('name')
