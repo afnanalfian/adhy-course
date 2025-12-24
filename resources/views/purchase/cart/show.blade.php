@@ -30,19 +30,12 @@
 
                 <div class="flex items-center gap-3">
                     {{-- QTY --}}
-                    <form method="POST"
-                          action="{{ route('cart.update', $item) }}">
-                        @csrf
-                        @method('PATCH')
-                        <input type="number"
-                               name="qty"
-                               min="1"
-                               value="{{ $item->qty }}"
-                               class="w-20 rounded-lg border-gray-300
-                                      dark:bg-azwara-darkest
-                                      dark:border-azwara-darker
-                                      focus:ring-primary focus:border-primary">
-                    </form>
+                    <span class="inline-flex items-center px-3 py-1
+                                rounded-full text-xs font-medium
+                                bg-slate-100 dark:bg-white/10
+                                text-slate-700 dark:text-slate-200">
+                        Qty: {{ $item->qty }}
+                    </span>
 
                     {{-- PRICE --}}
                     <span class="font-semibold text-gray-900 dark:text-white">

@@ -101,6 +101,7 @@
             </div>
 
             {{-- Actions --}}
+            @role('admin')
             <div class="mt-8 flex flex-col sm:flex-row gap-3">
 
                 {{-- WhatsApp --}}
@@ -143,6 +144,7 @@
                 </form>
 
             </div>
+            @endrole
 
         </div>
     </div>

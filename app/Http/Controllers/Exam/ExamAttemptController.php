@@ -15,6 +15,17 @@ class ExamAttemptController extends Controller
 {
     public function start(Exam $exam)
     {
+        // ===============================
+        // AUTHORIZATION (KHUSUS SISWA)
+        // ===============================
+        if (
+            auth()->check() &&
+            auth()->user()->hasRole('siswa') &&
+            auth()->user()->cannot('view', $exam)
+        ) {
+            toast('error', 'Silakan lakukan pembelian terlebih dahulu');
+            return back();
+        }
         if (!$exam->isActive()) {
             abort(403, 'Ujian belum aktif');
         }
@@ -57,6 +68,14 @@ class ExamAttemptController extends Controller
     }
     public function attempt(Exam $exam)
     {
+        if (
+            auth()->check() &&
+            auth()->user()->hasRole('siswa') &&
+            auth()->user()->cannot('view', $exam)
+        ) {
+            toast('error', 'Silakan lakukan pembelian terlebih dahulu');
+            return back();
+        }
         $attempt = $exam->attempts()
             ->where('user_id', auth()->id())
             ->firstOrFail();
@@ -83,6 +102,14 @@ class ExamAttemptController extends Controller
 
     public function submit(Exam $exam, ExamScoringService $scoring)
     {
+        if (
+            auth()->check() &&
+            auth()->user()->hasRole('siswa') &&
+            auth()->user()->cannot('view', $exam)
+        ) {
+            toast('error', 'Silakan lakukan pembelian terlebih dahulu');
+            return back();
+        }
         $attempt = $exam->attempts()
             ->where('user_id', auth()->id())
             ->where('is_submitted', false)
@@ -111,6 +138,15 @@ class ExamAttemptController extends Controller
 
     public function saveAnswer(Request $request, Exam $exam)
     {
+        if (
+            auth()->check() &&
+            auth()->user()->hasRole('siswa') &&
+            auth()->user()->cannot('view', $exam)
+        ) {
+            return response()->json([
+                'message' => 'Unauthorized'
+            ], 403);
+        }
         if (!$exam->isActive()) {
             abort(403);
         }

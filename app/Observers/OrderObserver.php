@@ -4,80 +4,118 @@ namespace App\Observers;
 
 use App\Models\Order;
 use App\Models\UserEntitlement;
-use Illuminate\Support\Facades\DB;
 
 class OrderObserver
 {
-    public function updated(Order $order)
+    public function updated(Order $order): void
     {
-        // ✅ hanya sekali: pending → verified
         if (! $this->shouldGrant($order)) {
             return;
         }
 
-        DB::transaction(function () use ($order) {
-            $order->loadMissing(['items.product.bonuses']);
+        $order->loadMissing([
+            'items.product.productable',
+            'items.product.bonuses',
+        ]);
 
-            foreach ($order->items as $item) {
-                $this->grantMainEntitlement(
+        foreach ($order->items as $item) {
+            $product = $item->product;
+
+            /** Entitlement utama */
+            $this->grantMainEntitlement(
+                $order->user_id,
+                $product
+            );
+
+            /** Bonus entitlement */
+            foreach ($product->bonuses as $bonus) {
+                $this->grantBonusEntitlement(
                     $order->user_id,
-                    $item->product
+                    $bonus
                 );
-
-                foreach ($item->product->bonuses as $bonus) {
-                    $this->grantBonusEntitlement(
-                        $order->user_id,
-                        $bonus
-                    );
-                }
             }
-        });
+        }
     }
 
     protected function shouldGrant(Order $order): bool
     {
         return $order->wasChanged('status')
-            && $order->getOriginal('status') === 'pending'
             && $order->status === 'verified';
     }
 
     protected function grantMainEntitlement(int $userId, $product): void
     {
         match ($product->type) {
-            'meeting' => UserEntitlement::firstOrCreate([
-                'user_id' => $userId,
-                'entitlement_type' => 'meeting',
-                'entitlement_id' => $product->productable_id,
-            ], ['source' => 'purchase']),
 
-            'course_package' => UserEntitlement::firstOrCreate([
-                'user_id' => $userId,
-                'entitlement_type' => 'course',
-                'entitlement_id' => $product->productable_id,
-            ], ['source' => 'purchase']),
+            'meeting' => $this->grant(
+                $userId,
+                'meeting',
+                $product->productable?->id
+            ),
 
-            'tryout' => UserEntitlement::firstOrCreate([
-                'user_id' => $userId,
-                'entitlement_type' => 'tryout',
-                'entitlement_id' => $product->productable_id,
-            ], ['source' => 'purchase']),
+            'course_package' => $this->grant(
+                $userId,
+                'course',
+                $product->productable?->id
+            ),
 
-            'addon' => UserEntitlement::firstOrCreate([
-                'user_id' => $userId,
-                'entitlement_type' => 'quiz',
-                'entitlement_id' => null,
-            ], ['source' => 'purchase']),
+            'tryout' => $this->grant(
+                $userId,
+                'tryout',
+                $product->productable?->id
+            ),
+
+            'addon' => $this->grant(
+                $userId,
+                'quiz',
+                0
+            ),
         };
+    }
+
+    protected function grant(int $userId, string $type, int $id): void
+    {
+        UserEntitlement::firstOrCreate(
+            [
+                'user_id'          => $userId,
+                'entitlement_type' => $type,
+                'entitlement_id'   => $id,
+            ],
+            [
+                'source' => 'purchase',
+            ]
+        );
     }
 
     protected function grantBonusEntitlement(int $userId, $bonus): void
     {
-        UserEntitlement::firstOrCreate([
-            'user_id' => $userId,
-            'entitlement_type' => $bonus->bonus_type,
-            'entitlement_id' => $bonus->bonus_id,
-        ], [
-            'source' => 'bonus',
-        ]);
+        if (! in_array($bonus->bonus_type, ['meeting','course','tryout','quiz'])) {
+            return;
+        }
+
+        UserEntitlement::firstOrCreate(
+            [
+                'user_id'          => $userId,
+                'entitlement_type' => $bonus->bonus_type,
+                'entitlement_id'   => $bonus->bonus_id ?? 0,
+            ],
+            [
+                'source' => 'bonus',
+            ]
+        );
+    }
+
+    protected function grantQuizIfNotExists(int $userId): void
+    {
+        UserEntitlement::firstOrCreate(
+            [
+                'user_id'          => $userId,
+                'entitlement_type' => 'quiz',
+                'entitlement_id'   => 0,
+            ],
+            [
+                'source' => 'purchase',
+            ]
+        );
     }
 }

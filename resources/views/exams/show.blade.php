@@ -185,69 +185,89 @@
         {{-- ===== SISWA ===== --}}
         @role('siswa')
 
-            @if($attempt && $attempt->is_submitted)
+            {{-- ===== TIDAK PUNYA AKSES ===== --}}
+            @cannot('view', $exam)
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                        Anda belum memiliki akses untuk ujian ini
+                    </span>
 
-            {{-- Score Card --}}
-            <div class="flex flex-wrap items-center gap-3">
-
-                <div
-                    class="rounded-2xl px-4 py-2
-                        bg-green-50 dark:bg-green-900/20
-                        border border-green-200 dark:border-green-500/30">
-
-                    <p class="text-xs text-green-700 dark:text-green-400">
-                        Skor Anda
-                    </p>
-
-                    <p class="text-xl font-bold text-green-700 dark:text-green-400 leading-tight">
-                        {{ $attempt->score }}
-                    </p>
+                    <a
+                        href="{{ route('browse.index') }}"
+                        class="px-4 py-2 rounded-xl text-sm font-medium
+                            bg-primary text-white
+                            hover:opacity-90 transition">
+                        Lakukan Pembelian
+                    </a>
                 </div>
-
-                <a
-                    href="{{ route('exams.result.student', $exam) }}"
-                    class="px-4 py-2 rounded-xl text-sm font-medium
-                        border border-gray-300
-                        text-gray-700
-                        hover:bg-gray-100 transition
-                        dark:border-gray-600 dark:text-gray-300
-                        dark:hover:bg-azwara-darkest">
-                    Lihat Hasil
-                </a>
-
-            </div>
-
             @else
 
-                @if($exam->status === 'active')
+                {{-- ===== SUDAH SUBMIT ===== --}}
+                @if($attempt && $attempt->is_submitted)
 
-                    @if(!$attempt)
-                        <form method="POST" action="{{ route('exams.start', $exam) }}">
-                            @csrf
-                            <button
-                                class="px-4 py-2 rounded-xl text-sm font-medium
-                                       bg-primary text-white
-                                       hover:opacity-90 transition">
-                                Mulai Exam
-                            </button>
-                        </form>
-                    @else
+                    <div class="flex flex-wrap items-center gap-3">
+
+                        <div
+                            class="rounded-2xl px-4 py-2
+                                bg-green-50 dark:bg-green-900/20
+                                border border-green-200 dark:border-green-500/30">
+
+                            <p class="text-xs text-green-700 dark:text-green-400">
+                                Skor Anda
+                            </p>
+
+                            <p class="text-xl font-bold text-green-700 dark:text-green-400 leading-tight">
+                                {{ $attempt->score }}
+                            </p>
+                        </div>
+
                         <a
-                            href="{{ route('exams.attempt', $exam) }}"
+                            href="{{ route('exams.result.student', $exam) }}"
                             class="px-4 py-2 rounded-xl text-sm font-medium
-                                   bg-primary text-white
-                                   hover:opacity-90 transition">
-                            Lanjutkan Exam
+                                border border-gray-300
+                                text-gray-700
+                                hover:bg-gray-100 transition
+                                dark:border-gray-600 dark:text-gray-300
+                                dark:hover:bg-azwara-darkest">
+                            Lihat Hasil
                         </a>
+
+                    </div>
+
+                {{-- ===== BELUM SUBMIT ===== --}}
+                @else
+
+                    @if($exam->status === 'active')
+
+                        @if(!$attempt)
+                            <form method="POST" action="{{ route('exams.start', $exam) }}">
+                                @csrf
+                                <button
+                                    class="px-4 py-2 rounded-xl text-sm font-medium
+                                        bg-primary text-white
+                                        hover:opacity-90 transition">
+                                    Mulai Exam
+                                </button>
+                            </form>
+                        @else
+                            <a
+                                href="{{ route('exams.attempt', $exam) }}"
+                                class="px-4 py-2 rounded-xl text-sm font-medium
+                                    bg-primary text-white
+                                    hover:opacity-90 transition">
+                                Lanjutkan Exam
+                            </a>
+                        @endif
+
+                    @else
+                        <span class="text-sm text-gray-500 dark:text-gray-400">
+                            Exam belum tersedia
+                        </span>
                     @endif
 
-                @else
-                    <span class="text-sm text-gray-500 dark:text-gray-400">
-                        Exam belum tersedia
-                    </span>
                 @endif
 
-            @endif
+            @endcannot
 
         @endrole
 

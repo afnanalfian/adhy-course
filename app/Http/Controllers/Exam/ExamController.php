@@ -167,7 +167,7 @@ class ExamController extends Controller
 
         // Kalau post test, pastikan meeting masih ada
         if (
-            $exam->examable_type === \App\Models\Meeting::class &&
+            $exam->examable_type === Meeting::class &&
             !$exam->examable
         ) {
             toast('error', 'Meeting tidak ditemukan');
@@ -179,7 +179,7 @@ class ExamController extends Controller
         toast('success', 'Ujian berhasil dihapus');
 
         // Redirect sesuai tipe
-        if ($exam->examable_type === \App\Models\Meeting::class) {
+        if ($exam->examable_type === Meeting::class) {
             return redirect()
                 ->route('meeting.show', $exam->examable);
         }

@@ -1,10 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
+<a
+    href="{{ route('pricing.index') }}"
+    class="text-sm font-medium text-primary hover:underline dark:text-azwara-lightest">
+    ← Kembali
+</a>
 <div class="max-w-3xl mx-auto space-y-6">
 
     <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-azwara-lightest">
             Tambah Pricing Rule
         </h1>
         <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -25,7 +30,7 @@
                 Tipe Produk
             </label>
             <select name="product_type"
-                    class="mt-1 w-full rounded-xl border-gray-300
+                    class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                            dark:bg-azwara-darkest dark:border-azwara-darker
                            focus:ring-primary focus:border-primary">
                 <option value="meeting">Meeting</option>
@@ -41,7 +46,7 @@
                 Tipe Harga
             </label>
             <select name="pricing_type" id="pricing_type"
-                    class="mt-1 w-full rounded-xl border-gray-300
+                    class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                            dark:bg-azwara-darkest dark:border-azwara-darker
                            focus:ring-primary focus:border-primary">
                 <option value="per_unit">Per Unit</option>
@@ -56,7 +61,7 @@
                     Minimum Qty
                 </label>
                 <input type="number" name="min_qty" min="1"
-                       class="mt-1 w-full rounded-xl border-gray-300
+                       class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                               dark:bg-azwara-darkest dark:border-azwara-darker
                               focus:ring-primary focus:border-primary">
             </div>
@@ -66,7 +71,7 @@
                     Maksimum Qty (opsional)
                 </label>
                 <input type="number" name="max_qty" min="1"
-                       class="mt-1 w-full rounded-xl border-gray-300
+                       class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                               dark:bg-azwara-darkest dark:border-azwara-darker
                               focus:ring-primary focus:border-primary">
             </div>
@@ -78,7 +83,7 @@
                 Harga
             </label>
             <input type="number" name="price" id="price" min="0" step="0.01"
-                   class="mt-1 w-full rounded-xl border-gray-300
+                   class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                           dark:bg-azwara-darkest dark:border-azwara-darker
                           focus:ring-primary focus:border-primary">
         </div>

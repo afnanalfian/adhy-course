@@ -18,6 +18,21 @@ class MeetingController extends Controller
      */
     public function show(Meeting $meeting)
     {
+        // ===============================
+        // AUTHORIZATION CHECK (CUSTOM)
+        // ===============================
+        if (
+            auth()->check() &&
+            auth()->user()->hasRole('siswa') &&
+            auth()->user()->cannot('view', $meeting)
+        ) {
+            toast('error', 'Silakan lakukan pembelian terlebih dahulu');
+            return redirect()->back();
+        }
+
+        // ===============================
+        // LOAD RELATIONS
+        // ===============================
         $meeting->load([
             'material',
             'video',
@@ -33,10 +48,9 @@ class MeetingController extends Controller
 
         $attempt = null;
 
-        // hitung attempt hanya jika:
-        // - login
-        // - siswa
-        // - meeting punya post test
+        // ===============================
+        // HITUNG ATTEMPT (KHUSUS SISWA)
+        // ===============================
         if (
             auth()->check() &&
             auth()->user()->hasRole('siswa') &&

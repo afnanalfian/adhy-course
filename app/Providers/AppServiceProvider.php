@@ -5,9 +5,21 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Gate;
+
 use App\Observers\OrderObserver;
 use App\Models\Order;
 use Carbon\Carbon;
+
+// MODELS
+use App\Models\Course;
+use App\Models\Meeting;
+use App\Models\Exam;
+
+// POLICIES
+use App\Policies\CoursePolicy;
+use App\Policies\MeetingPolicy;
+use App\Policies\ExamPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +39,17 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
         Paginator::useTailwind();
         Carbon::setLocale('id');
+
+        // ===============================
+        // OBSERVER
+        // ===============================
         Order::observe(OrderObserver::class);
+
+        // ===============================
+        // POLICY REGISTRATION (Laravel 11)
+        // ===============================
+        Gate::policy(Course::class, CoursePolicy::class);
+        Gate::policy(Meeting::class, MeetingPolicy::class);
+        Gate::policy(Exam::class, ExamPolicy::class);
     }
 }

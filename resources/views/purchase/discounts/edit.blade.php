@@ -1,10 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
+<a
+    href="{{ route('discounts.index') }}"
+    class="text-sm font-medium text-primary hover:underline dark:text-azwara-lightest">
+    ← Kembali
+</a>
 <div class="max-w-3xl mx-auto space-y-6">
 
     <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-azwara-lightest">
             Edit Discount
         </h1>
         <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -16,7 +21,7 @@
           action="{{ route('discounts.update', $discount) }}"
           class="space-y-6
                  p-6 rounded-2xl border dark:border-azwara-darker
-                 bg-white dark:bg-azwara-darkest">
+                 bg-white dark:text-azwara-lightest dark:bg-azwara-darkest">
         @csrf
         @method('PUT')
 

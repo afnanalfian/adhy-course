@@ -40,20 +40,12 @@
             LIST SISWA
             (SINGLE CHECKBOX / USER)
         ====================== --}}
-        @forelse ($students as $i => $student)
+        @forelse ($eligibleStudents as $i => $student)
             @php
                 $attendance = $attendances[$student->id] ?? null;
             @endphp
 
-            <div
-                class="flex items-center justify-between
-                       p-4 rounded-xl
-                       border border-gray-200 dark:border-white/10
-                       bg-white dark:bg-secondary
-                       hover:bg-azwara-lighter dark:hover:bg-azwara-lightest/5
-                       transition
-                       md:grid md:grid-cols-12 md:gap-4">
-
+            <div class="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-secondary hover:bg-azwara-lighter dark:hover:bg-azwara-lightest/5 transition md:grid md:grid-cols-12 md:gap-4">
                 {{-- NO (DESKTOP) --}}
                 <div class="hidden md:block md:col-span-1 text-sm text-gray-500">
                     {{ $i + 1 }}
@@ -72,18 +64,15 @@
                 {{-- CHECKBOX --}}
                 <div class="md:col-span-2 flex justify-end">
                     <input type="checkbox"
-                           name="attendances[{{ $student->id }}]"
-                           value="1"
-                           @checked(optional($attendance)->is_present)
-                           class="h-5 w-5 rounded
-                                  border-gray-300
-                                  text-primary
-                                  focus:ring-primary">
+                        name="attendances[{{ $student->id }}]"
+                        value="1"
+                        @checked(optional($attendance)->is_present)
+                        class="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary">
                 </div>
             </div>
         @empty
             <div class="py-8 text-center text-gray-500 dark:text-gray-400">
-                Tidak ada siswa terdaftar.
+                Tidak ada siswa yang memiliki akses ke meeting ini.
             </div>
         @endforelse
 

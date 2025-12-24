@@ -14,6 +14,7 @@ class CreateUserDiscountsTable extends Migration
             $table->foreignId('discount_id')->constrained()->cascadeOnDelete();
             $table->timestamp('used_at')->nullable();
             $table->unique(['user_id','discount_id']);
+            $table->timestamps();
         });
     }
 

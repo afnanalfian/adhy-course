@@ -41,12 +41,62 @@
             </svg>
         </button>
 
-        {{-- Bell Icon --}}
-        <button class="text-azwara-darkest dark:text-azwara-lighter">
-            <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 22c1.1 0 2-.9 2-2H10c0 1.1.9 2 2 2Zm6-6v-5a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2Z"/>
-            </svg>
-        </button>
+        @php
+            $notifications = auth()->user()?->unreadNotifications()->latest()->take(5)->get();
+            $unreadCount  = auth()->user()?->unreadNotifications()->count() ?? 0;
+        @endphp
+
+        <div x-data="{ open:false }" class="relative">
+
+            {{-- Bell --}}
+            <button @click="open = !open"
+                class="relative text-azwara-darkest dark:text-azwara-lighter">
+
+                <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22c1.1 0 2-.9 2-2H10c0 1.1.9 2 2 2Zm6-6v-5a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2Z"/>
+                </svg>
+
+                @if($unreadCount)
+                    <span class="absolute -top-1 -right-1
+                                bg-red-600 text-white text-xs
+                                rounded-full px-1.5">
+                        {{ $unreadCount }}
+                    </span>
+                @endif
+            </button>
+
+            {{-- Dropdown --}}
+            <div x-show="open" @click.outside="open=false"
+                class="absolute right-0 mt-3 w-80
+                        bg-white dark:bg-azwara-darker
+                        rounded-xl shadow-xl border
+                        dark:border-azwara-darkest z-50">
+
+                <div class="p-3 border-b dark:text-azwara-lightest dark:border-azwara-darkest font-semibold">
+                    Notifikasi
+                </div>
+
+                <div class="max-h-80 overflow-y-auto">
+                    @forelse($notifications as $notif)
+                        <a href="{{ $notif->data['url'] ?? '#' }}"
+                        class="block px-4 py-3 text-sm
+                                hover:bg-gray-50 dark:hover:bg-azwara-darkest">
+                            {{ $notif->data['message'] }}
+                        </a>
+                    @empty
+                        <p class="p-4 text-sm text-gray-500">
+                            Tidak ada notifikasi
+                        </p>
+                    @endforelse
+                </div>
+
+                <a href="{{ route('notifications.index') }}"
+                class="block text-center text-sm
+                        py-2 text-primary font-medium">
+                    Selengkapnya →
+                </a>
+            </div>
+        </div>
 
         {{-- User Dropdown --}}
         <div x-data="{ open: false }" class="relative">

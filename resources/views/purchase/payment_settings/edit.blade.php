@@ -33,12 +33,15 @@
             @endif
 
             <input type="file" name="qris_image"
-                   accept="image/*"
-                   class="mt-3 block w-full text-sm
-                          file:mr-4 file:py-2 file:px-4
-                          file:rounded-xl file:border-0
-                          file:bg-primary file:text-white
-                          hover:file:bg-azwara-medium">
+                accept="image/*"
+                class="mt-3 block w-full text-sm
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-xl file:border-0
+                        file:bg-primary file:text-white
+                        hover:file:bg-azwara-medium
+                        dark:file:bg-gray-700 dark:file:text-gray-200
+                        dark:hover:file:bg-gray-600">
+
         </div>
 
         {{-- PAYMENT INSTRUCTION --}}
@@ -48,7 +51,7 @@
             </label>
 
             <textarea name="payment_instruction" rows="4"
-                      class="mt-1 w-full rounded-xl border-gray-300
+                      class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                              dark:bg-azwara-darkest dark:border-azwara-darker
                              focus:ring-primary focus:border-primary">{{ old('payment_instruction', $settings['payment_instruction'] ?? '') }}</textarea>
         </div>
@@ -60,7 +63,7 @@
             </label>
 
             <select name="active_payment_method"
-                    class="w-full rounded-xl border-gray-300
+                    class="w-full rounded-xl border-gray-300 dark:text-white
                            dark:bg-azwara-darkest dark:border-azwara-darker
                            focus:ring-primary focus:border-primary">
 

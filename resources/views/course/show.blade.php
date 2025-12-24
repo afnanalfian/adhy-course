@@ -13,7 +13,6 @@
 
     {{-- COURSE HEADER --}}
     <div class="rounded-2xl p-6
-                {{-- bg-azwara-lightest dark:bg-secondary/80 --}}
                 border border-azwara-light/30 dark:border-white/10
                 backdrop-blur">
 
@@ -46,23 +45,18 @@
             </div>
 
             {{-- RIGHT --}}
-            <div class="flex flex-col sm:flex-row
-                        sm:items-center
-                        gap-3 w-full lg:w-auto">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full lg:w-auto">
 
-                {{-- SEARCH --}}
                 <input
                     id="meeting-search"
                     type="text"
                     placeholder="Cari pertemuan..."
-                    class="w-full sm:w-64
-                           rounded-xl
+                    class="w-full sm:w-64 rounded-xl
                            border-gray-300 dark:border-white/10
                            bg-azwara-lightest dark:bg-secondary
                            text-sm dark:text-white
                            focus:ring-primary focus:border-primary">
 
-                {{-- ADD --}}
                 @hasanyrole('admin|tentor')
                 <a href="{{ route('meeting.create', $course) }}"
                    class="inline-flex justify-center items-center gap-2
@@ -77,19 +71,50 @@
         </div>
     </div>
 
+    @php
+        $lockIcon = '
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M16 11V7a4 4 0 00-8 0v4
+                    M5 11h14
+                    a2 2 0 012 2v6
+                    a2 2 0 01-2 2H5
+                    a2 2 0 01-2-2v-6
+                    a2 2 0 012-2z" />
+        </svg>';
+    @endphp
+
     {{-- MEETING LIST --}}
     <div id="meeting-list" class="grid gap-4">
 
         @forelse ($course->meetings as $index => $meeting)
+
+            @php
+                $canAccessMeeting = auth()->check()
+                    && auth()->user()->can('view', $meeting);
+
+                $statusColor = match ($meeting->status) {
+                    'upcoming' => 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300',
+                    'live'     => 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300',
+                    'done'     => 'bg-gray-200 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300',
+                    default    => 'bg-gray-100 text-gray-600 dark:bg-gray-500/10 dark:text-gray-400',
+                };
+            @endphp
+
             <div
-                onclick="window.location='{{ route('meeting.show', $meeting) }}'"
-                class="meeting-card group
-                       cursor-pointer
+                @if($canAccessMeeting)
+                    onclick="window.location='{{ route('meeting.show', $meeting) }}'"
+                @else
+                    onclick="showLockedMeetingToast()"
+                @endif
+                class="meeting-card group cursor-pointer
                        rounded-xl p-5
                        bg-azwara-lightest dark:bg-secondary/70
                        border border-azwara-light/30 dark:border-white/10
                        transition
-                       hover:shadow-lg hover:-translate-y-0.5">
+                       hover:shadow-lg hover:-translate-y-0.5
+                       {{ ! $canAccessMeeting ? 'opacity-80 hover:shadow-none hover:translate-y-0' : '' }}">
 
                 <div class="flex flex-col sm:flex-row
                             sm:items-center sm:justify-between
@@ -116,22 +141,26 @@
                     </div>
 
                     {{-- RIGHT --}}
-                    @php
-                        $statusColor = match ($meeting->status) {
-                            'upcoming' => 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300',
-                            'live'     => 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300',
-                            'done'     => 'bg-gray-200 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300',
-                            default    => 'bg-gray-100 text-gray-600 dark:bg-gray-500/10 dark:text-gray-400',
-                        };
-                    @endphp
-
-                    <span class="self-start sm:self-center
-                                 px-3 py-1 rounded-full
-                                 text-md font-semibold {{ $statusColor }}">
-                        {{ ucfirst($meeting->status) }}
-                    </span>
+                    @if ($canAccessMeeting)
+                        <span class="self-start sm:self-center
+                                     px-3 py-1 rounded-full
+                                     text-md font-semibold {{ $statusColor }}">
+                            {{ ucfirst($meeting->status) }}
+                        </span>
+                    @else
+                        <span class="self-start sm:self-center
+                                     flex items-center gap-2
+                                     px-3 py-1 rounded-full
+                                     text-sm font-semibold
+                                     bg-gray-200 text-gray-600
+                                     dark:bg-gray-500/20 dark:text-gray-300">
+                            {!! $lockIcon !!}
+                            Terkunci
+                        </span>
+                    @endif
                 </div>
             </div>
+
         @empty
             <div class="text-center py-12
                         text-gray-500 dark:text-gray-400">
@@ -142,6 +171,7 @@
 
 </div>
 @endsection
+
 @push('scripts')
 <script>
     const searchInput = document.getElementById('meeting-search');
@@ -157,5 +187,13 @@
             card.classList.toggle('hidden', !title.includes(keyword));
         });
     });
+
+    function showLockedMeetingToast() {
+        if (window.toast) {
+            toast('error', 'Anda belum punya hak akses untuk meeting ini, silakan lakukan pembelian terlebih dahulu');
+        } else {
+            alert('Anda belum punya hak akses untuk meeting ini. Silakan lakukan pembelian terlebih dahulu');
+        }
+    }
 </script>
 @endpush

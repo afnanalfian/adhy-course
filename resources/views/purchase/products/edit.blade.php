@@ -24,7 +24,7 @@
 
         {{-- NAMA --}}
         <div>
-            <label class="block text-sm font-medium mb-1">
+            <label class="block text-sm font-medium mb-1 dark:text-azwara-lightest">
                 Nama Product
             </label>
             <input type="text"
@@ -40,7 +40,7 @@
 
         {{-- TIPE PRODUCT --}}
         <div>
-            <label class="block text-sm font-medium mb-1">
+            <label class="block text-sm font-medium mb-1 dark:text-azwara-lightest">
                 Tipe Product
             </label>
             <select name="type"
@@ -79,7 +79,7 @@
 
         {{-- PRODUCTABLE --}}
         <div id="productable-wrapper" class="hidden">
-            <label class="block text-sm font-medium mb-1">
+            <label class="block text-sm font-medium mb-1 dark:text-azwara-lightest">
                 Konten
             </label>
 
@@ -97,7 +97,7 @@
 
         {{-- DESKRIPSI --}}
         <div>
-            <label class="block text-sm font-medium mb-1">
+            <label class="block text-sm font-medium mb-1 dark:text-azwara-lightest">
                 Deskripsi (opsional)
             </label>
             <textarea name="description"
@@ -107,7 +107,7 @@
         </div>
 
         {{-- STATUS --}}
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 dark:text-azwara-lightest">
             <input type="checkbox"
                    name="is_active"
                    value="1"
@@ -126,7 +126,7 @@
             </a>
 
             <button type="submit"
-                    class="bg-primary hover:bg-azwara-medium
+                    class="bg-primary hover:bg-azwara-light
                            text-white font-semibold px-6 py-2.5 rounded-xl transition">
                 Simpan Perubahan
             </button>
@@ -160,7 +160,7 @@
 
         try {
             const response = await fetch(
-                `{{ url('/products/productables') }}/${type}`
+                `{{ url('admin/products/productables') }}/${type}`
             );
             const items = await response.json();
 

@@ -6,13 +6,27 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
+use App\Models\Discount;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
 class CheckoutService
 {
-    public function checkout(Cart $cart): Order
+    protected DiscountService $discountService;
+
+    public function __construct(DiscountService $discountService)
     {
+        $this->discountService = $discountService;
+    }
+
+    /**
+     * Checkout cart → order
+     */
+    public function checkout(
+        Cart $cart,
+        int $userId,
+        ?Discount $discount = null
+    ): Order {
         if ($cart->status !== 'active') {
             throw new Exception('Cart bukan active');
         }
@@ -21,33 +35,21 @@ class CheckoutService
             throw new Exception('Cart kosong');
         }
 
-        return DB::transaction(function () use ($cart) {
+        return DB::transaction(function () use ($cart, $userId, $discount) {
 
-            /**
-             * RELOAD CART ITEMS
-             * Pastikan snapshot sudah ada
-             */
             $cart->load('items.product');
 
-            $total = 0;
+            $subtotal = $cart->items->sum(
+                fn ($item) => $item->price_snapshot * $item->qty
+            );
 
-            foreach ($cart->items as $item) {
-                $total += ($item->price_snapshot * $item->qty);
-            }
-
-            /**
-             * CREATE ORDER
-             */
             $order = Order::create([
                 'user_id'      => $cart->user_id,
-                'total_amount' => $total,
+                'total_amount' => $subtotal,
                 'status'       => 'pending',
                 'expires_at'   => now()->addHours(2),
             ]);
 
-            /**
-             * SNAPSHOT CART ITEMS → ORDER ITEMS
-             */
             foreach ($cart->items as $item) {
                 OrderItem::create([
                     'order_id'   => $order->id,
@@ -57,18 +59,21 @@ class CheckoutService
                 ]);
             }
 
-            /**
-             * PAYMENT RECORD
-             */
+            // APPLY DISCOUNT (OPTIONAL)
+            if ($discount) {
+                $this->discountService->applyDiscountToOrder(
+                    $order,
+                    $discount,
+                    $userId
+                );
+            }
+
             Payment::create([
                 'order_id' => $order->id,
                 'method'   => 'manual_qris',
                 'status'   => 'waiting',
             ]);
 
-            /**
-             * CLOSE CART
-             */
             $cart->update([
                 'status' => 'checked_out',
             ]);

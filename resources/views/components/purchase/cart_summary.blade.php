@@ -34,7 +34,38 @@
                 </li>
             @endforeach
         </ul>
+        @php
+            $userHasQuiz = \App\Models\UserEntitlement::where('user_id', auth()->id())
+                ->where('entitlement_type', 'quiz')
+                ->exists();
 
+            $cartHasCourse = $cart->items->contains(fn ($i) =>
+                $i->product->type === 'course_package'
+            );
+
+            $cartHasAddon = $cart->items->contains(fn ($i) =>
+                $i->product->type === 'addon'
+            );
+        @endphp
+
+        @if (! $userHasQuiz && ! $cartHasCourse)
+            <form method="POST" action="{{ route('cart.add-addon') }}">
+                @csrf
+                <button
+                    type="submit"
+                    @disabled($cartHasAddon)
+                    class="w-full mt-4 rounded-xl py-3 font-semibold
+                        {{ $cartHasAddon
+                                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                                : 'bg-indigo-600 hover:bg-indigo-700 text-white' }}">
+                    @if($cartHasAddon)
+                        Addon Quiz sudah ditambahkan
+                    @else
+                        Tambah Addon Quiz (+Rp10.000)
+                    @endif
+                </button>
+            </form>
+        @endif
         <div class="mt-6 pt-4 border-t border-gray-200 dark:border-azwara-darker
                     flex items-center justify-between">
             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -47,13 +78,12 @@
                 ) }}
             </span>
         </div>
-
         @if($showAction)
             <div class="mt-5">
-                <a href="{{ route('checkout.process') }}"
-                   class="block w-full text-center rounded-xl
-                          bg-primary hover:bg-azwara-medium
-                          text-white font-semibold py-3 transition">
+                <a href="{{ route('checkout.review') }}"
+                class="block w-full text-center rounded-xl
+                        bg-primary hover:bg-azwara-medium
+                        text-white font-semibold py-3 transition">
                     Checkout
                 </a>
             </div>

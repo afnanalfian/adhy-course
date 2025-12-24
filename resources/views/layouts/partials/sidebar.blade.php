@@ -9,9 +9,11 @@
               h-screen
               bg-azwara-lighter dark:bg-azwara-darker
               border-r border-gray-200 dark:border-azwara-darkest
-              transform -translate-x-full md:translate-x-0">
+              transform -translate-x-full
+              transition-transform duration-300
+              flex flex-col">
 
-    <div class="flex flex-col items-center py-6 gap-4">
+    <div class="flex-shrink-0 flex flex-col items-center py-6 gap-4">
 
         {{-- Logo --}}
         <a href="{{ route('dashboard.redirect') }}">
@@ -31,7 +33,10 @@
     </div>
 
     {{-- Menu --}}
-    <nav class="px-6 flex flex-col gap-2 text-azwara-darkest dark:text-azwara-lighter">
+    <nav class="flex-1 overflow-y-auto px-4 pb-6
+            scrollbar-thin scrollbar-thumb-azwara-medium/40
+            scrollbar-track-transparent
+            text-azwara-darkest dark:text-azwara-lighter">
 
         @role('admin')
             @include('layouts.partials.menus.admin')

@@ -4,65 +4,89 @@ namespace App\Http\Controllers\Purchase;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\UserEntitlement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    public function index()
+    /**
+     * List order yang perlu ditangani admin
+     */
+    public function index(Request $request)
     {
-        $orders = Order::with(['user', 'payment'])
-            ->whereIn('status', ['pending', 'paid'])
-            ->orderBy('created_at', 'asc')
-            ->get();
+        $query = Order::with(['user', 'payment'])
+            ->orderByDesc('created_at');
+
+        // SEARCH BY USER NAME
+        if ($request->filled('q')) {
+            $q = $request->q;
+
+            $query->whereHas('user', function ($user) use ($q) {
+                $user->where('name', 'like', "%{$q}%");
+            });
+        }
+
+        $orders = $query->paginate(10)
+            ->withQueryString(); // biar pagination tetap bawa parameter search
 
         return view('purchase.orders.index', compact('orders'));
     }
 
+    /**
+     * Detail order
+     */
     public function show(Order $order)
     {
         $order->load([
             'user',
-            'items.product',
-            'payment.verifier'
+            'items.product.productable',
+            'payment.verifier',
         ]);
 
         return view('purchase.orders.show', compact('order'));
     }
 
     /**
-     * ACC pembayaran (AMAN dari double verify)
+     * APPROVE pembayaran + grant akses
      */
     public function approve(Request $request, Order $order)
     {
         DB::transaction(function () use ($order, $request) {
 
+            /** LOCK ORDER */
             $order = Order::where('id', $order->id)
                 ->lockForUpdate()
-                ->first();
+                ->with(['items.product.productable', 'payment'])
+                ->firstOrFail();
 
-            if ($order->status !== 'pending') {
-                abort(409, 'Order sudah diproses');
+            /** VALIDASI STATUS */
+            if (
+                $order->status !== 'paid' ||
+                $order->payment->status !== 'paid'
+            ) {
+                abort(409, 'Order tidak dalam status yang bisa diverifikasi');
             }
 
-            $order->payment()->update([
-                'status'       => 'verified',
-                'verified_at'  => now(),
-                'verified_by'  => $request->user()->id,
+            /** UPDATE PAYMENT */
+            $order->payment->update([
+                'status'      => 'verified',
+                'verified_at' => now(),
+                'verified_by' => $request->user()->id,
             ]);
 
+            /** UPDATE ORDER */
             $order->update([
                 'status' => 'verified',
             ]);
         });
 
-        return redirect()
-            ->route('orders.index')
-            ->with('success', 'Pembayaran berhasil diverifikasi');
+        toast('success', 'Pembayaran berhasil diverifikasi dan akses diberikan');
+        return redirect()->route('orders.index');
     }
 
     /**
-     * Tolak pembayaran
+     * REJECT pembayaran
      */
     public function reject(Request $request, Order $order)
     {
@@ -70,13 +94,14 @@ class OrderController extends Controller
 
             $order = Order::where('id', $order->id)
                 ->lockForUpdate()
-                ->first();
+                ->with('payment')
+                ->firstOrFail();
 
-            if (! in_array($order->status, ['pending', 'paid'])) {
+            if (! in_array($order->status, ['paid'])) {
                 abort(409, 'Order tidak bisa ditolak');
             }
 
-            $order->payment()->update([
+            $order->payment->update([
                 'status' => 'rejected',
             ]);
 
@@ -85,8 +110,7 @@ class OrderController extends Controller
             ]);
         });
 
-        return redirect()
-            ->route('orders.index')
-            ->with('success', 'Pembayaran ditolak');
+        toast('info', 'Pembayaran telah ditolak');
+        return redirect()->route('orders.index');
     }
 }

@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+<a
+    href="{{ route('pricing.index') }}"
+    class="text-sm font-medium text-primary hover:underline dark:text-azwara-lightest">
+    ← Kembali
+</a>
 <div class="max-w-3xl mx-auto space-y-6">
 
     <div>
@@ -27,7 +32,7 @@
             </label>
             <input type="text" disabled
                    value="{{ strtoupper($pricingRule->product_type) }}"
-                   class="mt-1 w-full rounded-xl bg-gray-100
+                   class="mt-1 w-full rounded-xl bg-gray-100 dark:text-white
                           dark:bg-azwara-darker border-gray-300">
         </div>
 
@@ -37,7 +42,7 @@
                 Tipe Harga
             </label>
             <select name="pricing_type"
-                    class="mt-1 w-full rounded-xl border-gray-300
+                    class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                            dark:bg-azwara-darkest dark:border-azwara-darker">
                 <option value="per_unit" @selected($pricingRule->pricing_type === 'per_unit')>
                     Per Unit
@@ -56,7 +61,7 @@
                 </label>
                 <input type="number" name="min_qty"
                        value="{{ $pricingRule->min_qty }}"
-                       class="mt-1 w-full rounded-xl border-gray-300
+                       class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                               dark:bg-azwara-darkest dark:border-azwara-darker">
             </div>
 
@@ -66,7 +71,7 @@
                 </label>
                 <input type="number" name="max_qty"
                        value="{{ $pricingRule->max_qty }}"
-                       class="mt-1 w-full rounded-xl border-gray-300
+                       class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                               dark:bg-azwara-darkest dark:border-azwara-darker">
             </div>
         </div>
@@ -78,7 +83,7 @@
             </label>
             <input type="number" name="price"
                    value="{{ $pricingRule->price }}"
-                   class="mt-1 w-full rounded-xl border-gray-300
+                   class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                           dark:bg-azwara-darkest dark:border-azwara-darker">
         </div>
 

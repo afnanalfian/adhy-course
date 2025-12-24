@@ -42,7 +42,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsTo(Province::class);
     }
-
+    public function teacher()
+    {
+        return $this->hasOne(Teacher::class);
+    }
     public function regency()
     {
         return $this->belongsTo(Regency::class);
@@ -51,12 +54,19 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(Cart::class)->where('status', 'active');
     }
+    public function attendances()
+    {
+        return $this->hasMany(MeetingAttendance::class);
+    }
 
     public function orders()
     {
         return $this->hasMany(Order::class);
     }
-
+    public function examAttempts()
+    {
+        return $this->hasMany(ExamAttempt::class);
+    }
     public function entitlements()
     {
         return $this->hasMany(UserEntitlement::class);
@@ -75,5 +85,64 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->avatar && Storage::disk('public')->exists($this->avatar)
             ? asset('storage/'.$this->avatar)
             : asset('img/user.png');
+    }
+    /* =====================================================
+     | GENERIC HELPERS
+     |===================================================== */
+
+    public function hasEntitlement(string $type, ?int $id = null): bool
+    {
+        return $this->entitlements()
+            ->where('entitlement_type', $type)
+            ->when(
+                ! is_null($id),
+                fn ($q) => $q->where('entitlement_id', $id)
+            )
+            ->exists();
+    }
+
+    public function entitlementIds(string $type): array
+    {
+        return $this->entitlements()
+            ->where('entitlement_type', $type)
+            ->pluck('entitlement_id')
+            ->filter()
+            ->values()
+            ->toArray();
+    }
+
+    /* =====================================================
+     | DOMAIN SHORTCUTS
+     |===================================================== */
+
+    public function hasCourse(int $courseId): bool
+    {
+        return $this->hasEntitlement('course', $courseId);
+    }
+
+    public function ownedCourseIds(): array
+    {
+        return $this->entitlementIds('course');
+    }
+
+    public function ownedMeetingIds(): array
+    {
+        return $this->entitlementIds('meeting');
+    }
+
+    /**
+     * Tryout bersifat GLOBAL
+     */
+    public function hasTryoutAccess(): bool
+    {
+        return $this->hasEntitlement('tryout');
+    }
+
+    /**
+     * Quiz bersifat GLOBAL
+     */
+    public function hasQuizAccess(): bool
+    {
+        return $this->hasEntitlement('quiz');
     }
 }

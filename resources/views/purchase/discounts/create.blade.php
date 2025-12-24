@@ -1,10 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
+<a
+    href="{{ route('discounts.index') }}"
+    class="text-sm font-medium text-primary hover:underline dark:text-azwara-lightest">
+    ← Kembali
+</a>
 <div class="max-w-3xl mx-auto space-y-6">
 
     <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-azwara-lightest">
             Tambah Discount
         </h1>
         <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -21,10 +26,10 @@
 
         {{-- NAMA --}}
         <div>
-            <label class="block text-sm font-medium">Nama Discount</label>
+            <label class="block text-sm font-medium dark:text-azwara-lightest">Nama Discount</label>
             <input type="text" name="name" required
                 value="{{ old('name') }}"
-                class="mt-1 w-full rounded-xl border-gray-300
+                class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                        dark:bg-azwara-darkest dark:border-azwara-darker">
             @error('name')
                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -33,13 +38,13 @@
 
         {{-- CODE --}}
         <div>
-            <label class="block text-sm font-medium">
+            <label class="block text-sm font-medium dark:text-azwara-lightest">
                 Kode Voucher (opsional)
             </label>
             <input type="text" name="code"
                    value="{{ old('code') }}"
                    placeholder="Contoh: HEMAT50"
-                   class="mt-1 w-full rounded-xl border-gray-300
+                   class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                           dark:bg-azwara-darkest dark:border-azwara-darker">
             @error('code')
                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -48,12 +53,12 @@
 
         {{-- TYPE --}}
         <div>
-            <label class="block text-sm font-medium">
+            <label class="block text-sm font-medium dark:text-azwara-lightest">
                 Tipe Discount
             </label>
 
             <select name="type"
-                    class="mt-1 w-full rounded-xl border-gray-300
+                    class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                            dark:bg-azwara-darkest dark:border-azwara-darker">
                 <option value="percentage"
                     {{ old('type') == 'percentage' ? 'selected' : '' }}>
@@ -73,13 +78,13 @@
 
         {{-- VALUE --}}
         <div>
-            <label class="block text-sm font-medium">
+            <label class="block text-sm font-medium dark:text-azwara-lightest">
                 Nilai Discount
             </label>
 
             <input type="number" name="value" min="0" required
                    value="{{ old('value') }}"
-                   class="mt-1 w-full rounded-xl border-gray-300
+                   class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                           dark:bg-azwara-darkest dark:border-azwara-darker">
 
             @error('value')
@@ -89,13 +94,13 @@
 
         {{-- MAX DISCOUNT --}}
         <div>
-            <label class="block text-sm font-medium">
+            <label class="block text-sm font-medium dark:text-azwara-lightest">
                 Maksimal Potongan (opsional untuk persentase)
             </label>
 
             <input type="number" name="max_discount" min="0"
                    value="{{ old('max_discount') }}"
-                   class="mt-1 w-full rounded-xl border-gray-300
+                   class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                           dark:bg-azwara-darkest dark:border-azwara-darker">
 
             @error('max_discount')
@@ -105,13 +110,13 @@
 
         {{-- MIN ORDER --}}
         <div>
-            <label class="block text-sm font-medium">
+            <label class="block text-sm font-medium dark:text-azwara-lightest">
                 Minimal Order (opsional)
             </label>
 
             <input type="number" name="min_order_amount" min="0"
                    value="{{ old('min_order_amount') }}"
-                   class="mt-1 w-full rounded-xl border-gray-300
+                   class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                           dark:bg-azwara-darkest dark:border-azwara-darker">
 
             @error('min_order_amount')
@@ -121,13 +126,13 @@
 
         {{-- QUOTA --}}
         <div>
-            <label class="block text-sm font-medium">
+            <label class="block text-sm font-medium dark:text-azwara-lightest">
                 Kuota Pemakaian (opsional)
             </label>
 
             <input type="number" name="quota" min="1"
                    value="{{ old('quota') }}"
-                   class="mt-1 w-full rounded-xl border-gray-300
+                   class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                           dark:bg-azwara-darkest dark:border-azwara-darker">
 
             @error('quota')
@@ -137,10 +142,10 @@
 
         {{-- PRODUK --}}
         <div>
-            <label class="block text-sm font-medium">Berikan ke Produk (opsional)</label>
+            <label class="block text-sm font-medium dark:text-azwara-lightest">Berikan ke Produk (opsional)</label>
 
             <select name="product_ids[]" id="product-select" multiple
-                class="mt-1 w-full rounded-xl border-gray-300
+                class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                     dark:border-azwara-darker dark:bg-azwara-darkest">
                 @foreach($products as $product)
                     <option value="{{ $product->id }}"
@@ -159,13 +164,13 @@
         <div class="grid grid-cols-2 gap-4">
 
             <div>
-                <label class="block text-sm font-medium">
+                <label class="block text-sm font-medium dark:text-azwara-lightest">
                     Mulai Berlaku
                 </label>
 
                 <input type="date" name="starts_at"
                        value="{{ old('starts_at') }}"
-                       class="mt-1 w-full rounded-xl border-gray-300
+                       class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                               dark:bg-azwara-darkest dark:border-azwara-darker">
 
                 @error('starts_at')
@@ -174,13 +179,13 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium">
+                <label class="block text-sm font-medium dark:text-azwara-lightest">
                     Berakhir
                 </label>
 
                 <input type="date" name="ends_at"
                        value="{{ old('ends_at') }}"
-                       class="mt-1 w-full rounded-xl border-gray-300
+                       class="mt-1 w-full rounded-xl border-gray-300 dark:text-white
                               dark:bg-azwara-darkest dark:border-azwara-darker">
 
                 @error('ends_at')

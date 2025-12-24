@@ -10,7 +10,9 @@ use App\Http\Controllers\Teras\{
 use App\Http\Controllers\User\{
     ProfileController,
     SiswaController,
-    TentorController
+    TentorController,
+    UserEntitlementController,
+    NotificationController
 };
 
 use App\Http\Controllers\Course\{
@@ -25,7 +27,8 @@ use App\Http\Controllers\Exam\{
     ExamController,
     ExamQuestionController,
     ExamAttemptController,
-    ExamResultController
+    ExamResultController,
+    LeaderBoardController
 };
 
 use App\Http\Controllers\Question\{
@@ -43,7 +46,10 @@ use App\Http\Controllers\Purchase\{
     ProductBonusController,
     BrowseController,
     ProductPricingController,
-    ProductController
+    ProductController,
+    MyOrderController,
+    OrderInvoiceController,
+    ReportIncomeController
 };
 
 /*
@@ -129,7 +135,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     |--------------------------------------------------------------------------
     */
     // SISWA
-    Route::prefix('siswa')->middleware(['role:admin'])->group(function () {
+    Route::prefix('siswa')->middleware(['role:admin|tentor'])->group(function () {
 
         Route::get('/', [SiswaController::class, 'index'])->name('siswa.index');
         Route::get('/{id}', [SiswaController::class, 'show'])->name('siswa.show');
@@ -209,7 +215,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['role:admin|tentor'])->group(function () {
         Route::get('/meetings/{meeting}/attendance',[MeetingAttendanceController::class, 'index'])->name('meeting.attendance.index');
         Route::post('/meetings/{meeting}/attendance',[MeetingAttendanceController::class, 'store'])->name('meeting.attendance.store');
+        Route::get('/reports/course-attendance', [MeetingAttendanceController::class, 'courseAttendanceReport'])->name('reports.course-attendance');
     });
+
 
     /*
     |--------------------------------------------------------------------------
@@ -324,6 +332,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | LEADERBOARD ROUTES
+    |--------------------------------------------------------------------------
+    */
+        Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
+        Route::get('/leaderboard/detail', [LeaderboardController::class, 'detail'])->name('leaderboard.detail');
+        Route::get('/leaderboard/load-exams', [LeaderboardController::class, 'loadExams'])->name('leaderboard.load-exams');
+        Route::get('/leaderboard/load-ranking', [LeaderboardController::class, 'loadRanking'])->name('leaderboard.load-ranking');
+    /*
+    |--------------------------------------------------------------------------
     | PURCHASE ROUTES
     |--------------------------------------------------------------------------
     */
@@ -333,18 +350,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
         Route::patch('/cart/item/{cartItem}', [CartController::class, 'updateQty'])->name('cart.update');
         Route::delete('/cart/item/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
-
-        //CHECKOUT
-        Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout.process');
-        Route::get('/checkout/{order}', [CheckoutController::class, 'show'])->name('checkout.show');
-        Route::post('/checkout/{order}/upload-proof', [CheckoutController::class, 'uploadProof'])->name('checkout.upload');
-        Route::get('/checkout/{order}/waiting', [CheckoutController::class, 'waiting'])->name('checkout.waiting');
+        Route::post('/cart/add-addon', [CartController::class,'addAddonQuiz'])->name('cart.add-addon');
 
         // ETALASE
         Route::get('/purchase/browse', [BrowseController::class, 'index'])->name('browse.index');
         Route::get('purchase/browse/course/{course}', [BrowseController::class, 'course'])->name('browse.course');
 
+        //CHECKOUT
+        Route::prefix('checkout')->name('checkout.')->group(function () {
+            Route::get('/', [CheckoutController::class, 'review'])->name('review');
+            Route::post('/', [CheckoutController::class, 'process'])->name('process');
+            Route::get('/{order}/payment', [CheckoutController::class, 'payment'])->name('payment');
+            Route::post('/{order}/upload-proof', [CheckoutController::class, 'uploadProof'])->name('uploadProof');
+            Route::get('/{order}/waiting', [CheckoutController::class, 'waiting'])->name('waiting');
+            Route::post('/preview-discount', [CheckoutController::class, 'previewDiscount'])->name('preview-discount');
+        });
+
+        //ORDER HISTORY
+        Route::prefix('my')->name('my.')->group(function () {
+            Route::get('/orders', [MyOrderController::class, 'index'])->name('orders.index');
+            Route::get('/orders/{order}', [MyOrderController::class, 'show'])->name('orders.show');
+        });
     });
+    //INVOICE
+    Route::get('/orders/{order}/invoice', [OrderInvoiceController::class, 'download'])->name('orders.invoice');
 
     Route::middleware('role:admin')->group(function () {
         //ADMIN PRODUCT -> CRUD
@@ -376,18 +405,53 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/bonuses/item/{productBonus}', [ProductBonusController::class, 'destroy'])->name('bonuses.destroy');
 
         //DISCOUNT
-        Route::get('/discounts', [DiscountController::class, 'index'])->name('discounts.index');
-        Route::get('/discounts/{discount}', [DiscountController::class, 'show'])->name('discounts.show');
-        Route::get('/discounts/create', [DiscountController::class, 'create'])->name('discounts.create');
-        Route::post('/discounts', [DiscountController::class, 'store'])->name('discounts.store');
-        Route::get('/discounts/{discount}/edit', [DiscountController::class, 'edit'])->name('discounts.edit');
-        Route::put('/discounts/{discount}', [DiscountController::class, 'update'])->name('discounts.update');
-        Route::delete('/discounts/{discount}', [DiscountController::class, 'destroy'])->name('discounts.destroy');
+        Route::resource('discounts', DiscountController::class);
         Route::patch('/discounts/{discount}/toggle', [DiscountController::class, 'toggle'])->name('discounts.toggle');
 
         //PAYMENT-SETTING
         Route::get('/payment-settings', [PaymentSettingController::class, 'edit'])->name('payment.settings.edit');
         Route::post('/payment-settings', [PaymentSettingController::class, 'update'])->name('payment.settings.update');
+
+        //REPORT INCOME
+        Route::get('/reports/income', [ReportIncomeController::class, 'incomeReport'])->name('reports.income');
+        Route::get('/reports/income/export', [ReportIncomeController::class, 'exportIncomeReport'])->name('reports.income.export');
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | USER ENTITLEMENTS ROUTES
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/user-entitlements',[UserEntitlementController::class, 'index'])->name('user-entitlements.index');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | NOTIFICATION ROUTES
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/notifications', [NotificationController::class, 'index'])
+        ->name('notifications.index');
+
+    Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])
+        ->name('notifications.readAll');
+
+    Route::delete('/notifications/clear', [NotificationController::class, 'clear'])
+        ->name('notifications.clear');
+
+    Route::get('/notifications/{id}', [NotificationController::class, 'read'])
+        ->name('notifications.read');
+
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])
+        ->name('notifications.destroy');
+
+    /*
+    |--------------------------------------------------------------------------
+    | GAMES ROUTES
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/game/math', function () {return view('games.math');})->name('game.math');
+    Route::get('/game/snake', function () {return view('games.snake');})->name('game.snake');
 });
 

@@ -9,28 +9,29 @@ use Exception;
 class PricingService
 {
     /**
-     * Hitung TOTAL CART DAN SETIAP ITEM.
-     * cart_items.qty menentukan rule mana yang berlaku.
+     * Hitung ulang cart (dipakai saat update qty & checkout)
      */
     public function calculateCartTotal(Cart $cart): array
     {
+        $cart->load('items.product');
+
         $items = [];
         $grandTotal = 0;
 
         foreach ($cart->items as $item) {
-
-            $unit = $this->determineUnitPrice(
+            $unitPrice = $this->determineUnitPrice(
                 $item->product->type,
                 $item->qty
             );
 
-            $lineTotal = $unit * $item->qty;
+            $lineTotal = $unitPrice * $item->qty;
 
             $items[] = [
-                'product_id' => $item->product_id,
-                'qty'        => $item->qty,
-                'unit_price' => $unit,
-                'total'      => $lineTotal,
+                'cart_item_id' => $item->id,
+                'product_id'   => $item->product_id,
+                'qty'          => $item->qty,
+                'unit_price'   => $unitPrice,
+                'subtotal'     => $lineTotal,
             ];
 
             $grandTotal += $lineTotal;
@@ -42,25 +43,33 @@ class PricingService
         ];
     }
 
-
     /**
-     * Tentukan harga per item
-     * berdasarkan PRICING_RULES.
+     * Harga satuan berdasarkan pricing rules
      */
-    public function determineUnitPrice(string $productType, int $qty): float
-    {
+    public function determineUnitPrice(
+        string $productType,
+        int $qty,
+        ?Cart $cart = null
+    ): float {
+
+        if ($productType === 'meeting') {
+            throw new \LogicException(
+                'Gunakan meetingUnitPriceFromCart() untuk product meeting'
+            );
+        }
+
         $rule = PricingRule::where('product_type', $productType)
             ->where('is_active', true)
             ->where('min_qty', '<=', $qty)
             ->where(function ($q) use ($qty) {
                 $q->whereNull('max_qty')
-                  ->orWhere('max_qty', '>=', $qty);
+                ->orWhere('max_qty', '>=', $qty);
             })
             ->orderBy('min_qty', 'desc')
             ->first();
 
         if (! $rule) {
-            throw new Exception("Pricing rule missing for product type {$productType}");
+            throw new \Exception("Pricing rule missing for {$productType} (qty={$qty})");
         }
 
         return $rule->fixed_price ?? $rule->price_per_unit;
@@ -68,20 +77,61 @@ class PricingService
 
 
     /**
-     * Harga full course berdasarkan jumlah meeting × rule kedalaman tertinggi
+     * Harga addon (flat, qty selalu 1)
      */
-    public function fullCoursePrice(int $meetingCount): float
+    public function addonPrice(): float
+    {
+        $rule = PricingRule::where('product_type', 'addon')
+            ->where('is_active', true)
+            ->first();
+
+        if (! $rule || ! $rule->fixed_price) {
+            throw new Exception('Addon pricing rule missing');
+        }
+
+        return $rule->fixed_price;
+    }
+
+    /**
+     * Harga course package (flat)
+     */
+    public function coursePackagePrice(): float
     {
         $rule = PricingRule::where('product_type', 'course_package')
             ->where('is_active', true)
-            ->orderBy('min_qty', 'asc')
             ->first();
 
         if (! $rule) {
-            throw new Exception("Pricing rule missing for course_package");
+            throw new Exception('Course package pricing rule missing');
         }
 
-        return $rule->fixed_price
-            ?? ($rule->price_per_unit * $meetingCount);
+        return $rule->fixed_price ?? 0;
     }
+    public function meetingUnitPriceFromCart(Cart $cart): float
+    {
+        $totalQty = $cart->items()
+            ->whereHas('product', fn ($q) => $q->where('type', 'meeting'))
+            ->sum('qty'); // ✅ BUKAN count()
+
+        if ($totalQty < 1) {
+            throw new Exception('Meeting qty invalid');
+        }
+
+        $rule = PricingRule::where('product_type', 'meeting')
+            ->where('is_active', true)
+            ->where('min_qty', '<=', $totalQty)
+            ->where(function ($q) use ($totalQty) {
+                $q->whereNull('max_qty')
+                ->orWhere('max_qty', '>=', $totalQty);
+            })
+            ->orderBy('min_qty', 'desc')
+            ->first();
+
+        if (! $rule) {
+            throw new Exception("Pricing rule missing for meeting (qty={$totalQty})");
+        }
+
+        return $rule->price_per_unit;
+    }
+
 }

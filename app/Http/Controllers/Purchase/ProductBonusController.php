@@ -17,7 +17,7 @@ class ProductBonusController extends Controller
     {
         $products = Product::with('bonuses')
             ->orderBy('name')
-            ->get();
+            ->paginate(10);
 
         return view('purchase.bonuses.index', compact('products'));
     }

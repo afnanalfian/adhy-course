@@ -62,10 +62,46 @@
                     {{-- overlay --}}
                     <div class="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
 
-                    {{-- badge --}}
+                    {{-- BADGE AKSES COURSE (KHUSUS SISWA) --}}
+                    @php
+                        $user = auth()->user();
+
+                        // default (admin / guest)
+                        $badgeText  = 'Course';
+                        $badgeClass = 'bg-primary/90 text-white';
+
+                        if ($user && $user->hasRole('siswa')) {
+
+                            $totalMeetings = $c->meetings->count();
+
+                            // beli full course
+                            if ($user->hasCourse($c->id)) {
+                                $badgeText  = 'Full Access';
+                                $badgeClass = 'bg-green-600 text-white';
+                            } else {
+                                $ownedMeetingIds = $user->ownedMeetingIds();
+
+                                $ownedCount = $c->meetings
+                                    ->whereIn('id', $ownedMeetingIds)
+                                    ->count();
+
+                                if ($ownedCount === 0) {
+                                    $badgeText  = 'No Meetings Buyed';
+                                    $badgeClass = 'bg-gray-500 text-white';
+                                } elseif ($ownedCount >= $totalMeetings) {
+                                    $badgeText  = 'Full Access';
+                                    $badgeClass = 'bg-green-600 text-white';
+                                } else {
+                                    $badgeText  = "{$ownedCount}/{$totalMeetings} Meetings Buyed";
+                                    $badgeClass = 'bg-blue-600 text-white';
+                                }
+                            }
+                        }
+                    @endphp
+
                     <span class="absolute left-3 top-3 text-xs font-medium
-                                    bg-primary/90 text-white px-3 py-1 rounded-lg shadow">
-                        Course
+                                px-3 py-1 rounded-lg shadow {{ $badgeClass }}">
+                        {{ $badgeText }}
                     </span>
                 </div>
 

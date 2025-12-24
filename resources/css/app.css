@@ -57,30 +57,36 @@ html {
 /* Sidebar & Menu */
 @layer components {
 
+    /* ===== MAIN MENU ITEM ===== */
     .menu-item {
-        @apply flex items-center gap-3
-               px-4 py-2.5 rounded-xl
+        @apply relative flex items-center gap-3
+               px-4 py-3 rounded-xl
                cursor-pointer font-medium text-sm
                text-azwara-darkest dark:text-azwara-light
-               hover:bg-azwara-light/30
-               dark:hover:bg-azwara-darkest
-               transition-colors duration-200;
+               transition-all duration-200
+               hover:bg-azwara-light/40
+               dark:hover:bg-azwara-darkest/80;
     }
 
+    /* subtle lift on hover */
+    .menu-item:hover {
+        transform: translateX(2px);
+    }
+
+    /* icon */
     .menu-item svg {
         @apply w-5 h-5 flex-shrink-0
                text-azwara-medium
                transition-colors duration-200;
     }
 
-    /* Hover → icon ikut berubah */
     .menu-item:hover svg {
         @apply text-primary;
     }
 
-    /* ACTIVE STATE (opsional, tapi disaranin) */
+    /* ===== ACTIVE STATE ===== */
     .menu-item.active {
-        @apply bg-azwara-light/40
+        @apply bg-azwara-light/60
                dark:bg-azwara-darkest
                text-primary;
     }
@@ -88,7 +94,46 @@ html {
     .menu-item.active svg {
         @apply text-primary;
     }
+
+    /* left accent bar */
+    .menu-item.active::before {
+        content: '';
+        @apply absolute left-0 top-2 bottom-2 w-1
+               bg-primary rounded-r-full;
+    }
+
+    /* ===== SUB MENU ===== */
+    .menu-subitem {
+        @apply relative flex items-center gap-2
+               px-3 py-2 rounded-lg
+               text-xs font-medium
+               text-azwara-darkest/80 dark:text-azwara-light/70
+               transition-all duration-150
+               hover:bg-azwara-light/30
+               dark:hover:bg-azwara-darkest;
+    }
+
+    .menu-subitem:hover {
+        transform: translateX(2px);
+    }
+
+    .menu-subitem.active {
+        @apply text-blue-600 dark:text-azwara-lightest;
+    }
+
+    /* dot indicator */
+    .menu-subitem span {
+        @apply opacity-60;
+    }
+
+    /* badge */
+    .badge {
+        @apply text-[10px] font-semibold
+               px-2 py-0.5 rounded-full
+               bg-primary text-white;
+    }
 }
+
 
 /* Sidebar desktop behavior */
 @media (min-width: 768px) {

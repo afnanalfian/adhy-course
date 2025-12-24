@@ -1,66 +1,212 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎓 Azwara Learning – Online Tutoring Platform (Laravel 11)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Azwara Learning is a web-based **online tutoring (bimbel) platform** built with **Laravel 11**, designed to manage courses, meetings, exams (tryout & quiz), purchases, entitlements, notifications, and interactive learning features.
 
-## About Laravel
+This project supports **Admin**, **Tentor (Teacher)**, and **Siswa (Student)** roles with a clear access control system.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Main Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 👤 User Roles
+- **Admin**
+  - Manage users, courses, meetings, exams
+  - Manage orders & verify purchases
+  - View all student entitlements
+  - Full system access (no restrictions)
 
-## Learning Laravel
+- **Tentor (Teacher)**
+  - Manage meetings
+  - Create and manage exams (post-test, tryout, quiz)
+  - View student attempts and results
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Siswa (Student)**
+  - Buy courses, meetings, tryouts, quizzes
+  - Access content based on entitlements
+  - Attend meetings
+  - Take exams and view results
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 📚 Course & Meeting System
+- Courses contain multiple meetings
+- Students can:
+  - Buy **full course package**
+  - Buy **individual meetings**
+- Meeting access logic:
+  - Full course → access all meetings
+  - Individual meeting → access only purchased meetings
+  - No access → meeting is locked (🔒 icon + toast message)
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 🧾 Purchase & Entitlement System
+- Automatic entitlement granting after order verification
+- Supported entitlement types:
+  - `course`
+  - `meeting`
+  - `tryout` (global)
+  - `quiz` (global)
+- Bonus entitlements supported
+- Centralized in `user_entitlements` table
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### 📝 Exam System
+- Exam types:
+  - **Tryout** (global access)
+  - **Daily Quiz** (global access)
+  - **Post Test** (attached to meeting)
+- Features:
+  - Time-based access
+  - Auto submit on timeout
+  - Attempt tracking
+  - Scoring & result pages
+- Access control:
+  - Students without entitlement cannot start exams
+  - Call-to-action: *“Purchase Access”*
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 🔔 Notification System
+- Database notifications
+- Optional email delivery (Brevo SMTP)
+- Real-time updates with **Pusher / WebSocket**
+- Features:
+  - Notification bell with unread badge
+  - Latest 5 notifications dropdown
+  - Full notification page
+  - Mark as read
+  - Mark all as read
+  - Delete single or all notifications
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 📧 Email Notifications
+- Custom Blade email templates
+- Used for:
+  - Purchase confirmation
+  - Bonus granted
+  - Exam activation
+  - Important system updates
+- SMTP provider: **Brevo**
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 🎮 Mini Games (Optional Fun Features)
+- **Snake Game** (classic)
+  - Keyboard (desktop)
+  - Swipe controls (mobile)
+- **Math Quiz Game**
+- Frontend-only (no controller needed)
+- Built with HTML + CSS + JavaScript
+- Integrated into Laravel views
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🛠 Tech Stack
+
+- **Laravel 11**
+- PHP 8.2+
+- MySQL / MariaDB
+- Tailwind CSS
+- Alpine.js
+- Pusher (Realtime)
+- Brevo SMTP (Email)
+- Spatie Laravel Permission
+
+---
+
+## ⚙️ Installation Guide (Laravel 11)
+
+### 1️⃣ Clone Repository
+```bash
+git clone https://github.com/your-username/azwara-learning.git
+cd azwara-learning
+```
+
+### 2️⃣ Install Dependencies
+```bash
+composer install
+npm install
+npm run build
+```
+
+### 3️⃣ Environment Setup
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+### 4️⃣ Configure Database
+
+Edit .env:
+
+```bash
+DB_DATABASE=azwara_learning
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 5️⃣ Configure Mail (Brevo SMTP)
+```bash
+MAIL_MAILER=smtp
+MAIL_HOST=smtp-relay.brevo.com
+MAIL_PORT=587
+MAIL_USERNAME=your-smtp-username@smtp-brevo.com
+MAIL_PASSWORD=your-smtp-password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="xxxxxxxx@gmail.com"
+MAIL_FROM_NAME=
+```
+
+### 6️⃣ Configure Pusher (Realtime Notifications)
+```bash
+BROADCAST_CONNECTION=pusher
+
+PUSHER_APP_ID=your_app_id
+PUSHER_APP_KEY=your_key
+PUSHER_APP_SECRET=your_secret
+PUSHER_APP_CLUSTER=ap1
+```
+
+### 7️⃣ Run Migration & Seeder
+```bash
+php artisan migrate --seed
+```
+
+### 8️⃣ Storage & Cache
+```bash
+php artisan storage:link
+php artisan optimize
+```
+
+### 9️⃣ Run Development Server
+```bash
+php artisan serve
+```
+
+## 🔐 Demo Accounts
+
+All demo accounts use the same password:password
+Admin
+- Email: admin@bimbel.com
+
+Students
+- Email: siswa1@bimbel.com
+- Email: siswa2@bimbel.com
+- Email: siswa3@bimbel.com
+
+## 📌 Notes
+- Admin role is not restricted by access policies
+- All access control applies only to Siswa
+- Notifications do not conflict with: Email verification and Password reset notifications
+
+## 📄 License
+This project is open for educational and portfolio purposes.
+
+## ✨ Author
+Muhammad Afnan Alfian, S.Tr.Stat.
+Alumni Politeknik Statistika STIS
+
+Built with ❤️ for online education using Laravel 11.

@@ -12,12 +12,13 @@ class CreateUserEntitlementsTable extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->enum('entitlement_type', ['meeting','course','tryout','quiz']);
-            $table->unsignedBigInteger('entitlement_id')->nullable();
+            $table->unsignedBigInteger('entitlement_id')->default(0)->change();
             $table->enum('source', ['purchase','bonus']);
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
 
             $table->index(['user_id','entitlement_type']);
+            $table->unique(['user_id', 'entitlement_type', 'entitlement_id'],'user_entitlements_unique');
         });
     }
 

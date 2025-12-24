@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+<a
+    href="{{ route('discounts.index') }}"
+    class="text-sm font-medium text-primary hover:underline dark:text-azwara-lightest">
+    ← Kembali
+</a>
 <div class="max-w-4xl mx-auto space-y-8">
 
     <div class="flex items-center justify-between">

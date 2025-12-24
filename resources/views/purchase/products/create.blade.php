@@ -1,11 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
+<a
+    href="{{ route('products.index') }}"
+    class="text-sm font-medium text-primary hover:underline dark:text-azwara-lightest">
+    ← Kembali
+</a>
 <div class="max-w-4xl mx-auto space-y-6">
 
     {{-- HEADER --}}
     <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-azwara-lightest">
             Tambah Product
         </h1>
         <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -23,7 +28,7 @@
 
         {{-- NAMA --}}
         <div>
-            <label class="block text-sm font-medium mb-1">
+            <label class="block text-sm font-medium mb-1 dark:text-azwara-lightest">
                 Nama Product
             </label>
             <input type="text"
@@ -39,7 +44,7 @@
 
         {{-- TIPE PRODUCT --}}
         <div>
-            <label class="block text-sm font-medium mb-1">
+            <label class="block text-sm font-medium mb-1 dark:text-azwara-lightest">
                 Tipe Product
             </label>
             <select name="type"
@@ -63,7 +68,7 @@
 
         {{-- PRODUCTABLE SELECT --}}
         <div id="productable-wrapper" class="hidden">
-            <label class="block text-sm font-medium mb-1">
+            <label class="block text-sm font-medium mb-1 dark:text-azwara-lightest">
                 Konten
             </label>
 
@@ -81,7 +86,7 @@
 
         {{-- DESKRIPSI --}}
         <div>
-            <label class="block text-sm font-medium mb-1">
+            <label class="block text-sm font-medium mb-1 dark:text-azwara-lightest">
                 Deskripsi (opsional)
             </label>
             <textarea name="description"
@@ -91,7 +96,7 @@
         </div>
 
         {{-- STATUS --}}
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 dark:text-azwara-lightest">
             <input type="checkbox"
                    name="is_active"
                    value="1"
@@ -110,7 +115,7 @@
             </a>
 
             <button type="submit"
-                    class="bg-primary hover:bg-azwara-medium
+                    class="bg-primary hover:bg-azwara-light
                            text-white font-semibold px-6 py-2.5 rounded-xl transition">
                 Simpan Product
             </button>
@@ -149,7 +154,7 @@
 
         try {
             const response = await fetch(
-                `{{ url('/products/productables') }}/${type}`
+                `{{ url('admin/products/productables') }}/${type}`
             );
             const items = await response.json();
 
