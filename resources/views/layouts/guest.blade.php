@@ -21,7 +21,7 @@
 </head>
 
 <body
-  class="min-h-screen overflow-hidden flex flex-col
+  class="h-screen overflow-hidden flex flex-col
          bg-gradient-to-br from-azwara-lighter via-white to-azwara-light/30
          dark:bg-brand-gradient bg-fixed
          text-azwara-darker dark:text-azwara-lighter
@@ -72,16 +72,21 @@
                 </svg>
             </button>
 
-                <a href="{{ route('login') }}"
-                class="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary transition">
-                    Login
-                </a>
+            <a href="{{ route('login') }}"
+            class="text-sm font-medium rounded-xl transition
+                    {{ request()->routeIs('login')
+                        ? 'px-4 py-2 bg-primary text-white font-semibold shadow hover:shadow-lg hover:scale-105'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-primary' }}">
+                Login
+            </a>
 
-                <a href="{{ route('register') }}"
-                class="px-4 py-2 bg-primary text-white rounded-xl text-sm font-semibold shadow
-                        hover:shadow-lg hover:scale-105 transition">
-                    Register
-                </a>
+            <a href="{{ route('register') }}"
+            class="text-sm font-medium rounded-xl transition
+                    {{ request()->routeIs('register')
+                        ? 'px-4 py-2 bg-primary text-white font-semibold shadow hover:shadow-lg hover:scale-105'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-primary' }}">
+                Register
+            </a>
             </div>
         </div>
     </nav>

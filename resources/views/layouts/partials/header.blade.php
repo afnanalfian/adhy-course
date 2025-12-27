@@ -79,12 +79,12 @@
                 <div class="max-h-80 overflow-y-auto">
                     @forelse($notifications as $notif)
                         <a href="{{ $notif->data['url'] ?? '#' }}"
-                        class="block px-4 py-3 text-sm
+                        class="block px-4 py-3 text-sm dark:text-azwara-lightest
                                 hover:bg-gray-50 dark:hover:bg-azwara-darkest">
                             {{ $notif->data['message'] }}
                         </a>
                     @empty
-                        <p class="p-4 text-sm text-gray-500">
+                        <p class="p-4 text-sm text-gray-500 dark:text-azwara-lightest">
                             Tidak ada notifikasi
                         </p>
                     @endforelse
@@ -92,7 +92,7 @@
 
                 <a href="{{ route('notifications.index') }}"
                 class="block text-center text-sm
-                        py-2 text-primary font-medium">
+                        py-2 text-primary dark:text-azwara-lighter font-medium">
                     Selengkapnya →
                 </a>
             </div>
