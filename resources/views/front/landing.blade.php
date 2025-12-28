@@ -1,6 +1,6 @@
 @extends('layouts.front.app')
 
-@section('title', 'Landing Page')
+@section('title', 'Bimbel Online Matematika dan SKD')
 
 @section('Landing Page')
 
@@ -17,9 +17,9 @@
 <div class="container-fluid header position-relative overflow-hidden p-0">
     <nav class="navbar navbar-expand-lg fixed-top navbar-light px-4 px-lg-5 py-3 py-lg-0">
         <a href="{{ route('home') }}" class="navbar-brand p-0">
-            <h1 class="display-6 text-primary m-0"><i class="fas fa-envelope me-3"></i>Mailler</h1>
+            <h1 class="display-6 text-azwara-dark m-0"><i class="fas fa-envelope me-3"></i>Mailler</h1>
             <!-- <img src="img/logo.png" alt="Logo"> -->
-        </a>git
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
             <span class="fa fa-bars"></span>
         </button>

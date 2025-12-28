@@ -38,7 +38,7 @@
 
     {{-- LIST --}}
     <div class="rounded-2xl overflow-hidden
-                bg-white dark:bg-azwara-darker
+                bg-azwara-lightest dark:bg-azwara-darker
                 border dark:border-azwara-darkest">
 
         @forelse($notifications as $notification)
