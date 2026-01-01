@@ -18,14 +18,9 @@ class MeetingController extends Controller
      */
     public function show(Meeting $meeting)
     {
-        // ===============================
-        // AUTHORIZATION CHECK (CUSTOM)
-        // ===============================
-        if (
-            auth()->check() &&
-            auth()->user()->hasRole('siswa') &&
-            auth()->user()->cannot('view', $meeting)
-        ) {
+        try {
+            $this->authorize('view', $meeting);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
             toast('error', 'Silakan lakukan pembelian terlebih dahulu');
             return redirect()->back();
         }
@@ -184,7 +179,7 @@ class MeetingController extends Controller
         if (
             $meeting->material ||
             $meeting->video ||
-            $meeting->exam ||   // ⬅️ GANTI DI SINI
+            $meeting->exam ||
             $meeting->attendances
         ) {
             toast(

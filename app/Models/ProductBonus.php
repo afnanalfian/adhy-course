@@ -21,4 +21,8 @@ class ProductBonus extends Model
     {
         return $this->belongsTo(Exam::class, 'bonus_id');
     }
+    public function course()
+    {
+        return $this->belongsTo(Course::class, 'bonus_id');
+    }
 }

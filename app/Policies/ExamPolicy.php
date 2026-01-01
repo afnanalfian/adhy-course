@@ -17,7 +17,7 @@ class ExamPolicy
         return match ($exam->type) {
 
             // Tryout → global
-            'tryout' => $user->hasTryoutAccess(),
+            'tryout' => $user->hasTryoutAccess($exam->id),
 
             // Quiz harian → global
             'quiz'   => $user->hasQuizAccess(),

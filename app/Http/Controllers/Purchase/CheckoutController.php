@@ -25,7 +25,8 @@ class CheckoutController extends Controller
         $cart = Cart::where('user_id', $request->user()->id)
             ->where('status', 'active')
             ->with([
-                'items.product.bonuses',
+                'items.product.bonuses.tryout',
+                'items.product.bonuses.course',
                 'items.product.productable',
             ])
             ->firstOrFail();

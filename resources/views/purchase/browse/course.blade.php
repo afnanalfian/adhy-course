@@ -117,47 +117,48 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
                     {{ $m->scheduled_at->format('d M Y, H:i') }}
                 </p>
-
-                @php
-                    $range = price_range_meeting($course);
-                @endphp
-
-                <p class="font-semibold text-primary text-sm">
-                    Rp {{ number_format($range['min'], 0, ',', '.') }}
-                    –
-                    Rp {{ number_format($range['max'], 0, ',', '.') }}
-                </p>
-
-                {{-- GUNAKAN $m->product (accessor) --}}
-                @if ($m->product)
+                @if ($m->product && $m->product->is_active)
                     @php
-                        // $m->product sudah mengembalikan Product model
-                        $productId = $m->product->id; // LANGSUNG .id
-                        $inCart    = in_array($productId, $cartProductIds);
-                        $locked    = in_array($m->course_id, $courseIdsInCart);
+                        $range = price_range_meeting($course);
                     @endphp
 
-                    @if ($locked)
-                        <button disabled
-                                class="mt-5 w-full py-3 rounded-xl
-                                    bg-gray-300 text-gray-600 cursor-not-allowed">
-                            Termasuk Full Course
-                        </button>
+                    <p class="font-semibold text-primary text-sm">
+                        Rp {{ number_format($range['min'], 0, ',', '.') }}
+                        –
+                        Rp {{ number_format($range['max'], 0, ',', '.') }}
+                    </p>
 
-                    @elseif ($inCart)
-                        <button disabled
-                                class="mt-5 w-full py-3 rounded-xl
-                                    bg-gray-400 text-white cursor-not-allowed">
-                            Sudah di Keranjang
-                        </button>
+                    {{-- GUNAKAN $m->product (accessor) --}}
+                    @if ($m->product)
+                        @php
+                            // $m->product sudah mengembalikan Product model
+                            $productId = $m->product->id; // LANGSUNG .id
+                            $inCart    = in_array($productId, $cartProductIds);
+                            $locked    = in_array($m->course_id, $courseIdsInCart);
+                        @endphp
 
-                    @else
-                        <button type="button"
-                                data-product-id="{{ $productId }}"
-                                class="add-to-cart-btn mt-5 w-full py-3 rounded-xl
-                                    bg-primary text-white">
-                            Tambah ke Keranjang
-                        </button>
+                        @if ($locked)
+                            <button disabled
+                                    class="mt-5 w-full py-3 rounded-xl
+                                        bg-gray-300 text-gray-600 cursor-not-allowed">
+                                Termasuk Full Course
+                            </button>
+
+                        @elseif ($inCart)
+                            <button disabled
+                                    class="mt-5 w-full py-3 rounded-xl
+                                        bg-gray-400 text-white cursor-not-allowed">
+                                Sudah di Keranjang
+                            </button>
+
+                        @else
+                            <button type="button"
+                                    data-product-id="{{ $productId }}"
+                                    class="add-to-cart-btn mt-5 w-full py-3 rounded-xl
+                                        bg-primary text-white">
+                                Tambah ke Keranjang
+                            </button>
+                        @endif
                     @endif
                 @endif
             </div>

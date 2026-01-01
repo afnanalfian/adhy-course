@@ -47,11 +47,35 @@
                             @if ($item->product->bonuses->isNotEmpty())
                                 <div class="mt-2 flex flex-wrap gap-2">
                                     @foreach ($item->product->bonuses as $bonus)
-                                        <span class="text-xs px-2 py-1 rounded
-                                                     bg-azwara-lightest dark:bg-white/10
-                                                     text-azwara-darker dark:text-azwara-lighter">
-                                            Bonus {{ ucfirst($bonus->bonus_type) }}
-                                        </span>
+
+                                        @if ($bonus->bonus_type === 'tryout')
+                                            <span class="text-xs px-2 py-1 rounded
+                                                        bg-azwara-lightest dark:bg-white/10
+                                                        text-azwara-darker dark:text-azwara-lighter">
+                                                Bonus Tryout:
+                                                <strong>
+                                                    {{ $bonus->tryout?->title ?? 'Tryout #' . $bonus->bonus_id }}
+                                                </strong>
+                                            </span>
+
+                                        @elseif ($bonus->bonus_type === 'course')
+                                            <span class="text-xs px-2 py-1 rounded
+                                                        bg-azwara-lightest dark:bg-white/10
+                                                        text-azwara-darker dark:text-azwara-lighter">
+                                                Bonus Course:
+                                                <strong>
+                                                    {{ $bonus->course?->name ?? 'Course #' . $bonus->bonus_id }}
+                                                </strong>
+                                            </span>
+
+                                        @elseif ($bonus->bonus_type === 'quiz')
+                                            <span class="text-xs px-2 py-1 rounded
+                                                        bg-azwara-lightest dark:bg-white/10
+                                                        text-azwara-darker dark:text-azwara-lighter">
+                                                Bonus Quiz (Semua Quiz)
+                                            </span>
+                                        @endif
+
                                     @endforeach
                                 </div>
                             @endif

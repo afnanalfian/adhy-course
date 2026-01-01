@@ -55,7 +55,7 @@
                  class="cursor-pointer rounded-xl border p-3 dark:border-gray-700 hover:border-purple-400 transition">
                 <div class="h-32 rounded-lg bg-gray-200 dark:bg-gray-700 mb-2 overflow-hidden">
                     @if($course->thumbnail)
-                        <img src="{{ asset($course->thumbnail) }}" class="w-full h-full object-cover">
+                        <img src="{{ asset('storage/'.$course->thumbnail) }}"  class="w-full h-full object-cover">
                     @else
                         <div class="flex items-center justify-center h-full text-3xl">📘</div>
                     @endif

@@ -131,13 +131,19 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Tryout bersifat GLOBAL
+     * Tryout
      */
-    public function hasTryoutAccess(): bool
+    public function hasTryoutAccess(int $tryoutId): bool
     {
-        return $this->hasEntitlement('tryout');
+        return $this->hasEntitlement('tryout', $tryoutId);
     }
-
+    public function ownedTryoutIds(): array
+    {
+        return $this->entitlements()
+            ->where('entitlement_type', 'tryout')
+            ->pluck('entitlement_id')
+            ->toArray();
+    }
     /**
      * Quiz bersifat GLOBAL
      */
@@ -146,7 +152,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasEntitlement('quiz');
     }
 
-    protected function usersWithMeetingAccess(Meeting $meeting)
+    public static function usersWithMeetingAccess(Meeting $meeting)
     {
         return User::whereHas('entitlements', function ($q) use ($meeting) {
             $q->where(function ($q2) use ($meeting) {

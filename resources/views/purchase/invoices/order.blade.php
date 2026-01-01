@@ -24,7 +24,7 @@
         }
 
         .logo {
-            width: 70px;
+            width: 90px;
         }
         .title {
             font-size: 20px;

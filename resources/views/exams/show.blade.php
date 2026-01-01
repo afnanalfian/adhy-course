@@ -116,6 +116,60 @@
 
         {{-- ===== ADMIN / TENTOR ===== --}}
         @role('admin|tentor')
+            @if($exam->type === 'tryout')
+            <div x-data="{ open: false }">
+
+                <button
+                    @click="open = true"
+                    class="px-4 py-2 rounded-xl text-sm font-medium
+                        bg-primary text-azwara-lightest border border-gray-300">
+                    Atur Urutan Tryout
+                </button>
+                <div
+                    x-show="open"
+                    x-cloak
+                    class="fixed inset-0 z-50 bg-black/50 flex items-start justify-center"
+                >
+                    <div class="bg-white max-w-md w-full mt-24 rounded-xl p-6">
+                        <h3 class="font-semibold mb-3">
+                            Tryout yang Harus Diselesaikan
+                        </h3>
+
+                        <form method="POST"
+                            action="{{ route('exams.prerequisites.update', $exam) }}">
+                            @csrf
+
+                            <select name="required_exam_ids[]" multiple
+                                class="w-full rounded-lg border p-2 text-sm">
+                                @foreach($allTryouts as $tryout)
+                                    @if($tryout->id !== $exam->id)
+                                        <option value="{{ $tryout->id }}"
+                                            @selected($exam->prerequisites->contains($tryout->id))>
+                                            {{ $tryout->title }}
+                                        </option>
+                                    @endif
+                                @endforeach
+                            </select>
+
+                            <div class="flex gap-2 mt-4">
+                                <button type="submit"
+                                    class="flex-1 bg-primary text-white py-2 rounded-xl">
+                                    Simpan
+                                </button>
+
+                                <button type="button"
+                                    @click="open = false"
+                                    class="flex-1 border py-2 rounded-xl">
+                                    Batal
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+            @endif
+
 
             @if($exam->status === 'inactive')
 
@@ -179,7 +233,17 @@
                 </a>
 
             @endif
-
+            {{-- KETERANGAN PREREQUISITE --}}
+            @if($exam->prerequisites->isNotEmpty())
+                <div class="mt-2 text-xs text-gray-600">
+                    <span class="font-medium">Prerequisite:</span>
+                    {{ $exam->prerequisites->pluck('title')->join(', ') }}
+                </div>
+            @else
+                <div class="mt-2 text-xs text-gray-400 italic">
+                    Tidak memiliki prerequisite (tryout independen)
+                </div>
+            @endif
         @endrole
 
         {{-- ===== SISWA ===== --}}
@@ -239,22 +303,31 @@
 
                     @if($exam->status === 'active')
 
-                        @if(!$attempt)
+                        @if($unmetPrerequisites->isNotEmpty())
+
+                            <div class="text-sm text-gray-500">
+                                Anda harus menyelesaikan terlebih dahulu:
+                                <ul class="list-disc ml-5 mt-1">
+                                    @foreach($unmetPrerequisites as $req)
+                                        <li class="font-medium text-gray-700">
+                                            {{ $req->title }}
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+
+                        @elseif(!$attempt)
+
                             <form method="POST" action="{{ route('exams.start', $exam) }}">
                                 @csrf
-                                <button
-                                    class="px-4 py-2 rounded-xl text-sm font-medium
-                                        bg-primary text-white
-                                        hover:opacity-90 transition">
+                                <button class="px-4 py-2 rounded-xl bg-primary text-white">
                                     Mulai Exam
                                 </button>
                             </form>
+
                         @else
-                            <a
-                                href="{{ route('exams.attempt', $exam) }}"
-                                class="px-4 py-2 rounded-xl text-sm font-medium
-                                    bg-primary text-white
-                                    hover:opacity-90 transition">
+                            <a href="{{ route('exams.attempt', $exam) }}"
+                            class="px-4 py-2 rounded-xl bg-primary text-white">
                                 Lanjutkan Exam
                             </a>
                         @endif

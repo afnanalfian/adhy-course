@@ -21,7 +21,7 @@ class BrowseController extends Controller
         $user = Auth::user();
 
         $ownedCourseIds   = $user?->ownedCourseIds() ?? [];
-        $hasTryoutAccess  = $user?->hasTryoutAccess() ?? false;
+        $ownedTryoutIds = $user?->ownedTryoutIds() ?? [];
 
         $courses = Course::query()
             ->with('product')
@@ -37,13 +37,16 @@ class BrowseController extends Controller
         * ========================== */
         $tryouts = collect();
 
-        if (! $hasTryoutAccess) {
-            $tryouts = Exam::query()
-                ->with(['productable.product']) // GANTI: product menjadi productable
-                ->where('type', 'tryout')
-                ->whereNull('deleted_at')
-                ->get();
-        }
+        $tryouts = Exam::query()
+            ->with(['productable.product'])
+            ->where('type', 'tryout')
+            ->whereNull('deleted_at')
+            ->when(
+                ! empty($ownedTryoutIds),
+                fn ($q) => $q->whereNotIn('id', $ownedTryoutIds)
+            )
+            ->get();
+
 
         /* ==========================
          * CART (UI ONLY)
@@ -77,12 +80,36 @@ class BrowseController extends Controller
                 ->values()
                 ->toArray()
             : [];
+        /**
+         * BONUS TRYOUT DARI COURSE PACKAGE YANG ADA DI CART
+         */
+        $bonusTryoutIdsInCart = [];
 
+        if ($cart) {
+            $coursePackageProducts = $cart->items()
+                ->whereHas('product', fn ($q) =>
+                    $q->where('type', 'course_package')
+                )
+                ->with('product.bonuses')
+                ->get()
+                ->pluck('product');
+
+            foreach ($coursePackageProducts as $coursePackage) {
+                foreach ($coursePackage->bonuses as $bonus) {
+                    if ($bonus->bonus_type === 'tryout' && $bonus->bonus_id) {
+                        $bonusTryoutIdsInCart[] = $bonus->bonus_id;
+                    }
+                }
+            }
+        }
+
+        $bonusTryoutIdsInCart = array_unique($bonusTryoutIdsInCart);
         return view('purchase.browse.index', compact(
             'courses',
             'tryouts',
             'cartProductIds',
-            'courseIdsInCart'
+            'courseIdsInCart',
+            'bonusTryoutIdsInCart'
         ));
     }
 

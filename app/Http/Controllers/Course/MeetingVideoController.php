@@ -6,6 +6,7 @@ use App\Models\Meeting;
 use App\Models\MeetingVideo;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 
 class MeetingVideoController extends Controller
 {
@@ -45,7 +46,7 @@ class MeetingVideoController extends Controller
         ]);
 
         /** NOTIFY STUDENTS WITH ACCESS */
-        $users = $this->usersWithMeetingAccess($meeting);
+        $users = User::usersWithMeetingAccess($meeting);
 
         foreach ($users as $user) {
             notify_user(

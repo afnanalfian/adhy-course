@@ -23,21 +23,42 @@ class ExamController extends Controller
         $exam->load([
             'questions',
             'attempts',
+            'prerequisites',
         ]);
 
+        $user    = auth()->user();
         $attempt = null;
 
-        if (
-            auth()->check() &&
-            auth()->user()->hasRole('siswa')
-        ) {
+        $blockedByPrerequisite = false;
+        $unmetPrerequisites    = collect();
+
+        if ($user && $user->hasRole('siswa')) {
+
             $attempt = $exam->attempts()
-                ->where('user_id', auth()->id())
+                ->where('user_id', $user->id)
                 ->latest()
                 ->first();
-        }
 
-        return view('exams.show', compact('exam', 'attempt'));
+            if ($exam->type === 'tryout' && $exam->prerequisites->isNotEmpty()) {
+                $unmetPrerequisites = $exam->unmetPrerequisitesFor($user);
+                $blockedByPrerequisite = $unmetPrerequisites->isNotEmpty();
+            }
+        }
+        $allTryouts = collect();
+
+        if ($user && $user->hasRole(['admin','tentor'])) {
+            $allTryouts = Exam::where('type', 'tryout')
+                ->where('id', '!=', $exam->id)
+                ->orderBy('title')
+                ->get();
+        }
+        return view('exams.show', compact(
+            'exam',
+            'attempt',
+            'blockedByPrerequisite',
+            'unmetPrerequisites',
+            'allTryouts'
+        ));
     }
 
     public function indexTryout(Request $request)
@@ -142,6 +163,28 @@ class ExamController extends Controller
         toast('success', 'Exam diperbarui');
         return back();
     }
+    public function updatePrerequisites(Request $request, Exam $exam)
+    {
+        abort_unless(auth()->user()->hasRole(['admin','tentor']), 403);
+
+        $data = $request->validate([
+            'required_exam_ids'   => 'nullable|array',
+            'required_exam_ids.*' => 'exists:exams,id',
+        ]);
+
+        // hanya untuk tryout
+        abort_if($exam->type !== 'tryout', 403);
+
+        // tidak boleh depend ke dirinya sendiri
+        $ids = collect($data['required_exam_ids'] ?? [])
+            ->reject(fn ($id) => $id == $exam->id)
+            ->values()
+            ->toArray();
+
+        $exam->prerequisites()->sync($ids);
+
+        return back()->with('success', 'Prerequisite tryout berhasil diperbarui');
+    }
 
     /* ================= STATUS ================= */
 
@@ -159,7 +202,7 @@ class ExamController extends Controller
 
         if ($exam->type === 'post_test' && $exam->owner_type === Meeting::class) {
             $meeting = Meeting::find($exam->owner_id);
-            $users   = $this->usersWithMeetingAccess($meeting);
+            $users = User::usersWithMeetingAccess($meeting);
         }
 
         foreach ($users as $user) {

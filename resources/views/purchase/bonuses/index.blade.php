@@ -92,9 +92,25 @@
                             @if($product->bonuses->isEmpty())
                                 <span class="text-gray-500 dark:text-gray-400">—</span>
                             @else
-                                <ul class="list-disc list-inside">
+                                <ul class="list-disc list-inside space-y-1">
                                     @foreach($product->bonuses as $bonus)
-                                        <li>{{ strtoupper($bonus->bonus_type) }}</li>
+                                        <li>
+                                            @if($bonus->bonus_type === 'tryout')
+                                                <span class="font-medium">
+                                                    {{ $bonus->tryout?->title ?? 'Tryout #' . $bonus->bonus_id }}
+                                                </span>
+
+                                            @elseif($bonus->bonus_type === 'course')
+                                                <span class="font-medium">
+                                                    {{ $bonus->course?->name ?? 'Course #' . $bonus->bonus_id }}
+                                                </span>
+
+                                            @elseif($bonus->bonus_type === 'quiz')
+                                                <span class="italic text-gray-500 dark:text-gray-400">
+                                                    Semua Quiz
+                                                </span>
+                                            @endif
+                                        </li>
                                     @endforeach
                                 </ul>
                             @endif

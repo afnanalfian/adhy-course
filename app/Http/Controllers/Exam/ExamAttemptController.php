@@ -33,6 +33,13 @@ class ExamAttemptController extends Controller
         if (!$exam->hasTimeWindow()) {
             abort(403, 'Ujian belum tersedia saat ini');
         }
+        if (
+            auth()->user()->hasRole('siswa') &&
+            $exam->type === 'tryout' &&
+            $exam->unmetPrerequisitesFor(auth()->user())->isNotEmpty()
+        ) {
+            abort(403, 'Anda harus menyelesaikan tryout sebelumnya terlebih dahulu');
+        }
 
         $attempt = $exam->attempts()
             ->firstOrCreate(

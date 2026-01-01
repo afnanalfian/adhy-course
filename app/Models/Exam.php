@@ -50,10 +50,27 @@ class Exam extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-
+    public function prerequisites()
+    {
+        return $this->belongsToMany(
+            Exam::class,
+            'exam_prerequisites',
+            'exam_id',
+            'required_exam_id'
+        );
+    }
+    public function unmetPrerequisitesFor(User $user)
+    {
+        return $this->prerequisites
+            ->filter(fn ($req) =>
+                ! $user->examAttempts()
+                    ->where('exam_id', $req->id)
+                    ->where('is_submitted', true)
+                    ->exists()
+            );
+    }
     /**
      * Relasi ke Productable
-     * Nama diubah dari product() menjadi productable()
      */
     public function productable()
     {
@@ -64,7 +81,6 @@ class Exam extends Model
 
     /**
      * Accessor untuk mendapatkan Product langsung
-     * Tetap menggunakan nama product
      */
     public function getProductAttribute()
     {

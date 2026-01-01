@@ -3,6 +3,7 @@ import './bootstrap';
 import './theme';
 import './sidebar';
 import './toast';
+import './landing';
 
 import Alpine from 'alpinejs'
 import collapse from '@alpinejs/collapse'

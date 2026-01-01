@@ -45,24 +45,30 @@ class OrderObserver
 
     protected function grantMainEntitlement(int $userId, $product): void
     {
+        $productable = $product->productable?->productable;
+
+        if (! $productable) {
+            return;
+        }
+
         match ($product->type) {
 
             'meeting' => $this->grant(
                 $userId,
                 'meeting',
-                $product->productable?->id
+                $productable->id
             ),
 
             'course_package' => $this->grant(
                 $userId,
                 'course',
-                $product->productable?->id
+                $productable->id
             ),
 
             'tryout' => $this->grant(
                 $userId,
                 'tryout',
-                $product->productable?->id
+                $productable->id
             ),
 
             'addon' => $this->grant(
@@ -89,15 +95,31 @@ class OrderObserver
 
     protected function grantBonusEntitlement(int $userId, $bonus): void
     {
-        if (! in_array($bonus->bonus_type, ['meeting','course','tryout','quiz'])) {
+        if (! in_array($bonus->bonus_type, ['course','tryout','quiz'])) {
             return;
         }
 
+        // Quiz = global access
+        if ($bonus->bonus_type === 'quiz') {
+            UserEntitlement::firstOrCreate(
+                [
+                    'user_id'          => $userId,
+                    'entitlement_type' => 'quiz',
+                    'entitlement_id'   => 0,
+                ],
+                [
+                    'source' => 'bonus',
+                ]
+            );
+            return;
+        }
+
+        // Tryout / Course = spesifik
         UserEntitlement::firstOrCreate(
             [
                 'user_id'          => $userId,
                 'entitlement_type' => $bonus->bonus_type,
-                'entitlement_id'   => $bonus->bonus_id ?? 0,
+                'entitlement_id'   => $bonus->bonus_id,
             ],
             [
                 'source' => 'bonus',

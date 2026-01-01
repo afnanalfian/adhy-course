@@ -126,7 +126,7 @@
             <div class="bg-azwara-lightest dark:bg-gray-800 rounded-2xl p-4 border dark:border-gray-700">
                 <div class="flex justify-between mb-4">
                     <h3 class="font-semibold text-gray-800 dark:text-white">Upcoming Tryouts</h3>
-                    <a href="{{ route('exams.index',['type'=>'tryout']) }}" class="text-sm text-blue-600">View all</a>
+                    <a href="{{ route('tryouts.index') }}" class="text-sm text-blue-600">View all</a>
                 </div>
 
                 <div class="space-y-3">

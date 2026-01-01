@@ -149,16 +149,13 @@
                         {{-- GUNAKAN ACCESSOR $t->product (bukan $t->productable) --}}
                         @if ($t->product)
                             @php
-                                // AMBIL PRODUCT_ID DARI ACCESSOR
                                 $productId = $t->product->id;
                                 $inCart    = in_array($productId, $cartProductIds);
 
-                                // CEK JIKA TRYOUT INI MILIK COURSE TERTENTU
-                                $courseId  = optional($t->owner)->id;
-                                $locked    = $courseId
-                                    ? in_array($courseId, $courseIdsInCart)
-                                    : false;
+                                // tryout ini bonus dari course_package di cart?
+                                $locked = in_array($t->id, $bonusTryoutIdsInCart);
                             @endphp
+
 
                             @if ($locked)
                                 <button disabled

@@ -3,13 +3,19 @@
 namespace App\Http\Controllers\Teras;
 
 use App\Http\Controllers\Controller;
-use App\Models\Course;
+use App\Services\LandingService;
+use Illuminate\Support\Facades\Cache;
 
 class LandingController extends Controller
 {
-    public function index()
+    public function index(LandingService $landingService)
     {
+        $data = Cache::remember(
+            'landing_page_v1',
+            600,
+            fn () => $landingService->getLandingData()
+        );
 
-        return view('front.landing');
+        return view('front.landing', $data);
     }
 }

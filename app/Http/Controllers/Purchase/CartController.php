@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
+use App\Models\Exam;
 use App\Models\Productable;
 use App\Models\Meeting;
 use App\Models\UserEntitlement;
@@ -64,19 +65,32 @@ class CartController extends Controller
         }
 
         /**
-         * 1. BLOK TRYOUT JIKA SUDAH ADA COURSE PACKAGE
+         * 1. BLOK TRYOUT JIKA TRYOUT INI ADALAH BONUS DARI COURSE PACKAGE DI CART
          */
-        if (
-            $product->type === 'tryout' &&
-            $cart->items()
+        if ($product->type === 'tryout') {
+
+            // ambil semua course package di cart
+            $coursePackages = $cart->items()
                 ->whereHas('product', fn ($q) =>
                     $q->where('type', 'course_package')
                 )
-                ->exists()
-        ) {
-            return response()->json([
-                'message' => 'Tryout sudah termasuk dalam Full Course'
-            ], 422);
+                ->with('product.bonuses')
+                ->get()
+                ->pluck('product');
+
+            foreach ($coursePackages as $coursePackage) {
+
+                $isBonusTryout = $coursePackage->bonuses
+                    ->where('bonus_type', 'tryout')
+                    ->where('bonus_id', $product->productable?->productable?->id)
+                    ->isNotEmpty();
+
+                if ($isBonusTryout) {
+                    return response()->json([
+                        'message' => 'Tryout ini sudah termasuk dalam paket course'
+                    ], 422);
+                }
+            }
         }
 
         /**
@@ -179,12 +193,34 @@ class CartController extends Controller
                     }
                 }
 
-                // HAPUS TRYOUT
-                $cart->items()
-                    ->whereHas('product', fn ($q) =>
-                        $q->where('type', 'tryout')
-                    )
-                    ->delete();
+                /**
+                 * HAPUS TRYOUT YANG MERUPAKAN BONUS COURSE PACKAGE SAJA
+                 */
+                $product->loadMissing('bonuses');
+
+                $bonusTryoutExamIds = $product->bonuses
+                    ->where('bonus_type', 'tryout')
+                    ->pluck('bonus_id')
+                    ->filter()
+                    ->toArray();
+
+                if (! empty($bonusTryoutExamIds)) {
+
+                    // WAJIB load productable supaya accessor product tidak N+1
+                    $bonusTryoutProductIds = Exam::with('productable.product')
+                        ->whereIn('id', $bonusTryoutExamIds)
+                        ->get()
+                        ->map(fn ($exam) => $exam->product?->id)
+                        ->filter()
+                        ->values()
+                        ->toArray();
+
+                    if (! empty($bonusTryoutProductIds)) {
+                        $cart->items()
+                            ->whereIn('product_id', $bonusTryoutProductIds)
+                            ->delete();
+                    }
+                }
 
                 // HAPUS ADDON
                 $cart->items()

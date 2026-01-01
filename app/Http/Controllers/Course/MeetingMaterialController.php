@@ -7,6 +7,7 @@ use App\Models\MeetingMaterial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 
 class MeetingMaterialController extends Controller
 {
@@ -35,7 +36,7 @@ class MeetingMaterialController extends Controller
         ]);
 
         /** NOTIFY STUDENTS */
-        $users = $this->usersWithMeetingAccess($meeting);
+        $users = User::usersWithMeetingAccess($meeting);
 
         foreach ($users as $user) {
             notify_user(
