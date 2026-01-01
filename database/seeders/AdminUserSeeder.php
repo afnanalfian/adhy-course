@@ -13,16 +13,16 @@ class AdminUserSeeder extends Seeder
     {
         // Buat akun admin default
         $admin = User::firstOrCreate(
-            ['email' => 'admin@bimbel.com'],  // <-- ganti sesuai kebutuhan
+            ['email' => 'azwaralearning@gmail.com'],  // <-- ganti sesuai kebutuhan
             [
                 'name' => 'Admin',
-                'password' => Hash::make('password'),  // <-- ganti password
-                'province_id' => 73,
-                'regency_id' => 7309,
+                'password' => Hash::make('nabilacantik'),  // <-- ganti password
+                'province_id' => 13,
+                'regency_id' => 1305,
                 'phone' => '082154734819',
                 'avatar' => null,
                 'is_active' => true,
-                'email_verified_at' => '2025-11-28 23:26:22',
+                'email_verified_at' => now(),
             ]
         );
 
