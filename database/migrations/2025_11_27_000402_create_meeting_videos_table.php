@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('meeting_videos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('meeting_id')->constrained()->cascadeOnDelete();
-            $table->string('youtube_video_id');
+            $table->string('youtube_video_id')->nullable();
             $table->string('title');
             $table->string('youtube_thumbnail_url')->nullable();
             $table->timestamps();

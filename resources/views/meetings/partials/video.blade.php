@@ -4,11 +4,6 @@
         $video = $meeting->video; // MeetingVideo | null
         $user  = auth()->user();
         $isAdminOrTentor = $user && $user->hasAnyRole(['admin', 'tentor']);
-
-        // thumbnail youtube
-        $thumbnailUrl = $video
-            ? "https://img.youtube.com/vi/{$video->youtube_video_id}/hqdefault.jpg"
-            : null;
     @endphp
 
     {{-- ================================
@@ -20,7 +15,6 @@
             Rekaman pembelajaran belum tersedia.
         </p>
 
-        {{-- ADMIN / TENTOR --}}
         @if ($isAdminOrTentor)
             <a
                 href="{{ route('meetings.video.create', $meeting) }}"
@@ -35,47 +29,74 @@
     ================================= --}}
     @else
 
-        <div class="flex items-start gap-4">
+        <div class="flex flex-col md:flex-row gap-6">
 
-            {{-- Thumbnail --}}
-            <div class="w-48 aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+        {{-- Thumbnail (BESAR + RESPONSIVE) --}}
+        <div
+            class="w-full md:w-[420px]
+                aspect-video
+                rounded-2xl
+                overflow-hidden
+                bg-gray-200 dark:bg-gray-700
+                shadow">
+
+            @php
+                $thumbnail = $video?->thumbnail;
+            @endphp
+
+            @if ($thumbnail)
                 <img
-                    src="{{ $thumbnailUrl }}"
+                    src="{{ $thumbnail }}"
                     alt="Thumbnail video"
+                    loading="lazy"
                     class="w-full h-full object-cover">
-            </div>
+            @else
+                <div class="w-full h-full flex items-center justify-center text-sm text-gray-500">
+                    Thumbnail tidak tersedia
+                </div>
+            @endif
+        </div>
+
 
             {{-- Info & Actions --}}
-            <div class="flex-1 space-y-2">
+            <div class="flex-1 space-y-3">
 
-                <p class="text-sm font-medium text-gray-800 dark:text-gray-200">
-                    {{ $video->title }}
-                </p>
+                <div>
+                    <p class="text-sm font-medium text-gray-800 dark:text-gray-200">
+                        {{ $video->title }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Platform: {{ $video->platform }}
+                    </p>
+                </div>
 
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                    Platform: YouTube
-                </p>
+                <div class="flex flex-wrap gap-3 pt-2">
 
-                <div class="flex flex-wrap gap-2 pt-2">
-
-                    {{-- NONTON (SEMUA ROLE) --}}
+                    {{-- NONTON --}}
                     <a
                         href="{{ route('meetings.video.playback', $meeting) }}"
-                        class="px-4 py-2 rounded-lg
-                               bg-primary text-white hover:bg-primary/90">
+                        class="inline-flex items-center justify-center
+                               px-5 py-2.5 rounded-lg
+                               bg-primary text-white
+                               text-sm font-medium
+                               hover:bg-primary/90">
                         ▶️ Nonton
                     </a>
 
-                    {{-- EDIT (ADMIN / TENTOR) --}}
+                    {{-- ADMIN / TENTOR --}}
                     @if ($isAdminOrTentor)
-                        {{-- <a
+
+                        {{-- EDIT --}}
+                        <a
                             href="{{ route('meetings.video.edit', $meeting) }}"
-                            class="px-4 py-2 rounded-lg
+                            class="inline-flex items-center justify-center
+                                   px-4 py-2.5 rounded-lg
                                    bg-gray-200 dark:bg-gray-700
+                                   text-sm font-medium
                                    text-gray-800 dark:text-gray-200
                                    hover:bg-gray-300 dark:hover:bg-gray-600">
-                            ✏️ Edit
-                        </a> --}}
+                            Edit
+                        </a>
 
                         {{-- HAPUS --}}
                         <form
@@ -88,12 +109,15 @@
 
                             <button
                                 type="submit"
-                                class="px-4 py-2 rounded-lg
-                                    bg-red-600 text-white
-                                    hover:bg-red-700">
-                                🗑️ Hapus
+                                class="inline-flex items-center justify-center
+                                       px-4 py-2.5 rounded-lg
+                                       bg-red-600 text-white
+                                       text-sm font-medium
+                                       hover:bg-red-700">
+                                Hapus
                             </button>
                         </form>
+
                     @endif
 
                 </div>

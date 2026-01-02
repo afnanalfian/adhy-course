@@ -7,6 +7,7 @@ use App\Models\MeetingVideo;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\VideoSourceResolver;
 
 class MeetingVideoController extends Controller
 {
@@ -27,35 +28,31 @@ class MeetingVideoController extends Controller
     | STORE (simpan youtube video id)
     |--------------------------------------------------------------------------
     */
-    public function store(Request $request, Meeting $meeting)
-    {
-        abort_if(
-            $meeting->video()->exists(),
-            409,
-            'Meeting sudah memiliki video'
-        );
+    public function store(
+        Request $request,
+        Meeting $meeting,
+        VideoSourceResolver $resolver
+    ) {
+        abort_if($meeting->video()->exists(), 409);
 
         $request->validate([
-            'youtube_video_id' => 'required|string'
+            'source' => 'required|in:youtube,cdn',
+            'title'  => 'required|string|max:255',
         ]);
 
-        MeetingVideo::create([
-            'meeting_id'        => $meeting->id,
-            'title'             => $meeting->title,
-            'youtube_video_id'  => $request->youtube_video_id,
-        ]);
-
-        /** NOTIFY STUDENTS WITH ACCESS */
-        $users = User::usersWithMeetingAccess($meeting);
-
-        foreach ($users as $user) {
-            notify_user(
-                $user,
-                "Video rekaman meeting '{$meeting->title}' sudah tersedia.",
-                false,
-                route('meeting.show', $meeting)
-            );
+        if ($request->source === 'youtube') {
+            $request->validate([
+                'youtube_video_id' => 'required|string',
+            ]);
         }
+
+        if ($request->source === 'cdn') {
+            $request->validate([
+                'cdn_video_id' => 'required|string',
+            ]);
+        }
+
+        $resolver->store($meeting, $request->all());
 
         toast('success', 'Video berhasil ditambahkan');
         return redirect()->route('meeting.show', $meeting);
@@ -81,24 +78,36 @@ class MeetingVideoController extends Controller
     | UPDATE (update metadata)
     |--------------------------------------------------------------------------
     */
-    public function update(Request $request, Meeting $meeting)
-    {
+    public function update(
+        Request $request,
+        Meeting $meeting,
+        VideoSourceResolver $resolver
+    ) {
         $video = $meeting->video;
         abort_if(! $video, 404);
 
         $request->validate([
-            'title'             => 'required|string|max:255',
-            'youtube_video_id'  => 'required|string',
+            'source' => 'required|in:youtube,cdn',
+            'title'  => 'required|string|max:255',
         ]);
 
-        $video->update([
-            'title'             => $request->title,
-            'youtube_video_id'  => $request->youtube_video_id,
-        ]);
-        toast('success', 'Metadata video berhasil diperbarui');
+        if ($request->source === 'youtube') {
+            $request->validate([
+                'youtube_video_id' => 'required|string',
+            ]);
+        }
+
+        if ($request->source === 'cdn') {
+            $request->validate([
+                'cdn_video_id' => 'required|string',
+            ]);
+        }
+
+        $resolver->update($video, $request->all());
+
+        toast('success', 'Video berhasil diperbarui');
         return redirect()->route('meeting.show', $meeting);
     }
-
     /*
     |--------------------------------------------------------------------------
     | DESTROY (hapus video dari database)
@@ -109,7 +118,9 @@ class MeetingVideoController extends Controller
         $video = $meeting->video;
         abort_if(! $video, 404);
 
+        // NOTE: Tidak hapus file CDN / YouTube
         $video->delete();
+
         toast('info', 'Video berhasil dihapus');
         return redirect()->route('meeting.show', $meeting);
     }
@@ -122,15 +133,11 @@ class MeetingVideoController extends Controller
     public function playback(Meeting $meeting)
     {
         $video = $meeting->video;
-        abort_if(! $video, 404);
+        abort_if(! $video || ! $video->is_ready, 404);
 
-        // generate embed url
-        $embedUrl = "https://www.youtube.com/embed/{$video->youtube_video_id}?modestbranding=1&rel=0&showinfo=0";
-
-        return view('meetings.videos.playback', compact(
-            'meeting',
-            'video',
-            'embedUrl'
-        ));
+        return view('meetings.videos.playback', [
+            'meeting' => $meeting,
+            'video'   => $video,
+        ]);
     }
 }

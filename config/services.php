@@ -30,5 +30,12 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'bunny' => [
+        'library_id' => env('BUNNY_VIDEO_LIBRARY_ID'),
+        'stream_key' => env('BUNNY_STREAM_KEY'),
+        'cdn_hostname' => env('BUNNY_CDN_HOSTNAME'),
+        'signed_expiry' => (int) env('BUNNY_SIGNED_EXPIRY', 3600),
+        'api_key' => env('BUNNY_API_KEY'),
+    ],
 
 ];
