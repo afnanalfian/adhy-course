@@ -207,21 +207,6 @@ class MeetingController extends Controller
             return back();
         }
 
-        $scheduledAt = $meeting->scheduled_at->timezone('Asia/Jakarta');
-        $joinAllowedAt = $scheduledAt->copy()->subMinutes(30);
-        $now = Carbon::now('Asia/Jakarta');
-
-        if ($now->lt($joinAllowedAt)) {
-            toast(
-                'error',
-                'Tidak dapat join, tunggu hingga pukul ' .
-                $joinAllowedAt->format('H:i') .
-                ' WIB - Tanggal ' .
-                $scheduledAt->format('d/m/Y')
-            );
-            return back();
-        }
-
         return redirect()->away($meeting->zoom_link);
     }
 
