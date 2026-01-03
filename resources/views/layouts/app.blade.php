@@ -16,7 +16,7 @@
     class="flex h-screen overflow-hidden
            bg-gradient-to-br from-azwara-lighter via-azwara-medium/20 to-white
            dark:bg-brand-gradient
-           bg-fixed bg-no-repeat bg-cover bg-[length:200%_200%]
+           bg-fixed bg-no-repeat bg-[length:200%_200%]
            transition-all duration-500">
 
     @include('layouts.partials.sidebar')

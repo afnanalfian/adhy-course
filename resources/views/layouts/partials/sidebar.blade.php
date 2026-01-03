@@ -1,6 +1,6 @@
 <div
     id="sidebar-backdrop"
-    onclick="console.log('BACKDROP CLICKED'); toggleSidebar()"
+    onclick="toggleSidebar()"
     class="fixed inset-0 bg-black/40 hidden md:hidden z-40">
 </div>
 
