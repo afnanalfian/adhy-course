@@ -25,34 +25,47 @@ class BrowseController extends Controller
 
         $courses = Course::query()
             ->whereNull('courses.deleted_at')
+
+            // HARUS punya product course_package yang aktif
             ->whereHas('product', function ($q) {
-                $q->where('type', 'course_package')
-                ->where('is_active', true)
-                ->whereNull('deleted_at');
+                $q->whereHas('product', function ($p) {
+                    $p->where('type', 'course_package')
+                    ->where('is_active', true);
+                });
             })
-            ->with('product')
+
+            // exclude course yang sudah dimiliki user
             ->when(
                 ! empty($ownedCourseIds),
                 fn ($q) => $q->whereNotIn('courses.id', $ownedCourseIds)
             )
+
+            ->with([
+                'product.product', // productable + product
+            ])
+
             ->get();
 
-        /* ==========================
-        * TRYOUTS (GLOBAL)
-        * ========================== */
-        $tryouts = collect();
-
         $tryouts = Exam::query()
-            ->with(['productable.product'])
             ->where('type', 'tryout')
-            ->whereHas('product', fn ($q) =>
-                    $q->where('is_active', true)
-                )
-            ->whereNull('deleted_at')
+            ->whereNull('exams.deleted_at')
+
+            // HARUS punya product tryout yang aktif
+            ->whereHas('productable.product', function ($q) {
+                $q->where('type', 'tryout')
+                ->where('is_active', true);
+            })
+
+            // exclude tryout yang sudah dimiliki user
             ->when(
                 ! empty($ownedTryoutIds),
-                fn ($q) => $q->whereNotIn('id', $ownedTryoutIds)
+                fn ($q) => $q->whereNotIn('exams.id', $ownedTryoutIds)
             )
+
+            ->with([
+                'productable.product',
+            ])
+
             ->get();
 
 
