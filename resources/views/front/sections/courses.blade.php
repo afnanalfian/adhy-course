@@ -18,7 +18,9 @@
                 @foreach($courses as $index => $course)
                     @php
                         // Get course package product
-                        $coursePackage = $products['course_package']->firstWhere('context.id', $course->id) ?? null;
+                        $coursePackage = $products
+                            ->get('course_package', collect())
+                            ->firstWhere('context.id', $course->id);
 
                         // Get all meetings for this course
                         $allCourseMeetings = $course->meetings ?? collect();
@@ -152,7 +154,7 @@
                                     {{-- Package Price --}}
                                     @if($coursePrice > 0)
                                         <div class="mb-6">
-                                            
+
                                             <div class="flex items-center justify-between mb-4">
                                                 <div>
                                                     <span class="text-sm font-semibold text-azwara-darkest">
