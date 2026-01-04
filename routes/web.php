@@ -391,6 +391,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
         Route::post('/orders/{order}/approve', [OrderController::class, 'approve'])->name('orders.approve');
         Route::post('/orders/{order}/reject', [OrderController::class, 'reject'])->name('orders.reject');
+        Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
 
         //PRICING
         Route::get('/pricing', [ProductPricingController::class, 'index'])->name('pricing.index');

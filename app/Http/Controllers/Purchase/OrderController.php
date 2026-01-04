@@ -123,8 +123,33 @@ class OrderController extends Controller
             true,
             route('checkout.payment', $order)
         );
-        
+
         toast('info', 'Pembayaran telah ditolak');
         return redirect()->route('orders.index');
     }
+    /**
+     * DELETE order (admin only)
+     */
+    public function destroy(Order $order)
+    {
+        // Order yang sudah diverifikasi tidak boleh dihapus
+        if ($order->status === 'verified') {
+            toast('error', 'Order yang sudah diverifikasi tidak dapat dihapus');
+            return back();
+        }
+
+        // Safety tambahan (opsional)
+        if ($order->payment && $order->payment->status === 'verified') {
+            toast('error', 'Payment sudah diverifikasi, order tidak dapat dihapus');
+            return back();
+        }
+
+        DB::transaction(function () use ($order) {
+            $order->delete(); // cascade ke items & payment
+        });
+
+        toast('warning', 'Order berhasil dihapus');
+        return redirect()->route('orders.index');
+    }
+
 }

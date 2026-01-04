@@ -103,6 +103,20 @@
                                class="text-primary font-semibold hover:underline dark:text-azwara-lightest">
                                 Detail
                             </a>
+                            @if($order->status !== 'verified')
+                                <form method="POST"
+                                    action="{{ route('orders.destroy', $order) }}"
+                                    class="inline sweet-confirm"
+                                    data-message="Yakin ingin menghapus order #{{ $order->id }}? Data pembayaran akan ikut terhapus.">
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button type="submit"
+                                            class="text-red-600 font-semibold hover:underline">
+                                        Hapus
+                                    </button>
+                                </form>
+                            @endif
                         </td>
                     </tr>
                 @empty
@@ -169,6 +183,22 @@
                           bg-primary text-white font-semibold py-2">
                     Lihat Detail
                 </a>
+                @if($order->status !== 'verified')
+                    <form method="POST"
+                        action="{{ route('orders.destroy', $order) }}"
+                        class="sweet-confirm"
+                        data-message="Yakin ingin menghapus order #{{ $order->id }}? Data pembayaran akan ikut terhapus.">
+                        @csrf
+                        @method('DELETE')
+
+                        <button type="submit"
+                                class="w-full rounded-xl
+                                    bg-red-100 text-red-700
+                                    font-semibold py-2">
+                            Hapus Order
+                        </button>
+                    </form>
+                @endif
             </div>
         @empty
             <div class="text-center text-gray-500 py-10">
