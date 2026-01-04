@@ -135,13 +135,13 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        if (
-            $product->cartItems()->exists() ||
-            $product->orderItems()->exists()
-        ) {
-            toast('error', 'Product tidak bisa dihapus karena sudah digunakan.');
-            return back();
-        }
+        // if (
+        //     $product->cartItems()->exists() ||
+        //     $product->orderItems()->exists()
+        // ) {
+        //     toast('error', 'Product tidak bisa dihapus karena sudah digunakan.');
+        //     return back();
+        // }
 
         $product->delete();
 
