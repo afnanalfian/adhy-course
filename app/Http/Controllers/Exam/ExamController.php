@@ -224,13 +224,19 @@ class ExamController extends Controller
     }
     public function destroy(Exam $exam)
     {
-        // Cegah hapus kalau sudah ada attempt
+        // Tidak boleh hapus kalau sedang aktif
+        if ($exam->status === 'active') {
+            toast('error', 'Exam sedang berlangsung dan tidak dapat dihapus');
+            return back();
+        }
+
+        // Tidak boleh hapus kalau sudah ada attempt
         if ($exam->attempts()->exists()) {
             toast('error', 'Ujian sudah dikerjakan, tidak dapat dihapus');
             return back();
         }
 
-        // Kalau post test, pastikan meeting masih ada
+        // Validasi examable untuk post test
         if (
             $exam->examable_type === Meeting::class &&
             !$exam->examable
@@ -239,22 +245,24 @@ class ExamController extends Controller
             return back();
         }
 
+        // Soft delete
         $exam->delete();
 
         toast('success', 'Ujian berhasil dihapus');
 
-        // Redirect sesuai tipe
-        if ($exam->examable_type === Meeting::class) {
+        // Redirect aman
+        if ($exam->examable_type === Meeting::class && $exam->examable) {
             return redirect()
                 ->route('meeting.show', $exam->examable);
         }
 
-        return redirect()
-            ->route(
-                $exam->type === 'quiz'
-                    ? 'quizzes.index'
-                    : 'tryouts.index'
-            );
+        return redirect()->route(
+            match ($exam->type) {
+                'quiz'   => 'quizzes.index',
+                'tryout' => 'tryouts.index',
+                default  => 'exams.index',
+            }
+        );
     }
 
 }
