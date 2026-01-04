@@ -83,6 +83,21 @@
                         Edit
                     </a>
 
+                    {{-- HAPUS (hanya jika nonaktif) --}}
+                    @if(! $rule->is_active)
+                        <form method="POST"
+                            action="{{ route('pricing.destroy', $rule) }}"
+                            class="sweet-confirm"
+                            data-message="Yakin ingin menghapus pricing rule ini?">
+                            @csrf
+                            @method('DELETE')
+
+                            <button type="submit"
+                                    class="text-red-600 font-semibold hover:underline">
+                                Hapus
+                            </button>
+                        </form>
+                    @endif
                     <form method="POST"
                           action="{{ route('pricing.toggle', $rule) }}"
                           class="sweet-confirm"
@@ -171,6 +186,22 @@
                                class="text-primary font-semibold hover:underline">
                                 Edit
                             </a>
+                            
+                            {{-- HAPUS (hanya jika nonaktif) --}}
+                            @if(! $rule->is_active)
+                                <form method="POST"
+                                    action="{{ route('pricing.destroy', $rule) }}"
+                                    class="inline sweet-confirm"
+                                    data-message="Yakin ingin menghapus pricing rule ini?">
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button type="submit"
+                                            class="text-red-600 font-semibold hover:underline">
+                                        Hapus
+                                    </button>
+                                </form>
+                            @endif
 
                             <form method="POST"
                                   action="{{ route('pricing.toggle', $rule) }}"
