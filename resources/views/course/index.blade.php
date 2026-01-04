@@ -72,28 +72,52 @@
 
                         if ($user && $user->hasRole('siswa')) {
 
-                            $totalMeetings = $c->meetings->count();
-
-                            // beli full course
-                            if ($user->hasCourse($c->id)) {
-                                $badgeText  = 'Full Access';
-                                $badgeClass = 'bg-green-600 text-white';
+                            /**
+                             * ======================================
+                             * 1. COURSE GRATIS (PRIORITAS TERTINGGI)
+                             * ======================================
+                             */
+                            if ($c->is_free) {
+                                $badgeText  = 'FREE';
+                                $badgeClass = 'bg-emerald-600 text-white';
                             } else {
-                                $ownedMeetingIds = $user->ownedMeetingIds();
 
-                                $ownedCount = $c->meetings
-                                    ->whereIn('id', $ownedMeetingIds)
-                                    ->count();
+                                $totalMeetings = $c->meetings->count();
 
-                                if ($ownedCount === 0) {
-                                    $badgeText  = 'No Meetings Buyed';
-                                    $badgeClass = 'bg-gray-500 text-white';
-                                } elseif ($ownedCount >= $totalMeetings) {
+                                /**
+                                 * ======================================
+                                 * 2. BELI FULL COURSE
+                                 * ======================================
+                                 */
+                                if ($user->hasCourse($c->id)) {
                                     $badgeText  = 'Full Access';
                                     $badgeClass = 'bg-green-600 text-white';
+
                                 } else {
-                                    $badgeText  = "{$ownedCount}/{$totalMeetings} Meetings Buyed";
-                                    $badgeClass = 'bg-blue-600 text-white';
+
+                                    $ownedMeetingIds = $user->ownedMeetingIds();
+
+                                    $ownedCount = $c->meetings
+                                        ->whereIn('id', $ownedMeetingIds)
+                                        ->count();
+
+                                    /**
+                                     * ======================================
+                                     * 3. BELI SEBAGIAN / TIDAK SAMA SEKALI
+                                     * ======================================
+                                     */
+                                    if ($ownedCount === 0) {
+                                        $badgeText  = 'No Meetings Buyed';
+                                        $badgeClass = 'bg-gray-500 text-white';
+
+                                    } elseif ($ownedCount >= $totalMeetings) {
+                                        $badgeText  = 'Full Access';
+                                        $badgeClass = 'bg-green-600 text-white';
+
+                                    } else {
+                                        $badgeText  = "{$ownedCount}/{$totalMeetings} Meetings Buyed";
+                                        $badgeClass = 'bg-blue-600 text-white';
+                                    }
                                 }
                             }
                         }

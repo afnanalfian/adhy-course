@@ -39,6 +39,12 @@
                 ->where('entitlement_type', 'quiz')
                 ->exists();
 
+            $quizAddonProduct = \App\Models\Product::where('type', 'addon')
+                ->where('is_active', true)       // atau status = active
+                ->first();
+
+            $addonAvailable = ! is_null($quizAddonProduct);
+
             $cartHasCourse = $cart->items->contains(fn ($i) =>
                 $i->product->type === 'course_package'
             );
@@ -48,7 +54,7 @@
             );
         @endphp
 
-        @if (! $userHasQuiz && ! $cartHasCourse)
+        @if ($addonAvailable && ! $userHasQuiz && ! $cartHasCourse)
             <form method="POST" action="{{ route('cart.add-addon') }}">
                 @csrf
                 <button

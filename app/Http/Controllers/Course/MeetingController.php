@@ -77,6 +77,7 @@ class MeetingController extends Controller
             'title'        => 'required|string|max:255',
             'scheduled_at' => 'required|date_format:Y-m-d\TH:i',
             'zoom_link'    => 'nullable|url',
+            'is_free'      => 'nullable|boolean',
         ]);
 
         $meeting = Meeting::create([
@@ -90,6 +91,7 @@ class MeetingController extends Controller
             ),
             'zoom_link'    => $request->zoom_link,
             'status'       => 'upcoming',
+            'is_free'      => $request->boolean('is_free'),
             'created_by'   => auth()->id(),
         ]);
 
@@ -113,6 +115,7 @@ class MeetingController extends Controller
             'title'        => 'required|string|max:255',
             'scheduled_at' => 'required|date',
             'zoom_link'    => 'nullable|url',
+            'is_free'      => 'nullable|boolean',
         ]);
 
         $meeting->update([
@@ -125,6 +128,7 @@ class MeetingController extends Controller
                 'Asia/Jakarta'
             ),
             'zoom_link'    => $request->zoom_link,
+            'is_free'      => $request->boolean('is_free'),
         ]);
 
         toast('success', 'Meeting berhasil diperbarui');

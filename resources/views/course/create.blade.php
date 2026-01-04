@@ -89,6 +89,27 @@
                 <p class="text-sm text-red-500">{{ $message }}</p>
             @enderror
         </div>
+        
+        {{-- FREE COURSE --}}
+        <div class="space-y-1">
+            <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox"
+                    name="is_free"
+                    value="1"
+                    {{ old('is_free') ? 'checked' : '' }}
+                    class="rounded border-gray-300
+                            text-primary
+                            focus:ring-primary">
+
+                <span class="font-medium text-gray-800 dark:text-gray-100">
+                    Course Gratis
+                </span>
+            </label>
+
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+                Jika dicentang, semua user dapat mengakses course ini tanpa membeli.
+            </p>
+        </div>
 
         {{-- Thumbnail --}}
         <div class="space-y-1">

@@ -13,6 +13,7 @@ class Meeting extends Model
         'course_id',
         'title',
         'slug',
+        'is_free',
         'scheduled_at',
         'started_at',
         'zoom_link',
@@ -22,6 +23,7 @@ class Meeting extends Model
     protected $casts = [
         'scheduled_at' => 'datetime',
         'started_at' => 'datetime',
+        'is_free' => 'boolean',
     ];
 
     public function course()
@@ -89,4 +91,13 @@ class Meeting extends Model
 
         return $this->productable?->product;
     }
+    public function isFree(): bool
+    {
+        return $this->is_free;
+    }
+    public function courseIsFree(): bool
+    {
+        return $this->course && $this->course->is_free;
+    }
+
 }

@@ -12,10 +12,13 @@ class Course extends Model
     protected $fillable = [
         'name',
         'slug',
+        'is_free',
         'description',
         'thumbnail',
     ];
-
+    protected $casts = [
+        'is_free' => 'boolean',
+    ];
     public function teachers()
     {
         return $this->belongsToMany(Teacher::class, 'course_teacher');
@@ -41,5 +44,9 @@ class Course extends Model
                 $q->where('type', 'course_package')
             )
             ->with('product');
+    }
+    public function isFree(): bool
+    {
+        return $this->is_free;
     }
 }

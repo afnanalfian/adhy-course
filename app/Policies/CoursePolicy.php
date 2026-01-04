@@ -12,7 +12,10 @@ class CoursePolicy
         if (! $user->hasRole('siswa')) {
             return true;
         }
-
+        // COURSE GRATIS → SEMUA BOLEH AKSES
+        if ($course->is_free) {
+            return true;
+        }
         return $user->hasCourse($course->id);
     }
 }

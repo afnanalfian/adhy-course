@@ -44,9 +44,11 @@ class CourseController extends Controller
             'slug'        => 'required|max:255|unique:courses,slug',
             'description' => 'required|max:1000',
             'thumbnail'   => 'required|image',
+            'is_free'     => 'nullable|boolean',
         ]);
 
         $data = $request->only('name','slug','description');
+        $data['is_free'] = $request->boolean('is_free');
         $data['thumbnail'] = $request->file('thumbnail')->store('courses','public');
 
         Course::create($data);
@@ -81,10 +83,11 @@ class CourseController extends Controller
             'slug'        => 'required|max:255|unique:courses,slug,' . $course->id,
             'description' => 'required|max:1000',
             'thumbnail'   => 'nullable|image',
+            'is_free'     => 'nullable|boolean',
         ]);
 
         $data = $request->only('name','slug','description');
-
+        $data['is_free'] = $request->boolean('is_free');
         if ($request->hasFile('thumbnail')) {
 
             if ($course->thumbnail && file_exists(storage_path('app/public/'.$course->thumbnail))) {

@@ -61,6 +61,27 @@
                              focus:ring-2 focus:ring-primary/40 focus:outline-none"
                       required>{{ old('description', $course->description) }}</textarea>
         </div>
+        
+        {{-- FREE COURSE --}}
+        <div>
+            <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox"
+                    name="is_free"
+                    value="1"
+                    {{ old('is_free', $course->is_free) ? 'checked' : '' }}
+                    class="rounded border-gray-300
+                            text-primary
+                            focus:ring-primary">
+
+                <span class="font-semibold text-sm text-gray-700 dark:text-gray-200">
+                    Course Gratis
+                </span>
+            </label>
+
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Course gratis dapat diakses tanpa pembelian.
+            </p>
+        </div>
 
         {{-- CURRENT THUMBNAIL --}}
         <div>

@@ -31,7 +31,6 @@ class ExamPolicy
 
     protected function canAccessPostTest(User $user, Exam $exam): bool
     {
-        // Safety: hanya berlaku untuk post_test
         if ($exam->type !== 'post_test') {
             return false;
         }
@@ -43,45 +42,54 @@ class ExamPolicy
          */
         $meeting = null;
 
-        // Normal case (morphTo bekerja)
-        if ($exam->relationLoaded('owner')) {
+        try {
             $meeting = $exam->owner;
-        } else {
-            try {
-                $meeting = $exam->owner;
-            } catch (\Throwable $e) {
-                $meeting = null;
-            }
+        } catch (\Throwable $e) {
+            $meeting = null;
         }
 
-        // Fallback: owner_id ada tapi morph gagal
         if (! $meeting && $exam->owner_id) {
             $meeting = Meeting::find($exam->owner_id);
         }
 
-        // Tetap bukan meeting → tolak
         if (! $meeting instanceof Meeting) {
             return false;
         }
 
         /**
          * ======================================
-         * 2. COURSE PACKAGE → AKSES SEMUA
+         * 2. COURSE GRATIS → POST TEST GRATIS
          * ======================================
          */
-        if (
-            $meeting->course_id &&
-            $user->hasCourse($meeting->course_id)
-        ) {
+        if ($meeting->course && $meeting->course->is_free) {
             return true;
         }
 
         /**
          * ======================================
-         * 3. MEETING SATUAN
+         * 3. MEETING GRATIS → POST TEST GRATIS
+         * ======================================
+         */
+        if ($meeting->is_free) {
+            return true;
+        }
+
+        /**
+         * ======================================
+         * 4. BELI COURSE
+         * ======================================
+         */
+        if ($meeting->course_id && $user->hasCourse($meeting->course_id)) {
+            return true;
+        }
+
+        /**
+         * ======================================
+         * 5. BELI MEETING SATUAN
          * ======================================
          */
         return $user->hasEntitlement('meeting', $meeting->id);
     }
+
 }
 

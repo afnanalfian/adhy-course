@@ -44,6 +44,27 @@
                           focus:ring-primary focus:border-primary">
         </div>
 
+        {{-- FREE MEETING --}}
+        <div>
+            <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox"
+                    name="is_free"
+                    value="1"
+                    {{ old('is_free', $meeting->is_free) ? 'checked' : '' }}
+                    class="rounded border-gray-300
+                            text-primary
+                            focus:ring-primary">
+
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
+                    Pertemuan Gratis
+                </span>
+            </label>
+
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Pertemuan gratis dapat diakses tanpa pembelian.
+            </p>
+        </div>
+
         {{-- DATETIME --}}
         <div>
             <label class="block text-sm font-medium mb-1
