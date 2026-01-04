@@ -160,7 +160,7 @@
                     Informasi Pembayaran
                 </h2>
 
-                @if ($order->payment)
+                {{-- @if ($order->payment)
                     <div class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
                         <div>Metode: <strong>{{ strtoupper($order->payment->method) }}</strong></div>
                         <div>Status: <strong>{{ strtoupper($order->payment->status) }}</strong></div>
@@ -183,7 +183,68 @@
                     <div class="text-sm text-slate-500">
                         Belum ada data pembayaran.
                     </div>
+                @endif --}}
+                @if ($order->payment)
+                    <div class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
+                        <div>Metode: <strong>{{ strtoupper($order->payment->method) }}</strong></div>
+                        <div>Status: <strong>{{ strtoupper($order->payment->status) }}</strong></div>
+
+                        @if ($order->payment->verified_at)
+                            <div>
+                                Diverifikasi:
+                                {{ $order->payment->verified_at->translatedFormat('d F Y H:i') }}
+                            </div>
+                        @endif
+                    </div>
+
+                    @php
+                        $proofs = [];
+
+                        if (!empty($order->payment->proof_image)) {
+                            $proofs[] = $order->payment->proof_image;
+                        }
+
+                        if (!empty($order->payment->proof_image_2)) {
+                            $proofs[] = $order->payment->proof_image_2;
+                        }
+
+                        if (!empty($order->payment->proof_image_3)) {
+                            $proofs[] = $order->payment->proof_image_3;
+                        }
+                    @endphp
+
+                    @if (count($proofs))
+                        <div class="mt-4 space-y-3">
+                            <div class="text-sm font-medium text-slate-700 dark:text-slate-300">
+                                Bukti Pembayaran
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                @foreach ($proofs as $index => $proof)
+                                    <div class="space-y-1">
+                                        <div class="text-xs text-slate-500">
+                                            Bukti {{ $index + 1 }}
+                                        </div>
+
+                                        <a href="{{ asset('storage/' . $proof) }}"
+                                        target="_blank"
+                                        class="block">
+                                            <img
+                                                src="{{ asset('storage/' . $proof) }}"
+                                                class="rounded-lg border w-full object-contain hover:opacity-90 transition"
+                                                alt="Bukti Pembayaran {{ $index + 1 }}">
+                                        </a>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                @else
+                    <div class="text-sm text-slate-500">
+                        Belum ada data pembayaran.
+                    </div>
                 @endif
+
             </div>
 
             {{-- ACTION --}}

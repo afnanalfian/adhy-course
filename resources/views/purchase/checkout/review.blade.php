@@ -95,7 +95,7 @@
         </div>
 
         {{-- ================= DISKON ================= --}}
-        <div class="bg-white dark:bg-secondary/60
+        {{-- <div class="bg-white dark:bg-secondary/60
                     border border-slate-200 dark:border-white/10
                     rounded-xl shadow-sm">
 
@@ -108,10 +108,10 @@
                 </p>
             </div>
 
-            <div class="px-5 py-5 space-y-5">
+            <div class="px-5 py-5 space-y-5"> --}}
 
                 {{-- VOUCHER --}}
-                <div>
+                {{-- <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                         Kode Voucher
                     </label>
@@ -126,17 +126,17 @@
                     <p class="text-xs text-slate-500 mt-1">
                         Kosongkan jika memilih diskon dari daftar
                     </p>
-                </div>
+                </div> --}}
 
                 {{-- OR --}}
-                <div class="flex items-center gap-3">
+                {{-- <div class="flex items-center gap-3">
                     <div class="flex-1 h-px bg-slate-200 dark:bg-white/10"></div>
                     <span class="text-xs text-slate-500">ATAU</span>
                     <div class="flex-1 h-px bg-slate-200 dark:bg-white/10"></div>
-                </div>
+                </div> --}}
 
                 {{-- DISCOUNT DROPDOWN --}}
-                <div>
+                {{-- <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                         Pilih Diskon
                     </label>
@@ -164,10 +164,10 @@
                             </option>
                         @endforeach
                     </select>
-                </div>
+                </div> --}}
 
                 {{-- APPLY BUTTON --}}
-                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                {{-- <div class="flex flex-col sm:flex-row sm:items-center gap-3">
                     <button type="button"
                             id="apply-discount"
                             class="w-full sm:w-auto px-4 py-2 rounded-lg
@@ -183,7 +183,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
         {{-- ================= RINGKASAN ================= --}}
         @php

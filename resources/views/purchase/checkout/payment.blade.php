@@ -6,10 +6,11 @@
     {{-- PAGE TITLE --}}
     <div>
         <h1 class="text-2xl font-semibold text-slate-800 dark:text-slate-100">
-            Pembayaran
+            {{-- Pembayaran --}}
+            Upload Bukti Syarat Tryout
         </h1>
         <p class="text-sm text-slate-600 dark:text-slate-400">
-            Silakan selesaikan pembayaran sebelum waktu berakhir.
+            Silakan upload bukti syarat sebelum waktu berakhir.
         </p>
     </div>
 
@@ -27,7 +28,7 @@
                     class="text-xs px-2 py-1 rounded
                            bg-amber-100 text-amber-700
                            dark:bg-amber-500/20 dark:text-amber-300">
-                    Menunggu Pembayaran
+                    Menunggu
                 </div>
             </div>
         </div>
@@ -49,7 +50,7 @@
         </div>
     </div>
 
-    {{-- PAYMENT METHOD --}}
+    {{-- PAYMENT METHOD
     <div class="bg-white dark:bg-secondary/60
                 border border-slate-200 dark:border-white/10
                 rounded-xl shadow-sm">
@@ -62,7 +63,7 @@
 
         <div class="px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
 
-            {{-- QRIS IMAGE --}}
+            QRIS IMAGE
             <div class="flex justify-center">
                 @if ($qrisImage)
                     <img
@@ -82,12 +83,12 @@
                 @endif
             </div>
 
-            {{-- INSTRUCTION --}}
+            INSTRUCTION
             <div class="space-y-3 text-sm text-slate-700 dark:text-slate-300">
                 {!! nl2br(e($instruction)) !!}
             </div>
         </div>
-    </div>
+    </div> --}}
 
     {{-- UPLOAD PROOF --}}
     <div class="bg-white dark:bg-secondary/60
@@ -96,11 +97,12 @@
 
         <div class="px-6 py-4 border-b border-slate-200 dark:border-white/10">
             <h2 class="font-medium text-slate-800 dark:text-slate-100">
-                Upload Bukti Pembayaran
+                {{-- Upload Bukti Pembayaran --}}
+                Upload Syarat Tryout
             </h2>
         </div>
 
-        <form
+        {{-- <form
             method="POST"
             action="{{ route('checkout.uploadProof', $order) }}"
             enctype="multipart/form-data"
@@ -135,7 +137,104 @@
                     Saya Sudah Bayar
                 </button>
             </div>
+        </form> --}}
+        <form
+            method="POST"
+            action="{{ route('checkout.uploadProof', $order) }}"
+            enctype="multipart/form-data"
+            class="px-6 py-4 space-y-6">
+            @csrf
+
+            {{-- ================= BUKTI 1 (WAJIB) ================= --}}
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Bukti Syarat 1 <span class="text-red-500">*</span>
+                </label>
+
+                <input
+                    type="file"
+                    name="proof_images[]"
+                    required
+                    class="block w-full text-sm
+                        text-slate-600 dark:text-slate-300
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-lg file:border-0
+                        file:bg-azwara-lightest file:text-azwara-darker
+                        dark:file:bg-white/10 dark:file:text-azwara-lighter"
+                >
+
+                <p class="text-xs text-slate-500 mt-1">
+                    Screenshot - Follow akun instagram azwara_learning.
+                </p>
+            </div>
+
+            {{-- ================= BUKTI 2 (OPSIONAL) ================= --}}
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Bukti Syarat 2 <span class="text-red-500">*</span>
+                </label>
+
+                <input
+                    type="file"
+                    name="proof_images[]"
+                    class="block w-full text-sm
+                        text-slate-600 dark:text-slate-300
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-lg file:border-0
+                        file:bg-azwara-lightest file:text-azwara-darker
+                        dark:file:bg-white/10 dark:file:text-azwara-lighter"
+                >
+
+                <p class="text-xs text-slate-500 mt-1">
+                    Screenshoot - Repost postingan Tryout ke story instagram.
+                </p>
+            </div>
+
+            {{-- ================= BUKTI 3 (OPSIONAL) ================= --}}
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Bukti Syarat 3 <span class="text-red-500">*</span>
+                </label>
+
+                <input
+                    type="file"
+                    name="proof_images[]"
+                    class="block w-full text-sm
+                        text-slate-600 dark:text-slate-300
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-lg file:border-0
+                        file:bg-azwara-lightest file:text-azwara-darker
+                        dark:file:bg-white/10 dark:file:text-azwara-lighter"
+                >
+
+                <p class="text-xs text-slate-500 mt-1">
+                    Screenshoot - Mention 5 teman di kolom komentar.
+                </p>
+            </div>
+
+            {{-- ================= ERROR GLOBAL ================= --}}
+            @error('proof_images')
+                <p class="text-sm text-red-600">{{ $message }}</p>
+            @enderror
+
+            @error('proof_images.*')
+                <p class="text-sm text-red-600">{{ $message }}</p>
+            @enderror
+
+            {{-- ================= ACTION ================= --}}
+            <div class="flex justify-end pt-2">
+                <button
+                    type="submit"
+                    class="inline-flex items-center justify-center
+                        px-6 py-3 rounded-lg
+                        bg-primary hover:bg-azwara-darker
+                        text-white font-medium
+                        transition">
+                    Upload Syarat
+                </button>
+            </div>
         </form>
+
     </div>
 
 </div>

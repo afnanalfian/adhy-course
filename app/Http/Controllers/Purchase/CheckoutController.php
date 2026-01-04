@@ -66,7 +66,10 @@ class CheckoutController extends Controller
             'discount_id'  => 'nullable|exists:discounts,id',
         ]);
 
-        if ($data['voucher_code'] && $data['discount_id']) {
+        $voucherCode = $data['voucher_code'] ?? null;
+        $discountId  = $data['discount_id'] ?? null;
+
+        if ($voucherCode && $discountId) {
             throw ValidationException::withMessages([
                 'discount' => 'Pilih salah satu: voucher atau diskon',
             ]);
@@ -79,12 +82,12 @@ class CheckoutController extends Controller
 
         $discount = null;
 
-        if ($data['voucher_code']) {
-            $discount = Discount::where('code', $data['voucher_code'])->firstOrFail();
+        if ($voucherCode) {
+            $discount = Discount::where('code', $voucherCode)->firstOrFail();
         }
 
-        if ($data['discount_id']) {
-            $discount = Discount::findOrFail($data['discount_id']);
+        if ($discountId) {
+            $discount = Discount::findOrFail($discountId);
         }
 
         $order = $checkoutService->checkout(
@@ -119,27 +122,71 @@ class CheckoutController extends Controller
     /**
      * Upload bukti pembayaran
      */
+    // public function uploadProof(Order $order, Request $request)
+    // {
+    //     abort_if($order->user_id !== $request->user()->id, 403);
+    //     abort_if($order->status !== 'pending', 403);
+
+    //     $validated = $request->validate([
+    //         'proof_image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+    //     ]);
+
+    //     $path = $validated['proof_image']->store('payments/proofs', 'public');
+
+    //     $payment = Payment::where('order_id', $order->id)->firstOrFail();
+
+    //     $payment->update([
+    //         'proof_image' => $path,
+    //         'paid_at'     => now(),
+    //         'status'      => 'paid',
+    //     ]);
+    //     $order->update([
+    //         'status' => 'paid',
+    //     ]);
+    //     $admins = User::role('admin')->get();
+
+    //     foreach ($admins as $admin) {
+    //         notify_user(
+    //             $admin,
+    //             "Order #{$order->id} baru masuk dan menunggu konfirmasi pembayaran.",
+    //             true,
+    //             route('orders.show', $order)
+    //         );
+    //     }
+    //     return redirect()
+    //         ->route('checkout.waiting', $order)
+    //         ->with('success', 'Bukti pembayaran berhasil diupload');
+    // }
     public function uploadProof(Order $order, Request $request)
     {
         abort_if($order->user_id !== $request->user()->id, 403);
         abort_if($order->status !== 'pending', 403);
 
         $validated = $request->validate([
-            'proof_image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'proof_images'   => 'required|array|min:1|max:3',
+            'proof_images.*' => 'image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $path = $validated['proof_image']->store('payments/proofs', 'public');
+        $paths = [];
+
+        foreach ($validated['proof_images'] as $file) {
+            $paths[] = $file->store('payments/proofs', 'public');
+        }
 
         $payment = Payment::where('order_id', $order->id)->firstOrFail();
 
         $payment->update([
-            'proof_image' => $path,
-            'paid_at'     => now(),
-            'status'      => 'paid',
+            'proof_image'   => $paths[0] ?? null,
+            'proof_image_2' => $paths[1] ?? null,
+            'proof_image_3' => $paths[2] ?? null,
+            'paid_at'       => now(),
+            'status'        => 'paid',
         ]);
+
         $order->update([
             'status' => 'paid',
         ]);
+
         $admins = User::role('admin')->get();
 
         foreach ($admins as $admin) {
@@ -150,10 +197,12 @@ class CheckoutController extends Controller
                 route('orders.show', $order)
             );
         }
+
         return redirect()
             ->route('checkout.waiting', $order)
             ->with('success', 'Bukti pembayaran berhasil diupload');
     }
+
     public function previewDiscount(
         Request $request,
         DiscountService $discountService

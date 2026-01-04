@@ -11,6 +11,8 @@ class Payment extends Model
         'method',
         'qris_image',
         'proof_image',
+        'proof_image_2',
+        'proof_image_3',
         'paid_at',
         'verified_at',
         'verified_by',
