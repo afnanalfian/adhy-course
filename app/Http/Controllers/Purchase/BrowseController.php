@@ -24,11 +24,16 @@ class BrowseController extends Controller
         $ownedTryoutIds = $user?->ownedTryoutIds() ?? [];
 
         $courses = Course::query()
+            ->whereNull('courses.deleted_at')
+            ->whereHas('product', function ($q) {
+                $q->where('type', 'course_package')
+                ->where('is_active', true)
+                ->whereNull('deleted_at');
+            })
             ->with('product')
-            ->whereNull('deleted_at')
             ->when(
                 ! empty($ownedCourseIds),
-                fn ($q) => $q->whereNotIn('id', $ownedCourseIds)
+                fn ($q) => $q->whereNotIn('courses.id', $ownedCourseIds)
             )
             ->get();
 
@@ -40,6 +45,9 @@ class BrowseController extends Controller
         $tryouts = Exam::query()
             ->with(['productable.product'])
             ->where('type', 'tryout')
+            ->whereHas('product', fn ($q) =>
+                    $q->where('is_active', true)
+                )
             ->whereNull('deleted_at')
             ->when(
                 ! empty($ownedTryoutIds),
