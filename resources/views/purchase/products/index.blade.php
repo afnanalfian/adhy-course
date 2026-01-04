@@ -71,6 +71,21 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-4 pt-2 text-sm">
+                    @if(! $product->is_active)
+                        <form method="POST"
+                            action="{{ route('products.destroy', $product) }}"
+                            class="sweet-confirm w-full sm:w-auto"
+                            data-message="Yakin ingin menghapus product ini? Product akan dihapus permanen.">
+                            @csrf
+                            @method('DELETE')
+
+                            <button type="submit"
+                                    class="text-red-600 font-semibold hover:underline">
+                                Hapus
+                            </button>
+                        </form>
+                    @endif
+
                     <a href="{{ route('products.edit', $product) }}"
                        class="text-primary font-semibold hover:underline">
                         Edit
@@ -164,6 +179,21 @@
                         </td>
 
                         <td class="px-6 py-4 text-right space-x-3 whitespace-nowrap">
+                            @if(! $product->is_active)
+                                <form method="POST"
+                                    action="{{ route('products.destroy', $product) }}"
+                                    class="sweet-confirm w-full sm:w-auto"
+                                    data-message="Yakin ingin menghapus product ini? Product akan dihapus permanen.">
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button type="submit"
+                                            class="text-red-600 font-semibold hover:underline">
+                                        Hapus
+                                    </button>
+                                </form>
+                            @endif
+
                             <a href="{{ route('products.edit', $product) }}"
                                class="text-primary font-semibold hover:underline">
                                 Edit
