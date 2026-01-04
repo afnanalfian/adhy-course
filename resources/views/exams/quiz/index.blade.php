@@ -53,6 +53,7 @@
             </button>
 
             {{-- Tambah Quiz --}}
+            @role('admin')
             <button
                 type="button"
                 @click="open = true"
@@ -63,6 +64,7 @@
                     transition">
                 Tambah Quiz
             </button>
+            @endrole
         </form>
     </div>
 

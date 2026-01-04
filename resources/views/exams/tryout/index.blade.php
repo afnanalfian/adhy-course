@@ -53,6 +53,7 @@
             </button>
 
             {{-- Tambah Tryout --}}
+            @role('admin')
             <button
                 type="button"
                 @click="open = true"
@@ -63,6 +64,7 @@
                     transition">
                 Tambah Tryout
             </button>
+            @endrole
         </form>
     </div>
 
