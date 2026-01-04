@@ -152,6 +152,7 @@
                                     {{-- Package Price --}}
                                     @if($coursePrice > 0)
                                         <div class="mb-6">
+                                            
                                             <div class="flex items-center justify-between mb-4">
                                                 <div>
                                                     <span class="text-sm font-semibold text-azwara-darkest">

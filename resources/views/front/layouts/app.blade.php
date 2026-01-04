@@ -6,6 +6,7 @@
     <title>Azwara Learning</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('layouts.partials.ga')
 </head>
 
 <body class="font-sans text-secondary bg-azwara-lightest overflow-x-hidden landing-page">
