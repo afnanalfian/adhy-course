@@ -176,18 +176,18 @@ class MeetingController extends Controller
      */
     public function destroy(Meeting $meeting)
     {
-        if (
-            $meeting->material ||
-            $meeting->video ||
-            $meeting->exam ||
-            $meeting->attendances
-        ) {
-            toast(
-                'error',
-                'Meeting tidak dapat dihapus karena masih memiliki absensi, materi, video, atau post test.'
-            );
-            return back();
-        }
+        // if (
+        //     $meeting->material ||
+        //     $meeting->video ||
+        //     $meeting->exam ||
+        //     $meeting->attendances
+        // ) {
+        //     toast(
+        //         'error',
+        //         'Meeting tidak dapat dihapus karena masih memiliki absensi, materi, video, atau post test.'
+        //     );
+        //     return back();
+        // }
 
         $meeting->delete();
 
