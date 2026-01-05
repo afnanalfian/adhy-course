@@ -53,7 +53,7 @@ class LandingService
          * ====================== */
         $tryouts = Exam::query()
             ->where('type', 'tryout')
-            ->where('status', 'active')
+            ->where('status', '!=', 'closed')
             ->orderByDesc('exam_date')
             ->limit(6)
             ->get(['id', 'title', 'exam_date']);
