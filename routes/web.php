@@ -52,6 +52,9 @@ use App\Http\Controllers\Purchase\{
     OrderInvoiceController,
     ReportIncomeController
 };
+use App\Http\Controllers\Marketing\{
+    PromoBannerController
+};
 
 /*
 |--------------------------------------------------------------------------
@@ -468,6 +471,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     */
     Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');
 
+    /*
+    |--------------------------------------------------------------------------
+    | PANEL PROMO BANNERS ROUTES
+    |--------------------------------------------------------------------------
+    */
+
+    Route::middleware('role:admin')->group(function () {
+        Route::resource('promo-banners', PromoBannerController::class);
+        Route::put('/promo-banners/{promoBanner}/toggle-status', [PromoBannerController::class, 'toggleStatus'])->name('promo-banners.toggle-status');
+    });
 });
 
 Route::get('/test-notif-admin', function () {

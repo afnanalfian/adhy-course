@@ -118,7 +118,8 @@
         'discounts.*',
         'bonuses.*',
         'payment.settings.*',
-        'reports.income.*'
+        'reports.income.*',
+        'promo-banners.*'
     );
 @endphp
 
@@ -193,6 +194,11 @@
            class="menu-subitem {{ request()->routeIs('reports.income.*') ? 'active' : '' }}">
             <span class="w-1 h-1 rounded-full bg-current"></span>
             Laporan Pemasukan
+        </a>
+        <a href="{{ route('promo-banners.index') }}"
+           class="menu-subitem {{ request()->routeIs('promo-banners.*') ? 'active' : '' }}">
+            <span class="w-1 h-1 rounded-full bg-current"></span>
+            Promo Banner
         </a>
     </div>
 </div>

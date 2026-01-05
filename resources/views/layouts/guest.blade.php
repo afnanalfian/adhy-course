@@ -41,7 +41,7 @@
             {{-- Logo --}}
             <a href="{{ route('home') }}"
             class="text-xl font-bold text-azwara-darker dark:text-white tracking-wide">
-                Azwara<span class="text-primary">Learning</span>
+                Azwara<span class="text-primary dark:text-azwara-lighter">Learning</span>
             </a>
 
             <div class="flex items-center gap-4">

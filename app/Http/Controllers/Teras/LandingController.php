@@ -12,7 +12,7 @@ class LandingController extends Controller
     {
         $data = Cache::remember(
             'landing_page_v1',
-            600,
+            300,
             fn () => $landingService->getLandingData()
         );
 

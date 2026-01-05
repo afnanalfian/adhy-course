@@ -6,6 +6,7 @@
     <title>Azwara Learning</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
     @include('layouts.partials.ga')
 </head>
 
@@ -19,6 +20,7 @@
 
     @include('front.partials.footer')
     @include('front.partials.scroll-to-top')
-
+    @include('front.partials.promo')
+    @stack('scripts')
 </body>
 </html>

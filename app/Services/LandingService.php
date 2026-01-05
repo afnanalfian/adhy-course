@@ -8,12 +8,23 @@ use App\Models\Teacher;
 use App\Models\Exam;
 use App\Models\Product;
 use App\Models\PricingRule;
+use App\Models\PromoBanner;
 use Illuminate\Support\Carbon;
 
 class LandingService
 {
     public function getLandingData(): array
     {
+        /* ======================
+        * ACTIVE PROMO BANNERS
+        * ====================== */
+        $activePromo = PromoBanner::query()
+            ->active()
+            ->forLanding()
+            ->currentlyActive()
+            ->orderByPriority()
+            ->first(); // Ambil yang prioritas tertinggi saja
+
         /* ======================
          * COURSES
          * ====================== */
@@ -100,7 +111,8 @@ class LandingService
             'meetings',
             'teachers',
             'tryouts',
-            'products'
+            'products',
+            'activePromo'
         );
     }
 

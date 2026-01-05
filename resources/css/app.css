@@ -1132,3 +1132,46 @@ footer .social-icon span::before {
 #tryouts .from-primary.to-azwara-darker:hover {
     background-image: linear-gradient(to right, #102F4A, #0B1F33);
 }
+
+/* ===== PROMO POPUP STYLES ===== */
+#promoPopup {
+    transition: opacity 0.3s ease;
+}
+
+#promoPopup .bg-black\/70 {
+    backdrop-filter: blur(4px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #promoPopup .max-w-4xl {
+        max-width: 95%;
+    }
+
+    #promoPopup .p-4 {
+        padding: 1rem;
+    }
+
+    #promoPopup img {
+        max-height: 70vh;
+    }
+}
+
+/* Animation for countdown */
+@keyframes countdownPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+#promoCountdown {
+    animation: countdownPulse 1s infinite;
+}
+
+/* Hide scrollbar when popup is open */
+body.popup-open {
+    overflow: hidden;
+}
