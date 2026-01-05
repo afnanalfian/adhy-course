@@ -99,11 +99,11 @@
             Daily Quiz
         </a>
 
-        {{-- <a href="{{ route('leaderboard.index') }}"
+        <a href="{{ route('leaderboard.detail') }}"
            class="menu-subitem {{ request()->routeIs('leaderboard.*') ? 'active' : '' }}">
             <span class="w-1 h-1 rounded-full bg-current"></span>
             Leaderboard
-        </a> --}}
+        </a>
     </div>
 </div>
 
