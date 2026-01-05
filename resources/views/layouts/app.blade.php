@@ -10,7 +10,7 @@
     <meta name="google-site-verification" content="exlEPP1kFOZJWZ_zxo5Qa-PoW-3oPa-9avX-Xbgcjb4" />
     <meta name="msvalidate.01" content="E0E1D8239606A4386F61EB8D5FC2DED6" />
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="canonical" href="https://azwaralearning.com{{ request()->getRequestUri() }}">
 
     <meta property="og:title" content="@yield('title', 'Azwara Learning')">
     <meta property="og:description" content="@yield('description')">
