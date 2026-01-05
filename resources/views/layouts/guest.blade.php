@@ -21,6 +21,7 @@
             }
         })();
     </script>
+    @include('components.structured-data')
 </head>
 
 <body
