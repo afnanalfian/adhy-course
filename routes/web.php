@@ -74,7 +74,7 @@ Route::get('/sitemap.xml', function () {
         ->add(Url::create('/tutorial')->setPriority(0.8));
 
     // Tambahkan semua course ke sitemap
-    $courses = Course::where('is_active', true)->get();
+    $courses = Course::all();
     foreach ($courses as $course) {
         $sitemap->add(Url::create("/course/{$course->slug}")->setLastModificationDate($course->updated_at));
     }
