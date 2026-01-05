@@ -792,6 +792,16 @@ footer .social-icon span::before {
         margin: 0 auto;
     }
 }
+.courses-slider {
+    scroll-behavior: smooth;
+}
+.courses-slider::-webkit-scrollbar {
+    height: 6px;
+}
+.courses-slider::-webkit-scrollbar-thumb {
+    background: linear-gradient(to right, #027373, #014F56);
+    border-radius: 10px;
+}
 
 /* ===== ABOUT SECTION ===== */
 #about img {
