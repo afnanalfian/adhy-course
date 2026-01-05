@@ -79,7 +79,8 @@
                 <div class="max-h-80 overflow-y-auto">
                     @forelse($notifications as $notif)
                         <a href="{{ $notif->data['url'] ?? '#' }}"
-                        class="block px-4 py-3 text-sm dark:text-azwara-lightest
+                        data-notif-id="{{ $notif->id }}"
+                        class="notif-link block px-4 py-3 text-sm dark:text-azwara-lightest
                                 hover:bg-gray-50 dark:hover:bg-azwara-darkest">
                             {{ $notif->data['message'] }}
                         </a>
@@ -132,3 +133,24 @@
 
     </div>
 </header>
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.notif-link').forEach(link => {
+        link.addEventListener('click', () => {
+            const id = link.dataset.notifId;
+            if (!id) return;
+
+            fetch(`/notifications/${id}/mark-read`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                },
+                keepalive: true
+            });
+        });
+    });
+});
+</script>
+@endpush

@@ -39,6 +39,19 @@ class NotificationController extends Controller
             $notification->data['url'] ?? route('notifications.index')
         );
     }
+    public function markRead(string $id)
+    {
+        $notification = auth()->user()
+            ->notifications()
+            ->where('id', $id)
+            ->firstOrFail();
+
+        if (is_null($notification->read_at)) {
+            $notification->markAsRead();
+        }
+
+        return response()->json(['status' => 'ok']);
+    }
 
     /**
      * MARK ALL AS READ

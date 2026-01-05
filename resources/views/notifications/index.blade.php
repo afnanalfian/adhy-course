@@ -61,10 +61,10 @@
 
                 {{-- CONTENT --}}
                 <div class="flex-1 min-w-0">
-                    <a href="{{ route('notifications.read', $notification->id) }}"
-                       class="block font-medium
-                              text-gray-900 dark:text-white
-                              hover:underline">
+                    <a href="{{ $notification->data['url'] ?? '#' }}"
+                    data-notif-id="{{ $notification->id }}"
+                    class="notif-link block font-medium
+                            text-gray-900 dark:text-white hover:underline">
                         {{ $notification->data['title'] ?? 'Notifikasi' }}
                     </a>
 
@@ -103,3 +103,24 @@
 
 </div>
 @endsection
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.notif-link').forEach(link => {
+        link.addEventListener('click', () => {
+            const id = link.dataset.notifId;
+            if (!id) return;
+
+            fetch(`/notifications/${id}/mark-read`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                },
+                keepalive: true
+            });
+        });
+    });
+});
+</script>
+@endpush

@@ -450,6 +450,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])
         ->name('notifications.destroy');
 
+    Route::post('/notifications/{id}/mark-read', [NotificationController::class,'markRead'])
+        ->name('notifications.markRead');
+
     /*
     |--------------------------------------------------------------------------
     | GAMES ROUTES
