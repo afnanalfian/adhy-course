@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <link rel="icon" href="/favicon.ico" sizes="any">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Azwara Learning – Bimbel Online, Quiz Harian, & Tryout')</title>
@@ -17,6 +18,7 @@
     <meta name="twitter:title" content="@yield('title', 'Azwara Learning – Bimbel Online, Quiz Harian, & Tryout')">
     <meta name="twitter:description" content="@yield('description', 'Bimbel online, tryout beragam, quiz harian, live zoom, materi lengkap, latihan soal terbaru.')">
     <meta name="twitter:image" content="{{ asset('img/og-image.jpg') }}">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
     @include('layouts.partials.ga')
