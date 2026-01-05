@@ -35,11 +35,16 @@ class GlobalNotification extends Notification implements ShouldQueue
     public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject(config('app.name').' Notification')
+            ->from(
+                config('mail.from.address'),
+                config('mail.from.name')
+            )
+            ->subject(config('app.name') . ' Notification')
             ->view('emails.notification', [
                 'user'    => $notifiable,
-                'message' => $this->message,
+                'bodyMessage' => $this->message,
                 'url'     => $this->url,
             ]);
     }
+
 }

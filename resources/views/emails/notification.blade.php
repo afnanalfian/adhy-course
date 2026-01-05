@@ -10,7 +10,7 @@
         <p>Halo {{ $user->name }},</p>
 
         <p style="font-size:15px;color:#374151">
-            {{ $message }}
+            {{ $bodyMessage }}
         </p>
 
         @if($url)
