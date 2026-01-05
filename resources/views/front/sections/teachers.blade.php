@@ -13,15 +13,15 @@
         </div>
 
         @if($teachers->count() > 0)
-            {{-- Teachers Grid --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {{-- Teachers Grid dengan Auto-fit --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
                 @foreach($teachers as $teacher)
-                    <div class="bg-azwara-lightest rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-azwara-lighter">
+                    <div class="flex flex-col bg-azwara-lightest rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-azwara-lighter/50 h-full">
                         {{-- Teacher Card Content --}}
-                        <div class="p-6">
+                        <div class="flex-1 p-5 md:p-6">
                             {{-- Avatar and Name --}}
-                            <div class="flex items-center gap-4 mb-6">
-                                <div class="h-20 w-20 rounded-full overflow-hidden border-2 border-white shadow-md flex-shrink-0">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-5">
+                                <div class="h-16 w-16 sm:h-20 sm:w-20 rounded-full overflow-hidden border-2 border-white shadow-md flex-shrink-0 mx-auto sm:mx-0">
                                     @if($teacher->user->avatar)
                                         <img
                                             src="{{ Storage::url($teacher->user->avatar) }}"
@@ -36,44 +36,44 @@
                                         </div>
                                     @endif
                                 </div>
-                                <div>
-                                    <h3 class="text-xl font-bold text-azwara-darkest">
+                                <div class="text-center sm:text-left">
+                                    <h3 class="text-lg md:text-xl font-bold text-azwara-darkest mb-1">
                                         {{ $teacher->user->name }}
                                     </h3>
-                                    <p class="text-primary text-sm font-medium">
+                                    <p class="text-primary text-xs md:text-sm font-medium">
                                         Tentor Azwara Learning
                                     </p>
                                 </div>
                             </div>
 
-                            {{-- Bio - Full tanpa dipotong --}}
-                            @if($teacher->bio)
-                                <div class="mb-6">
-                                    <p class="text-secondary text-sm leading-relaxed whitespace-pre-line">
+                            {{-- Bio --}}
+                            <div class="mb-5 flex-1">
+                                <p class="text-secondary text-sm leading-relaxed line-clamp-3">
+                                    @if($teacher->bio)
                                         {{ $teacher->bio }}
-                                    </p>
-                                </div>
-                            @else
-                                <div class="mb-6">
-                                    <p class="text-secondary text-sm leading-relaxed">
-                                        Tentor berpengalaman dengan metode pengajaran yang mudah dipahami
-                                        dan fokus pada pemahaman konsep dasar.
-                                    </p>
-                                </div>
-                            @endif
+                                    @else
+                                        Tentor berpengalaman dengan metode pengajaran yang mudah dipahami dan fokus pada pemahaman konsep dasar.
+                                    @endif
+                                </p>
+                            </div>
 
                             {{-- Courses They Teach --}}
                             @if($teacher->courses->count() > 0)
-                                <div class="pt-4 border-t border-azwara-lighter">
-                                    <h4 class="text-sm font-semibold text-azwara-darkest mb-3">
+                                <div class="pt-4 border-t border-azwara-lighter/50">
+                                    <h4 class="text-xs md:text-sm font-semibold text-azwara-darkest mb-2">
                                         Mengajarkan Kelas:
                                     </h4>
-                                    <div class="flex flex-wrap gap-2">
-                                        @foreach($teacher->courses as $course)
-                                            <span class="px-3 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium">
+                                    <div class="flex flex-wrap gap-1.5">
+                                        @foreach($teacher->courses->take(3) as $course)
+                                            <span class="px-2.5 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium">
                                                 {{ $course->name }}
                                             </span>
                                         @endforeach
+                                        @if($teacher->courses->count() > 3)
+                                            <span class="px-2.5 py-1 bg-azwara-lighter text-secondary text-xs rounded-full font-medium">
+                                                +{{ $teacher->courses->count() - 3 }}
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
                             @endif
@@ -84,16 +84,16 @@
 
             {{-- CTA Section --}}
             <div class="mt-16 text-center">
-                <div class="inline-flex flex-col sm:flex-row items-center gap-4 bg-gradient-to-r from-primary/5 to-azwara-lighter/30 rounded-xl p-8">
-                    <div class="text-left">
-                        <h3 class="text-xl font-bold text-azwara-darkest mb-2">
+                <div class="inline-flex flex-col sm:flex-row items-center gap-4 bg-gradient-to-r from-primary/5 to-azwara-lighter/30 rounded-xl p-6 md:p-8">
+                    <div class="text-center sm:text-left">
+                        <h3 class="text-lg md:text-xl font-bold text-azwara-darkest mb-2">
                             Siap bergabung dengan kelas?
                         </h3>
                         <p class="text-secondary text-sm">
                             Pilih kelas yang sesuai dan belajar bersama tentor profesional.
                         </p>
                     </div>
-                    <div class="flex gap-3">
+                    <div class="flex flex-col sm:flex-row gap-3">
                         <a href="#courses" class="px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-lg hover:bg-azwara-medium transition duration-300">
                             Lihat Semua Kelas
                         </a>

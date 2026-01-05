@@ -659,46 +659,190 @@ footer .social-icon span::before {
     border-top: 5px solid black;
 }
 
-/* ===== TEACHERS SECTION ===== */
+/* ===== TEACHERS SECTION IMPROVED ===== */
+#teachers .grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
 #teachers .grid > div {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 #teachers .grid > div:hover {
-    transform: translateY(-4px);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(11, 31, 51, 0.15); /* #0B1F33 dengan opacity */
 }
 
-/* Ensure bio text wraps properly */
-.whitespace-pre-line {
-    white-space: pre-line;
+/* Avatar animation */
+#teachers .grid > div:hover .h-16,
+#teachers .grid > div:hover .h-20 {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+/* Ensure consistent card heights */
+#teachers .grid > div {
+    min-height: 320px;
+}
+
+/* Line clamp for bio text */
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Course badges hover effect - using #1E4E6D (primary) */
+#teachers .grid > div:hover .bg-primary\/10 {
+    background-color: rgba(30, 78, 109, 0.15); /* #1E4E6D dengan opacity 0.15 */
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+/* Border color adjustment for #BFD3E0 */
+#teachers .grid > div {
+    border-color: rgba(191, 211, 224, 0.5); /* #BFD3E0 dengan opacity */
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 640px) {
     #teachers .grid {
-        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.25rem;
     }
 
     #teachers .grid > div {
-        padding: 1.5rem;
+        min-height: 300px;
     }
 }
 
-/* ===== COURSES SECTION MODERN DESIGN ===== */
-#courses .relative.group {
-    transition: all 0.4s ease;
+@media (min-width: 641px) and (max-width: 768px) {
+    #teachers .grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
 }
 
-#courses .relative.group:hover {
+@media (min-width: 769px) and (max-width: 1024px) {
+    #teachers .grid {
+        grid-template-columns: repeat(2, minmax(280px, 1fr));
+    }
+}
+
+@media (min-width: 1025px) and (max-width: 1280px) {
+    #teachers .grid {
+        grid-template-columns: repeat(3, minmax(280px, 1fr));
+    }
+}
+
+@media (min-width: 1281px) {
+    #teachers .grid {
+        grid-template-columns: repeat(4, minmax(280px, 1fr));
+    }
+}
+
+/* Stagger animation for cards */
+#teachers .grid > div {
+    animation: fadeInUp 0.5s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Stagger delay for each card */
+#teachers .grid > div:nth-child(1) { animation-delay: 0.1s; }
+#teachers .grid > div:nth-child(2) { animation-delay: 0.2s; }
+#teachers .grid > div:nth-child(3) { animation-delay: 0.3s; }
+#teachers .grid > div:nth-child(4) { animation-delay: 0.4s; }
+#teachers .grid > div:nth-child(5) { animation-delay: 0.5s; }
+#teachers .grid > div:nth-child(6) { animation-delay: 0.6s; }
+
+/* Gradient background for avatar fallback - menggunakan warna azwara */
+#teachers .bg-gradient-to-br {
+    background-image: linear-gradient(to bottom right, #1E4E6D, #0B1F33); /* primary ke darkest */
+}
+
+/* Hover effect untuk CTA buttons */
+#teachers .bg-primary:hover {
+    background-color: #3A6F8F; /* azwara-light */
+}
+
+#teachers .border-primary:hover {
+    background-color: #1E4E6D; /* primary */
+    color: white;
+}
+
+/* Custom scrollbar untuk mobile jika perlu */
+@media (max-width: 768px) {
+    #teachers .grid {
+        padding-bottom: 8px;
+    }
+}
+
+/* Ensure text colors are correct */
+#teachers .text-primary {
+    color: #1E4E6D;
+}
+
+#teachers .text-azwara-darkest {
+    color: #0B1F33;
+}
+
+#teachers .text-secondary {
+    color: #102F4A;
+}
+
+/* Gradient border effect on hover */
+#teachers .grid > div {
+    position: relative;
+}
+
+#teachers .grid > div::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(to right, #1E4E6D, #3A6F8F);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#teachers .grid > div:hover::after {
+    opacity: 1;
+}
+
+/* ===== COURSES SECTION GRID DESIGN ===== */
+#courses .course-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+}
+
+#courses .course-card:hover {
     transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(11, 31, 51, 0.15);
 }
 
 #courses .shadow-xl {
-    box-shadow: 0 10px 40px rgba(1, 42, 54, 0.08);
+    box-shadow: 0 10px 40px rgba(11, 31, 51, 0.08);
 }
 
 #courses .shadow-xl:hover {
-    box-shadow: 0 20px 60px rgba(1, 42, 54, 0.12);
+    box-shadow: 0 20px 60px rgba(11, 31, 51, 0.12);
 }
 
 /* Gradient backgrounds */
@@ -711,131 +855,6 @@ footer .social-icon span::before {
     0% { background-position: 0% 0%; }
     50% { background-position: 100% 100%; }
     100% { background-position: 0% 0%; }
-}
-
-/* Line clamp for descriptions */
-.line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-/* Teacher avatar stack */
-.flex.-space-x-2 > div {
-    transition: transform 0.3s ease;
-}
-
-.flex.-space-x-2 > div:hover {
-    transform: translateY(-2px);
-    z-index: 10;
-}
-
-/* Modern modal styling */
-#meetingsModal .bg-azwara-darkest\/90 {
-    backdrop-filter: blur(8px);
-}
-
-#meetingsModal .shadow-2xl {
-    box-shadow: 0 25px 50px rgba(1, 42, 54, 0.15);
-}
-
-/* Custom scrollbar for modern look */
-#meetingsModal .max-h-\[50vh\] {
-    scrollbar-width: thin;
-    scrollbar-color: #A9D6D6 #F2EFE7;
-}
-
-#meetingsModal .max-h-\[50vh\]::-webkit-scrollbar {
-    width: 8px;
-}
-
-#meetingsModal .max-h-\[50vh\]::-webkit-scrollbar-track {
-    background: #F2EFE7;
-    border-radius: 10px;
-}
-
-#meetingsModal .max-h-\[50vh\]::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, #027373, #014F56);
-    border-radius: 10px;
-}
-
-#meetingsModal .max-h-\[50vh\]::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to bottom, #014F56, #012A36);
-}
-
-/* Status badges */
-.bg-azwara-lighter {
-    background-color: rgba(169, 214, 214, 0.2);
-}
-
-/* Responsive improvements */
-@media (max-width: 768px) {
-    #courses .grid {
-        gap: 2rem;
-    }
-
-    #courses .relative.group:hover {
-        transform: translateY(-4px);
-    }
-
-    #meetingsModal .inline-block {
-        width: 95%;
-        margin: 1rem auto;
-    }
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-    #courses .grid {
-        grid-template-columns: 1fr;
-        max-width: 600px;
-        margin: 0 auto;
-    }
-}
-/* ===== COURSES SECTION CAROUSEL DESIGN ===== */
-#courses .courses-container {
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    cursor: grab;
-}
-
-#courses .courses-container:active {
-    cursor: grabbing;
-}
-
-/* Hide scrollbar for Chrome, Safari and Opera */
-#courses .courses-container::-webkit-scrollbar {
-    display: none;
-}
-
-/* Hide scrollbar for IE, Edge and Firefox */
-#courses .courses-container {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-}
-
-/* Course card responsive sizing */
-.course-card {
-    flex: 0 0 auto;
-}
-
-@media (max-width: 639px) {
-    .course-card {
-        width: 85vw;
-    }
-}
-
-@media (min-width: 640px) and (max-width: 1023px) {
-    .course-card {
-        width: 400px;
-    }
-}
-
-@media (min-width: 1024px) {
-    .course-card {
-        width: auto;
-        flex: 1 1 calc(50% - 1rem);
-    }
 }
 
 /* Line clamp utilities */
@@ -860,18 +879,28 @@ footer .social-icon span::before {
     overflow: hidden;
 }
 
-/* Free course badge animation */
-@keyframes pulse-free {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
+/* Teacher avatar stack */
+.flex.-space-x-2 > div {
+    transition: transform 0.3s ease;
 }
 
-.course-card .bg-green-500 {
-    animation: pulse-free 2s infinite;
+.flex.-space-x-2 > div:hover {
+    transform: translateY(-2px);
+    z-index: 10;
+}
+
+/* Free course badge (gunakan warna hijau standar) */
+.bg-green-500.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
 }
 
 /* Course thumbnail hover effect */
@@ -883,61 +912,97 @@ footer .social-icon span::before {
     transform: scale(1.1);
 }
 
-/* Navigation button hover effects */
-.courses-prev-btn:hover,
-.courses-next-btn:hover {
-    transform: translate(-50%, -50%) scale(1.1);
-}
-
-.courses-prev-btn:active,
-.courses-next-btn:active {
-    transform: translate(-50%, -50%) scale(0.95);
-}
-
-/* Dot indicator animation */
-.course-dot {
-    transition: all 0.3s ease;
-}
-
-.course-dot:hover {
-    transform: scale(1.2);
-}
-
-/* Responsive improvements for courses section */
-@media (max-width: 768px) {
-    #courses .courses-prev-btn,
-    #courses .courses-next-btn {
-        display: none !important;
+/* Grid responsive untuk jumlah course ganjil */
+@media (min-width: 768px) and (max-width: 1023px) {
+    #courses .grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 
-    #courses .courses-container {
-        padding: 0 1rem;
-        margin: 0 -1rem;
-    }
-}
-
-@media (min-width: 769px) and (max-width: 1023px) {
-    #courses .courses-container {
+    /* Untuk 1 course di tengah */
+    #courses .grid:has(> :nth-child(1):last-child) {
         justify-content: center;
     }
+
+    #courses .grid:has(> :nth-child(1):last-child) > .course-card {
+        max-width: 400px;
+        margin: 0 auto;
+    }
 }
 
-/* Gradient overlay for thumbnail */
+@media (min-width: 1024px) {
+    #courses .grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Untuk 1 atau 2 course, layout lebih rapi */
+    #courses .grid:has(> :nth-child(1):last-child) > .course-card,
+    #courses .grid:has(> :nth-child(2):last-child) > .course-card {
+        max-width: 400px;
+    }
+}
+
+/* Gradient overlay untuk thumbnail */
 .course-card .bg-gradient-to-t {
     pointer-events: none;
 }
 
-/* Card elevation on hover */
-.course-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Card content flex untuk tinggi seragam */
+.course-card > div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
-.course-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 60px rgba(1, 42, 54, 0.15);
+/* Responsive improvements */
+@media (max-width: 767px) {
+    #courses .course-card:hover {
+        transform: translateY(-4px);
+    }
+
+    #courses .course-card {
+        margin-bottom: 1.5rem;
+    }
 }
 
-/* Free course special styling */
+/* Modern modal styling */
+#meetingsModal .bg-azwara-darkest\/90 {
+    backdrop-filter: blur(8px);
+}
+
+#meetingsModal .shadow-2xl {
+    box-shadow: 0 25px 50px rgba(11, 31, 51, 0.15);
+}
+
+/* Custom scrollbar dengan warna Azwara */
+#meetingsModal .max-h-\[50vh\] {
+    scrollbar-width: thin;
+    scrollbar-color: #3A6F8F #F2EFE7;
+}
+
+#meetingsModal .max-h-\[50vh\]::-webkit-scrollbar {
+    width: 8px;
+}
+
+#meetingsModal .max-h-\[50vh\]::-webkit-scrollbar-track {
+    background: #F2EFE7;
+    border-radius: 10px;
+}
+
+#meetingsModal .max-h-\[50vh\]::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #1E4E6D, #102F4A);
+    border-radius: 10px;
+}
+
+#meetingsModal .max-h-\[50vh\]::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #102F4A, #0B1F33);
+}
+
+/* Status badges */
+.bg-azwara-lighter {
+    background-color: rgba(191, 211, 224, 0.2);
+}
+
+/* Tombol free course */
 .course-card .from-green-500.to-green-600 {
     background-image: linear-gradient(to right, #10b981, #059669);
 }
