@@ -7,7 +7,7 @@
 
     <title>@yield('title', 'Azwara Learning – Bimbel Online, Quiz Harian, & Tryout')</title>
     <meta name="description" content="@yield('description', 'Bimbel online, tryout beragam, quiz harian, live zoom, materi lengkap, latihan soal terbaru.')">
-
+    <meta name="google-site-verification" content="exlEPP1kFOZJWZ_zxo5Qa-PoW-3oPa-9avX-Xbgcjb4" />
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ url()->current() }}">
 
