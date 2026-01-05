@@ -6,6 +6,7 @@
     <title>Azwara Learning</title>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <meta name="google-site-verification" content="exlEPP1kFOZJWZ_zxo5Qa-PoW-3oPa-9avX-Xbgcjb4" />
+    <meta name="msvalidate.01" content="E0E1D8239606A4386F61EB8D5FC2DED6" />
     @vite(['resources/css/app.css','resources/js/app.js'])
     @include('layouts.partials.ga')
     <script>
