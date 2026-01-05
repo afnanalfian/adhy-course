@@ -684,36 +684,60 @@ footer .social-icon span::before {
     }
 }
 
-/* ===== COURSES SECTION MODERN DESIGN ===== */
-#courses .relative.group {
-    transition: all 0.4s ease;
+/* ===== COURSES SECTION CAROUSEL DESIGN ===== */
+#courses .courses-container {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    cursor: grab;
 }
 
-#courses .relative.group:hover {
-    transform: translateY(-8px);
+#courses .courses-container:active {
+    cursor: grabbing;
 }
 
-#courses .shadow-xl {
-    box-shadow: 0 10px 40px rgba(1, 42, 54, 0.08);
+/* Hide scrollbar for Chrome, Safari and Opera */
+#courses .courses-container::-webkit-scrollbar {
+    display: none;
 }
 
-#courses .shadow-xl:hover {
-    box-shadow: 0 20px 60px rgba(1, 42, 54, 0.12);
+/* Hide scrollbar for IE, Edge and Firefox */
+#courses .courses-container {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
 
-/* Gradient backgrounds */
-.bg-gradient-to-bl {
-    background-size: 200% 200%;
-    animation: gradientShift 8s ease infinite;
+/* Course card responsive sizing */
+.course-card {
+    flex: 0 0 auto;
 }
 
-@keyframes gradientShift {
-    0% { background-position: 0% 0%; }
-    50% { background-position: 100% 100%; }
-    100% { background-position: 0% 0%; }
+@media (max-width: 639px) {
+    .course-card {
+        width: 85vw;
+    }
 }
 
-/* Line clamp for descriptions */
+@media (min-width: 640px) and (max-width: 1023px) {
+    .course-card {
+        width: 400px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .course-card {
+        width: auto;
+        flex: 1 1 calc(50% - 1rem);
+    }
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -721,86 +745,97 @@ footer .social-icon span::before {
     overflow: hidden;
 }
 
-/* Teacher avatar stack */
-.flex.-space-x-2 > div {
-    transition: transform 0.3s ease;
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-.flex.-space-x-2 > div:hover {
-    transform: translateY(-2px);
-    z-index: 10;
+/* Free course badge animation */
+@keyframes pulse-free {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
 }
 
-/* Modern modal styling */
-#meetingsModal .bg-azwara-darkest\/90 {
-    backdrop-filter: blur(8px);
+.course-card .bg-green-500 {
+    animation: pulse-free 2s infinite;
 }
 
-#meetingsModal .shadow-2xl {
-    box-shadow: 0 25px 50px rgba(1, 42, 54, 0.15);
+/* Course thumbnail hover effect */
+.course-card img {
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Custom scrollbar for modern look */
-#meetingsModal .max-h-\[50vh\] {
-    scrollbar-width: thin;
-    scrollbar-color: #A9D6D6 #F2EFE7;
+.course-card:hover img {
+    transform: scale(1.1);
 }
 
-#meetingsModal .max-h-\[50vh\]::-webkit-scrollbar {
-    width: 8px;
+/* Navigation button hover effects */
+.courses-prev-btn:hover,
+.courses-next-btn:hover {
+    transform: translate(-50%, -50%) scale(1.1);
 }
 
-#meetingsModal .max-h-\[50vh\]::-webkit-scrollbar-track {
-    background: #F2EFE7;
-    border-radius: 10px;
+.courses-prev-btn:active,
+.courses-next-btn:active {
+    transform: translate(-50%, -50%) scale(0.95);
 }
 
-#meetingsModal .max-h-\[50vh\]::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, #027373, #014F56);
-    border-radius: 10px;
+/* Dot indicator animation */
+.course-dot {
+    transition: all 0.3s ease;
 }
 
-#meetingsModal .max-h-\[50vh\]::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to bottom, #014F56, #012A36);
+.course-dot:hover {
+    transform: scale(1.2);
 }
 
-/* Status badges */
-.bg-azwara-lighter {
-    background-color: rgba(169, 214, 214, 0.2);
-}
-
-/* Responsive improvements */
+/* Responsive improvements for courses section */
 @media (max-width: 768px) {
-    #courses .grid {
-        gap: 2rem;
+    #courses .courses-prev-btn,
+    #courses .courses-next-btn {
+        display: none !important;
     }
 
-    #courses .relative.group:hover {
-        transform: translateY(-4px);
-    }
-
-    #meetingsModal .inline-block {
-        width: 95%;
-        margin: 1rem auto;
+    #courses .courses-container {
+        padding: 0 1rem;
+        margin: 0 -1rem;
     }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-    #courses .grid {
-        grid-template-columns: 1fr;
-        max-width: 600px;
-        margin: 0 auto;
+@media (min-width: 769px) and (max-width: 1023px) {
+    #courses .courses-container {
+        justify-content: center;
     }
 }
-.courses-slider {
-    scroll-behavior: smooth;
+
+/* Gradient overlay for thumbnail */
+.course-card .bg-gradient-to-t {
+    pointer-events: none;
 }
-.courses-slider::-webkit-scrollbar {
-    height: 6px;
+
+/* Card elevation on hover */
+.course-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.courses-slider::-webkit-scrollbar-thumb {
-    background: linear-gradient(to right, #027373, #014F56);
-    border-radius: 10px;
+
+.course-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(1, 42, 54, 0.15);
+}
+
+/* Free course special styling */
+.course-card .from-green-500.to-green-600 {
+    background-image: linear-gradient(to right, #10b981, #059669);
+}
+
+.course-card .from-green-500.to-green-600:hover {
+    background-image: linear-gradient(to right, #059669, #047857);
 }
 
 /* ===== ABOUT SECTION ===== */
