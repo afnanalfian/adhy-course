@@ -25,4 +25,5 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withSchedule(function (Schedule $schedule) {
         $schedule->command('accounts:purge')->dailyAt('00:00');
         $schedule->command('orders:expire')->everyMinute();
+        $schedule->command('backup:system')->weeklyOn(1, '02:00')->timezone('Asia/Jakarta');
     })->create();
