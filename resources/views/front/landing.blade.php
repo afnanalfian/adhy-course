@@ -13,11 +13,7 @@
     <section id="courses">
         @include('front.sections.courses')
     </section>
-
-    {{-- <section id="tryouts">
-        @include('front.sections.tryouts')
-    </section> --}}
-
+    
     <section id="teachers">
         @include('front.sections.teachers')
     </section>

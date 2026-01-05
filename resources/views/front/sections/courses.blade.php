@@ -371,9 +371,9 @@
                     </div>
 
                     {{-- CTA --}}
-                    <div class="text-center">
+                    <div class="text-center mt-3 mb-5">
                         <a href="{{ route('tryouts.index') }}"
-                        class="inline-flex items-center gap-2 mt-5 px-5 py-2.5 border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition duration-300 text-sm">
+                        class="inline-flex items-center gap-2 px-5 py-2.5 border border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition duration-300 text-sm">
                             Lihat Semua Tryout
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>

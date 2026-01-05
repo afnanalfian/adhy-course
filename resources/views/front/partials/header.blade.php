@@ -32,7 +32,6 @@
                     <a href="#home" class="nav-link text-lg font-medium">Home</a>
                     <a href="#about" class="nav-link text-lg font-medium">About</a>
                     <a href="#courses" class="nav-link text-lg font-medium">Course</a>
-                    <a href="#tryouts" class="nav-link text-lg font-medium">Tryout</a>
                     <a href="#teachers" class="nav-link text-lg font-medium">Teachers</a>
                     {{-- <a href="#testimonials" class="nav-link text-lg font-medium">Testimonial</a> --}}
                     {{-- <a href="#tutorial" class="nav-link text-lg font-medium">
