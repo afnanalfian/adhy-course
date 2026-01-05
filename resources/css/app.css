@@ -661,7 +661,9 @@ footer .social-icon span::before {
 
 /* ===== TEACHERS SECTION IMPROVED ===== */
 #teachers .grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
 }
 
 #teachers .grid > div {
@@ -669,18 +671,15 @@ footer .social-icon span::before {
     display: flex;
     flex-direction: column;
     height: 100%;
+    background: white;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(191, 211, 224, 0.5);
+    overflow: hidden;
 }
 
 #teachers .grid > div:hover {
     transform: translateY(-6px);
-    box-shadow: 0 12px 24px rgba(11, 31, 51, 0.15); /* #0B1F33 dengan opacity */
-}
-
-/* Avatar animation */
-#teachers .grid > div:hover .h-16,
-#teachers .grid > div:hover .h-20 {
-    transform: scale(1.05);
-    transition: transform 0.3s ease;
+    box-shadow: 0 12px 24px rgba(11, 31, 51, 0.15);
 }
 
 /* Ensure consistent card heights */
@@ -696,22 +695,12 @@ footer .social-icon span::before {
     overflow: hidden;
 }
 
-/* Course badges hover effect - using #1E4E6D (primary) */
-#teachers .grid > div:hover .bg-primary\/10 {
-    background-color: rgba(30, 78, 109, 0.15); /* #1E4E6D dengan opacity 0.15 */
-    transform: translateY(-1px);
-    transition: all 0.2s ease;
-}
-
-/* Border color adjustment for #BFD3E0 */
-#teachers .grid > div {
-    border-color: rgba(191, 211, 224, 0.5); /* #BFD3E0 dengan opacity */
-}
-
 /* Responsive adjustments */
-@media (max-width: 640px) {
+@media (max-width: 639px) {
     #teachers .grid {
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        grid-template-columns: 1fr;
+        max-width: 400px;
+        margin: 0 auto;
         gap: 1.25rem;
     }
 
@@ -720,110 +709,99 @@ footer .social-icon span::before {
     }
 }
 
-@media (min-width: 641px) and (max-width: 768px) {
+@media (min-width: 640px) and (max-width: 767px) {
     #teachers .grid {
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
         gap: 1.5rem;
     }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1023px) {
     #teachers .grid {
-        grid-template-columns: repeat(2, minmax(280px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
     }
 }
 
-@media (min-width: 1025px) and (max-width: 1280px) {
+@media (min-width: 1024px) and (max-width: 1279px) {
     #teachers .grid {
-        grid-template-columns: repeat(3, minmax(280px, 1fr));
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
     }
 }
 
-@media (min-width: 1281px) {
+@media (min-width: 1280px) {
     #teachers .grid {
-        grid-template-columns: repeat(4, minmax(280px, 1fr));
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
     }
 }
 
-/* Stagger animation for cards */
-#teachers .grid > div {
-    animation: fadeInUp 0.5s ease forwards;
-    opacity: 0;
+/* Hanya tampilkan grid yang sesuai untuk jumlah teachers */
+#teachers .grid {
+    justify-content: center;
 }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+/* Untuk 1 teacher - tampilkan di tengah */
+#teachers .grid:has(> :nth-child(1):last-child) {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+}
+
+/* Untuk 2 teachers - tampilkan 2 kolom */
+#teachers .grid:has(> :nth-child(2):last-child) {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Untuk 3 teachers - tampilkan 3 kolom */
+#teachers .grid:has(> :nth-child(3):last-child) {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Untuk 5 teachers - tampilkan 3 kolom */
+#teachers .grid:has(> :nth-child(5):last-child) {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Untuk 6+ teachers - tampilkan 4 kolom di desktop */
+/* CTA Section responsive */
+@media (max-width: 639px) {
+    #teachers .inline-flex {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
     }
 }
 
-/* Stagger delay for each card */
-#teachers .grid > div:nth-child(1) { animation-delay: 0.1s; }
-#teachers .grid > div:nth-child(2) { animation-delay: 0.2s; }
-#teachers .grid > div:nth-child(3) { animation-delay: 0.3s; }
-#teachers .grid > div:nth-child(4) { animation-delay: 0.4s; }
-#teachers .grid > div:nth-child(5) { animation-delay: 0.5s; }
-#teachers .grid > div:nth-child(6) { animation-delay: 0.6s; }
-
-/* Gradient background for avatar fallback - menggunakan warna azwara */
+/* Gradient background for avatar fallback */
 #teachers .bg-gradient-to-br {
-    background-image: linear-gradient(to bottom right, #1E4E6D, #0B1F33); /* primary ke darkest */
+    background-image: linear-gradient(to bottom right, #1E4E6D, #0B1F33);
+}
+
+/* Avatar hover effect */
+#teachers .grid > div:hover .h-16,
+#teachers .grid > div:hover .h-20 {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+/* Course badges hover effect */
+#teachers .grid > div:hover .bg-primary\/10 {
+    background-color: rgba(30, 78, 109, 0.15);
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
 }
 
 /* Hover effect untuk CTA buttons */
 #teachers .bg-primary:hover {
-    background-color: #3A6F8F; /* azwara-light */
+    background-color: #3A6F8F;
 }
 
 #teachers .border-primary:hover {
-    background-color: #1E4E6D; /* primary */
+    background-color: #1E4E6D;
     color: white;
-}
-
-/* Custom scrollbar untuk mobile jika perlu */
-@media (max-width: 768px) {
-    #teachers .grid {
-        padding-bottom: 8px;
-    }
-}
-
-/* Ensure text colors are correct */
-#teachers .text-primary {
-    color: #1E4E6D;
-}
-
-#teachers .text-azwara-darkest {
-    color: #0B1F33;
-}
-
-#teachers .text-secondary {
-    color: #102F4A;
-}
-
-/* Gradient border effect on hover */
-#teachers .grid > div {
-    position: relative;
-}
-
-#teachers .grid > div::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(to right, #1E4E6D, #3A6F8F);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-#teachers .grid > div:hover::after {
-    opacity: 1;
 }
 
 /* ===== COURSES SECTION GRID DESIGN ===== */

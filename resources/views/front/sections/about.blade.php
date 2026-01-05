@@ -40,20 +40,6 @@
 
                     {{-- Features List --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-                        {{-- <div class="flex items-start gap-4">
-                            <div class="flex-shrink-0 mt-1">
-                                <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-azwara-darkest mb-1">Tentor Berpengalaman</h4>
-                                <p class="text-secondary text-sm">Tentor profesional dengan sertifikasi dan pengalaman mengajar.</p>
-                            </div>
-                        </div> --}}
-
                         <div class="flex items-start gap-4">
                             <div class="flex-shrink-0 mt-1">
                                 <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -82,7 +68,7 @@
                             </div>
                         </div>
 
-                        {{-- <div class="flex items-start gap-4">
+                        <div class="flex items-start gap-4">
                             <div class="flex-shrink-0 mt-1">
                                 <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                                     <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,10 +77,24 @@
                                 </div>
                             </div>
                             <div>
-                                <h4 class="font-bold text-azwara-darkest mb-1">Fleksibel Waktu</h4>
-                                <p class="text-secondary text-sm">Jadwal belajar yang dapat disesuaikan dengan kebutuhan siswa.</p>
+                                <h4 class="font-bold text-azwara-darkest mb-1">Fleksibel Akses</h4>
+                                <p class="text-secondary text-sm">Rekaman Pembelajaran tersimpan dan dapat diakses kapan saja dimana saja.</p>
                             </div>
-                        </div> --}}
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 mt-1">
+                                <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-azwara-darkest mb-1">Practice Everyday</h4>
+                                <p class="text-secondary text-sm">Dilengkapi dengan post test dan quiz harian.</p>
+                            </div>
+                        </div>
                     </div>
 
                     {{-- CTA Buttons --}}
