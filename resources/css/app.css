@@ -671,7 +671,6 @@ footer .social-icon span::before {
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: white;
     border-radius: 0.75rem;
     border: 1px solid rgba(191, 211, 224, 0.5);
     overflow: hidden;
