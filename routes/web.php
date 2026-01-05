@@ -2,6 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
+use Spatie\Sitemap\Sitemap;
+use Spatie\Sitemap\Tags\Url;
+use App\Models\Course;
+use App\Models\Product;
 use App\Http\Controllers\Teras\{
     LandingController,
     DashboardController
@@ -63,6 +67,26 @@ use App\Http\Controllers\Marketing\{
 */
 Route::get('/', [LandingController::class, 'index'])->name('home');
 Route::get('/tutorial', [LandingController::class, 'tutorial'])->name('tutorial');
+
+Route::get('/sitemap.xml', function () {
+    $sitemap = Sitemap::create()
+        ->add(Url::create('/')->setPriority(1.0))
+        ->add(Url::create('/tutorial')->setPriority(0.8));
+
+    // Tambahkan semua course ke sitemap
+    $courses = Course::where('is_active', true)->get();
+    foreach ($courses as $course) {
+        $sitemap->add(Url::create("/course/{$course->slug}")->setLastModificationDate($course->updated_at));
+    }
+
+    // Tambahkan semua product ke sitemap
+    $products = Product::where('is_active', true)->get();
+    foreach ($products as $product) {
+        $sitemap->add(Url::create("/purchase/browse")->setLastModificationDate($product->updated_at));
+    }
+
+    return response($sitemap->render(), 200, ['Content-Type' => 'application/xml']);
+});
 /*
 |--------------------------------------------------------------------------
 | AUTH DAN API ROUTES

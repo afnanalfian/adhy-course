@@ -2,13 +2,21 @@
 <html lang="id" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'Azwara Learning' }}</title>
 
-    {{-- App Assets --}}
+    <title>@yield('title', 'Azwara Learning – Bimbel Online, Quiz Harian, & Tryout')</title>
+    <meta name="description" content="@yield('description', 'Bimbel online, tryout beragam, quiz harian, live zoom, materi lengkap, latihan soal terbaru.')">
+
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    <meta property="og:title" content="@yield('title', 'Azwara Learning')">
+    <meta property="og:description" content="@yield('description')">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
     @stack('styles')
     @include('layouts.partials.ga')
 </head>

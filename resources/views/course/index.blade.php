@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Course Online Matematika & SKD | Azwara Learning')
+@section('description', 'Kumpulan berbagai subjek termasuk CPNS dan sekolah kedinasan dengan materi terstruktur, video, dan latihan soal.')
 @section('content')
 {{-- HEADER --}}
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">

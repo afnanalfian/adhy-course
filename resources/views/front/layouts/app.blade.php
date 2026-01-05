@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Azwara Learning</title>
+    <title>@yield('title', 'Azwara Learning – Bimbel Online, Quiz Harian, & Tryout')</title>
+    <meta name="description" content="@yield('description', 'Bimbel online, tryout beragam, quiz harian, live zoom, materi lengkap, latihan soal terbaru.')">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')

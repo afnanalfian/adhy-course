@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', $meeting->title.' | Live Class')
+@section('description', 'Live class '.$meeting->title)
 @section('content')
 <div class="max-w-6xl mx-auto space-y-6">
 

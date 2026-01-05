@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', $exam->title.' | Tryout Azwara Learning - Matematika, SKD, dll')
+@section('description', 'Ikuti tryout '.$exam->title.' lengkap dengan pembahasan.')
 @section('content')
 <div class="max-w-6xl mx-auto space-y-8 px-4 sm:px-0">
 
