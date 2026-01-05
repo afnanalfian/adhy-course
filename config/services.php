@@ -37,5 +37,7 @@ return [
         'signed_expiry' => (int) env('BUNNY_SIGNED_EXPIRY', 3600),
         'api_key' => env('BUNNY_API_KEY'),
     ],
-
+    'indexnow' => [
+        'key' => env('INDEXNOW_KEY'),
+    ],
 ];

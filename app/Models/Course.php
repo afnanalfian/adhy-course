@@ -49,4 +49,14 @@ class Course extends Model
     {
         return $this->is_free;
     }
+
+
+    protected static function booted()
+    {
+        static::saved(function ($course) {
+            \App\Services\IndexNowService::submit([
+                url("/course/{$course->slug}")
+            ]);
+        });
+    }
 }
