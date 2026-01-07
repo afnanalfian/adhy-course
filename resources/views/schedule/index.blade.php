@@ -103,6 +103,9 @@
                                         ? 'text-primary'
                                         : 'text-gray-500 dark:text-gray-400' }}">
                                     {{ $date->day }}
+                                    @if($date->isToday())
+                                        <span class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
+                                    @endif
                                 </span>
                             </div>
 
