@@ -59,6 +59,57 @@
     @include('meetings.partials.video')
     @include('meetings.partials.posttest')
 
+    {{-- Modal Post Test --}}
+    <div id="postTestModal"
+        class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
+
+        <div class="bg-white dark:bg-azwara-darker rounded-xl p-6 w-full max-w-sm">
+            <h3 class="font-bold text-lg mb-4">
+                Pilih Tipe Post Test
+            </h3>
+
+            <form method="POST"
+                action="{{ route('meetings.posttest.store', $meeting) }}">
+                @csrf
+
+                <select name="test_type"
+                        required
+                        class="w-full rounded-lg border p-2 mb-4">
+                    <option value="">-- Pilih Tipe Tes --</option>
+                    <option value="skd">SKD</option>
+                    <option value="mtk_stis">Matematika STIS</option>
+                    <option value="mtk_tka">Matematika TKA</option>
+                    <option value="general">General</option>
+                </select>
+
+                <div class="flex justify-end gap-2">
+                    <button type="button"
+                            onclick="closePostTestModal()"
+                            class="px-4 py-2 rounded-lg bg-gray-200">
+                        Batal
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 rounded-lg bg-primary text-white">
+                        Buat
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+    function openPostTestModal() {
+        document.getElementById('postTestModal')
+            .classList.remove('hidden');
+        document.getElementById('postTestModal')
+            .classList.add('flex');
+    }
+
+    function closePostTestModal() {
+        document.getElementById('postTestModal')
+            .classList.add('hidden');
+    }
+    </script>
+
 </div>
 
 @endsection

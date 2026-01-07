@@ -19,17 +19,15 @@
             </p>
 
             @role('admin|tentor')
-                <form method="POST"
-                      action="{{ route('meetings.posttest.store', $meeting) }}">
-                    @csrf
-                    <button
-                        class="inline-flex items-center justify-center
-                               px-6 py-3 rounded-xl
-                               bg-primary text-white font-semibold
-                               hover:bg-primary/90 transition">
-                        ➕ Buat Post Test
-                    </button>
-                </form>
+            <button
+                type="button"
+                onclick="openPostTestModal()"
+                class="inline-flex items-center justify-center
+                    px-6 py-3 rounded-xl
+                    bg-primary text-white font-semibold
+                    hover:bg-primary/90 transition">
+                ➕ Buat Post Test
+            </button>
             @endrole
         </div>
 

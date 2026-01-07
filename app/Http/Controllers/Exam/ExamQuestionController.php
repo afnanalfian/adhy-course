@@ -23,6 +23,8 @@ class ExamQuestionController extends Controller
         }
 
         $query = Question::where('material_id', $material->id);
+        $allowedTypes = $exam->allowedQuestionTypes();
+        $query->whereIn('test_type', $allowedTypes);
 
         // Filter type (whitelist)
         if ($request->filled('type')) {
@@ -43,16 +45,29 @@ class ExamQuestionController extends Controller
     public function attach(Request $request, Exam $exam)
     {
         $data = $request->validate([
-            'question_ids' => 'required|array',
+            'question_ids'   => 'required|array',
             'question_ids.*' => 'exists:questions,id',
         ]);
 
-        foreach ($data['question_ids'] as $qid) {
+        // Ambil soal
+        $questions = Question::whereIn('id', $data['question_ids'])->get();
+
+        $allowedTypes = $exam->allowedQuestionTypes();
+
+        foreach ($questions as $question) {
+            // HARD GUARD
+            abort_unless(
+                in_array($question->test_type, $allowedTypes),
+                403,
+                "Soal dengan tipe {$question->test_type} tidak boleh dimasukkan ke ujian {$exam->test_type}"
+            );
+
             $exam->questions()->firstOrCreate([
-                'question_id' => $qid,
+                'question_id' => $question->id,
             ]);
         }
 
+        toast('success', 'Soal berhasil ditambahkan');
         return redirect()->route('exams.edit', $exam);
     }
 

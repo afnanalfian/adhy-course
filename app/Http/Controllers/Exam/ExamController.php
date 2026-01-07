@@ -96,14 +96,20 @@ class ExamController extends Controller
     {
         // untuk tryout / daily quiz
         $type = $request->get('type', 'tryout');
-
-        return view('exams.create', compact('type'));
+        $testTypes = [
+            'skd' => 'SKD',
+            'mtk_stis' => 'Matematika STIS',
+            'mtk_tka' => 'Matematika TKA',
+            'general' => 'General',
+        ];
+        return view('exams.create', compact('type','testTypes'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
             'type' => 'required|in:quiz,tryout',
+            'test_type' => 'required|in:skd,mtk_stis,mtk_tka,general',
             'title' => 'required|string|max:255',
             'exam_date' => 'required|date',
         ]);
@@ -111,6 +117,7 @@ class ExamController extends Controller
         $exam = Exam::create([
             'type' => $data['type'],
             'title' => $data['title'],
+            'test_type' => $data['test_type'],
             'exam_date' => $data['exam_date'],
             'status' => 'inactive',
             'created_by' => auth()->id(),
@@ -134,7 +141,7 @@ class ExamController extends Controller
         $usedQuestionIds = $exam->questions
             ->pluck('question_id')
             ->toArray();
-
+        $allowedQuestionTypes = $exam->allowedQuestionTypes();
         // Load kategori + materi (UNTUK MODAL PICKER)
         $categories = QuestionCategory::with([
             'materials' => function ($q) {
@@ -147,7 +154,8 @@ class ExamController extends Controller
         return view('exams.edit', compact(
             'exam',
             'categories',
-            'usedQuestionIds'
+            'usedQuestionIds',
+            'allowedQuestionTypes'
         ));
     }
     public function update(Request $request, Exam $exam)

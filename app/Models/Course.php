@@ -53,10 +53,42 @@ class Course extends Model
 
     protected static function booted()
     {
+        // Submit ketika course disimpan (created atau updated)
         static::saved(function ($course) {
-            \App\Services\IndexNowService::submit([
-                url("/course/{$course->slug}")
-            ]);
+            // Hanya submit jika course published
+            if ($course->is_published) {
+                // Delay sedikit agar data benar-benar tersimpan
+                dispatch(function () use ($course) {
+                    \App\Services\IndexNowService::submit([
+                        "/course/{$course->slug}"
+                    ]);
+                })->delay(now()->addSeconds(5));
+            }
+        });
+
+        // Submit ketika status berubah dari draft ke published
+        static::updated(function ($course) {
+            // Cek jika status berubah menjadi published
+            if ($course->is_published && $course->wasChanged('is_published')) {
+                dispatch(function () use ($course) {
+                    \App\Services\IndexNowService::submit([
+                        "/course/{$course->slug}"
+                    ]);
+                })->delay(now()->addSeconds(5));
+            }
+
+            // Juga submit jika slug berubah (URL berubah)
+            if ($course->is_published && $course->wasChanged('slug')) {
+                // Submit URL baru
+                dispatch(function () use ($course) {
+                    \App\Services\IndexNowService::submit([
+                        "/course/{$course->slug}"
+                    ]);
+                })->delay(now()->addSeconds(5));
+
+                // Optional: Submit URL lama untuk di-remove/di-update
+                // (tergantung kebutuhan)
+            }
         });
     }
 }

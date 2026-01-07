@@ -27,8 +27,19 @@ class Exam extends Model
 
     protected $casts = [
         'exam_date' => 'datetime',
+        'test_type' => 'string',
+    ];
+    public const QUESTION_TYPE_RULES = [
+        'skd' => ['tiu', 'twk', 'tkp'],
+        'mtk_stis' => ['mtk_stis'],
+        'mtk_tka' => ['mtk_tka'],
+        'general' => ['tiu', 'twk', 'mtk_stis', 'mtk_tka'], // EXCLUDE tkp
     ];
 
+    public function allowedQuestionTypes(): array
+    {
+        return self::QUESTION_TYPE_RULES[$this->test_type] ?? [];
+    }
     /* ================= RELATIONS ================= */
 
     // post test → Meeting
@@ -130,7 +141,10 @@ class Exam extends Model
     {
         return $this->test_type === 'mtk_tka';
     }
-
+    public function isGeneral(): bool
+    {
+        return $this->test_type === 'general';
+    }
 
     public function hasTimeWindow(): bool
     {

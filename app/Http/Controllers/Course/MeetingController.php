@@ -219,23 +219,27 @@ class MeetingController extends Controller
      * POST TEST (EXAM) CREATOR
      * ===============================
      */
-    public function storePostTest(Meeting $meeting)
+    public function storePostTest(Request $request, Meeting $meeting)
     {
         if ($meeting->exam) {
             toast('error', 'Post Test sudah ada');
             return back();
         }
 
+        $data = $request->validate([
+            'test_type' => 'required|in:skd,mtk_stis,mtk_tka,general',
+        ]);
+
         $exam = Exam::create([
-            'type'         => 'post_test',
-            'status'       => 'inactive',
-            'owner_type'   => Meeting::class,
-            'owner_id'     => $meeting->id,
-            'created_by'   => auth()->id(),
+            'type'       => 'post_test',
+            'test_type'  => $data['test_type'],
+            'status'     => 'inactive',
+            'owner_type' => Meeting::class,
+            'owner_id'   => $meeting->id,
+            'created_by' => auth()->id(),
         ]);
 
         toast('success', 'Post Test berhasil dibuat');
-
         return redirect()->route('exams.edit', $exam);
     }
 }
