@@ -45,6 +45,38 @@
         {{-- Form --}}
         <div class="space-y-4">
 
+            {{-- Tipe Tes --}}
+            <div>
+                <label class="block mb-1 text-sm font-medium
+                            text-azwara-darkest dark:text-azwara-light">
+                    Tipe Tes
+                </label>
+
+                <select
+                    name="test_type"
+                    required
+                    class="w-full rounded-xl
+                        border-gray-300 dark:border-gray-700
+                        bg-white dark:bg-azwara-darkest
+                        px-3 py-2 text-sm
+                        text-azwara-darkest dark:text-azwara-lighter
+                        focus:ring-primary focus:border-primary">
+
+                    <option value="" disabled selected>
+                        Pilih tipe tes
+                    </option>
+
+                    <option value="skd">SKD </option>
+                    <option value="mtk_stis">MTK STIS</option>
+                    <option value="mtk_tka">MTK TKA</option>
+                    <option value="general">General</option>
+                </select>
+
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Tipe tes menentukan jenis soal yang boleh dimasukkan
+                </p>
+            </div>
+
             {{-- Judul --}}
             <div>
                 <label class="block mb-1 text-sm font-medium

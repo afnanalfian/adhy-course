@@ -23,10 +23,13 @@
             </h3>
             <button @click="openAddQuestion = false" class="text-xl dark:text-white">&times;</button>
         </div>
-
+        <div class="px-6 py-2 text-sm bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+            Soal yang ditampilkan sudah disesuaikan dengan tipe ujian:
+            <strong class="uppercase">{{ $exam->test_type }}</strong>
+        </div>
         {{-- FILTER --}}
         <div class="px-6 py-4 border-b dark:border-white/10
-                    grid grid-cols-1 md:grid-cols-3 gap-4">
+                    grid grid-cols-1 md:grid-cols-2 gap-4">
 
             {{-- CATEGORY --}}
             <div
@@ -110,58 +113,7 @@
                     </template>
                 </div>
             </div>
-
-            {{-- TYPE --}}
-            <div x-data="{ openType: false }" class="relative">
-
-                <button
-                    :disabled="!materialId"
-                    @click="if(materialId) openType = !openType"
-                    class="w-full text-left px-3 py-2 text-sm rounded-lg
-                        border bg-white text-gray-800
-                        disabled:opacity-50
-                        dark:bg-slate-800 dark:text-gray-100
-                        dark:border-white/10">
-
-                    <span x-text="
-                        type
-                        ? getTypeLabel(type)
-                        : 'Semua Tipe'
-                    "></span>
-                </button>
-
-                <div x-show="openType"
-                    @click.outside="openType = false"
-                    x-transition
-                    class="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto
-                            bg-white dark:bg-slate-800
-                            border dark:border-white/10 rounded-lg">
-
-                    <template x-for="t in [
-                        {v:'', l:'Semua Tipe'},
-                        {v:'mcq', l:'Pilihan Ganda (1 Benar)'},
-                        {v:'mcma', l:'Pilihan Ganda (Banyak Benar)'},
-                        {v:'truefalse', l:'Benar / Salah'},
-                        {v:'short_answer', l:'Isian Singkat'},
-                        {v:'compound', l:'Soal Kompleks'}
-                    ]" :key="t.v">
-                        <div
-                            @click="
-                                type = t.v;
-                                openType = false;
-                                fetchQuestions(1);
-                            "
-                            class="px-3 py-2 text-sm cursor-pointer
-                                text-gray-800 dark:text-gray-100
-                                hover:bg-gray-100 dark:hover:bg-white/10"
-                            x-text="t.l">
-                        </div>
-                    </template>
-                </div>
-            </div>
         </div>
-
-
         {{-- LIST --}}
         <div class="flex-1 overflow-y-auto p-6 space-y-4">
 
@@ -186,12 +138,24 @@
 
                             <div class="flex justify-between mb-2">
                                 <span class="font-semibold">Soal</span>
-                                <span class="text-xs px-2 py-1 rounded bg-primary/10 text-primary">
-                                    <span x-text="q.type"></span>
-                                    <template x-if="q.type === 'compound' && q.sub_items_count">
-                                        <span class="ml-1">(<span x-text="q.sub_items_count"></span> sub)</span>
-                                    </template>
-                                </span>
+                                <div class="flex items-center gap-2">
+                                    {{-- BADGE TYPE --}}
+                                    <span class="text-xs px-2 py-1 rounded bg-primary/10 text-primary font-semibold">
+                                        <span x-text="q.type"></span>
+                                        <template x-if="q.type === 'compound' && q.sub_items_count">
+                                            <span class="ml-1">(<span x-text="q.sub_items_count"></span> sub)</span>
+                                        </template>
+                                    </span>
+
+                                    {{-- BADGE DIPAKAI --}}
+                                    <span
+                                        class="text-xs px-2 py-1 rounded
+                                            bg-gray-100 dark:bg-white/10
+                                            text-gray-600 dark:text-gray-300"
+                                        title="Jumlah ujian yang menggunakan soal ini">
+                                        Dipakai <span x-text="q.exam_questions_count"></span>x
+                                    </span>
+                                </div>
                             </div>
 
                             <template x-if="q.image">
@@ -322,7 +286,6 @@ function examQuestionPicker(config) {
         // State
         categoryId: null,
         materialId: null,
-        type: '',
         materials: [],
         questions: [],
         selected: [],
@@ -333,17 +296,6 @@ function examQuestionPicker(config) {
         init() {
             this.usedIds = config.usedIds || [];
             this.selected = [];
-        },
-
-        getTypeLabel(type) {
-            const labels = {
-                'mcq': 'Pilihan Ganda (1 Benar)',
-                'mcma': 'Pilihan Ganda (Banyak Benar)',
-                'truefalse': 'Benar / Salah',
-                'short_answer': 'Isian Singkat',
-                'compound': 'Soal Kompleks'
-            };
-            return labels[type] || type.toUpperCase();
         },
 
         getShortAnswerPreview(question) {
@@ -379,7 +331,6 @@ function examQuestionPicker(config) {
 
             const params = new URLSearchParams({
                 page: page,
-                type: this.type
             });
 
             try {

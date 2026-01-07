@@ -33,7 +33,7 @@ class Exam extends Model
         'skd' => ['tiu', 'twk', 'tkp'],
         'mtk_stis' => ['mtk_stis'],
         'mtk_tka' => ['mtk_tka'],
-        'general' => ['tiu', 'twk', 'mtk_stis', 'mtk_tka'], // EXCLUDE tkp
+        'general' => ['tiu', 'twk', 'mtk_stis', 'mtk_tka','general'], // EXCLUDE tkp
     ];
 
     public function allowedQuestionTypes(): array

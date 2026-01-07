@@ -39,10 +39,13 @@ class Question extends Model
     {
         return $this->belongsTo(QuestionMaterial::class, 'material_id');
     }
-
+    public function examQuestions()
+    {
+        return $this->hasMany(ExamQuestion::class, 'question_id');
+    }
     public function options()
     {
-        return $this->hasMany(QuestionOption::class, 'question_id');
+        return $this->hasMany(QuestionOption::class, 'question_id')->orderBy('order');
     }
     public function subItems()
     {
@@ -50,7 +53,10 @@ class Question extends Model
             ->orderBy('order');
     }
     /* ================= HELPERS ================= */
-
+    public function usedInExamsCount(): int
+    {
+        return $this->examQuestions()->count();
+    }
     public function isCompound(): bool
     {
         return $this->type === 'compound';

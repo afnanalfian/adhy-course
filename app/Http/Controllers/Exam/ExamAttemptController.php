@@ -43,10 +43,7 @@ class ExamAttemptController extends Controller
         $attempt = $exam->attempts()
             ->firstOrCreate(
                 ['user_id' => auth()->id()],
-                [
-                    'started_at' => now(),
-                    'duration_seconds' => $exam->duration_minutes * 60,
-                ]
+                ['started_at' => now(),]
             );
 
         // kalau sudah submit → dilarang
@@ -303,73 +300,5 @@ class ExamAttemptController extends Controller
         }
 
         return ExamAnswer::formatCompoundAnswer($answers);
-    }
-    
-    /**
-     * Build selected_options array based on request data
-     */
-    private function buildSelectedOptions(Request $request): ?array
-    {
-        $answerType = $request->answer_type;
-
-        switch ($answerType) {
-            case 'mcq':
-            case 'mcma':
-            case 'truefalse':
-                $request->validate([
-                    'mcq_answers' => 'required|array',
-                    'mcq_answers.*' => 'integer',
-                ]);
-                return [
-                    'type' => $answerType,
-                    'mcq_answers' => $request->mcq_answers,
-                ];
-
-            case 'short_answer':
-                $request->validate([
-                    'value' => 'required|string|max:1000',
-                ]);
-                return [
-                    'type' => 'short_answer',
-                    'value' => $request->value,
-                    'normalized' => Str::lower(trim(preg_replace('/\s+/', ' ', $request->value))),
-                ];
-
-            case 'compound':
-                $request->validate([
-                    'answers' => 'required|array',
-                ]);
-
-                $answers = [];
-                foreach ($request->answers as $answer) {
-                    if (!isset($answer['sub_id']) || !isset($answer['type'])) {
-                        continue;
-                    }
-
-                    $formattedAnswer = [
-                        'sub_id' => (int) $answer['sub_id'],
-                        'type' => $answer['type'],
-                    ];
-
-                    if ($answer['type'] === 'truefalse' && isset($answer['boolean'])) {
-                        $formattedAnswer['boolean'] = (bool) $answer['boolean'];
-                    }
-                    elseif ($answer['type'] === 'short_answer' && isset($answer['value'])) {
-                        $formattedAnswer['value'] = $answer['value'];
-                        $formattedAnswer['normalized'] = Str::lower(trim(preg_replace('/\s+/', ' ', $answer['value'])));
-                    } else {
-                        continue; // Skip invalid answers
-                    }
-
-                    $answers[] = $formattedAnswer;
-                }
-
-                return [
-                    'type' => 'compound',
-                    'answers' => $answers,
-                ];
-        }
-
-        return null;
     }
 }

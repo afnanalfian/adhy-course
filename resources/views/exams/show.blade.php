@@ -184,12 +184,15 @@
                     Edit Exam
                 </a>
 
-                <form method="POST" action="{{ route('exams.activate', $exam) }}">
+                <form method="POST"
+                    action="{{ route('exams.activate', $exam) }}"
+                    class="sweet-confirm"
+                    data-message="Yakin ingin memulai ujian ini? Anda tidak dapat edit atau hapus jika telah mulai">
                     @csrf
-                    <button
-                        class="px-4 py-2 rounded-xl text-sm font-medium
-                               bg-primary text-white
-                               hover:opacity-90 transition">
+                    <button type="submit"
+                            class="px-4 py-2 rounded-xl text-sm font-medium
+                                bg-primary text-white
+                                hover:opacity-90 transition">
                         Launch Exam
                     </button>
                 </form>
@@ -339,9 +342,13 @@
 
                         @elseif(!$attempt)
 
-                            <form method="POST" action="{{ route('exams.start', $exam) }}">
+                            <form method="POST"
+                                action="{{ route('exams.start', $exam) }}"
+                                class="sweet-confirm"
+                                data-message="Yakin ingin mengerjakan? Anda tidak dapat reset waktu maupun mengulang ujian jika mulai mengerjakan">
                                 @csrf
-                                <button class="px-4 py-2 rounded-xl bg-primary text-white">
+                                <button type="submit"
+                                        class="px-4 py-2 rounded-xl bg-primary text-white">
                                     Mulai Exam
                                 </button>
                             </form>

@@ -137,6 +137,12 @@
                     ({{ $q->subItems->count() }} sub)
                 </span>
                 @endif
+                {{-- USED COUNT --}}
+                <span class="text-xs px-2 py-1 rounded-lg
+                            bg-gray-100 dark:bg-white/10
+                            text-gray-600 dark:text-gray-300">
+                    Dipakai {{ $q->exam_questions_count }}x
+                </span>
             </div>
         </div>
 

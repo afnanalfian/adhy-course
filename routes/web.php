@@ -300,6 +300,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('attach', [ExamQuestionController::class, 'attach'])->name('ajax.exams.questions.attach');
             Route::post('detach', [ExamQuestionController::class, 'detach'])->name('ajax.exams.questions.detach');
         });
+        Route::post('/exams/{exam}/questions/{examQuestion}/move',[ExamQuestionController::class, 'move'])->name('exams.questions.move');
         Route::post('/exams/{exam}/prerequisites', [ExamController::class, 'updatePrerequisites'])->name('exams.prerequisites.update');
         Route::get('/{exam}/questions/{questionId}/analysis', [ExamResultController::class, 'questionAnalysis'])->name('exams.question.analysis');
     });

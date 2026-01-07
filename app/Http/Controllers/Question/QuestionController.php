@@ -30,6 +30,7 @@ class QuestionController extends Controller
                 $q->where('question_text', 'like', "%{$request->q}%")
             )
             ->latest()
+            ->withCount('examQuestions')
             ->paginate(10)
             ->withQueryString();
 

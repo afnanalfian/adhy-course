@@ -122,7 +122,25 @@
                         📘 Hasil & Pembahasan
                     </a>
                 @endif
+                @if(in_array($exam->status, ['inactive', 'closed']))
+                    <form
+                        method="POST"
+                        action="{{ route('exams.destroy', $exam) }}"
+                        class="sweet-confirm w-full sm:w-auto"
+                        data-message="Yakin ingin menghapus exam ini? Data akan diarsipkan.">
+                        @csrf
+                        @method('DELETE')
 
+                        <button
+                            type="submit"
+                            class="px-4 py-2 rounded-xl text-sm font-medium
+                                bg-red-100 text-red-700
+                                hover:bg-red-200 transition
+                                dark:bg-red-900/30 dark:text-red-400">
+                            Hapus Exam
+                        </button>
+                    </form>
+                @endif
             @endrole
 
             {{-- ================== SISWA ================== --}}

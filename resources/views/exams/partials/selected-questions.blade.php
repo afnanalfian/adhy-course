@@ -5,9 +5,14 @@
 
     {{-- HEADER --}}
     <div class="flex items-center justify-between">
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
-            Soal Ujian
-        </h2>
+        <div>
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                Soal Ujian
+            </h2>
+            <p class="text-xs text-gray-500 mt-1">
+                Soal diurut mulai dari yang pertama ditambahkan, tapi dapat diurutkan ulang
+            </p>
+        </div>
 
         @if($exam->status === 'inactive')
             <button
@@ -25,8 +30,8 @@
     @else
 
         {{-- ================= SORTABLE WRAPPER ================= --}}
-        <div class="space-y-6">
-            @foreach ($exam->questions as $i => $pq)
+        <div id="sortable-questions" class="space-y-6">
+            @foreach ($questions as $i => $pq)
                 @php $q = $pq->question; @endphp
 
                 {{-- ================= ITEM ================= --}}
@@ -41,7 +46,7 @@
                         <h3
                             data-question-number
                             class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                            Soal {{ $i + 1 }}
+                            Soal {{ $questions->firstItem() + $i }}
                         </h3>
 
                         <div class="flex items-center gap-3">
@@ -66,6 +71,30 @@
                             @endif
 
                             @if($exam->status === 'inactive')
+                                <form
+                                    method="POST"
+                                    action="{{ route('exams.questions.move', [$exam, $pq]) }}"
+                                    class="flex items-center gap-2">
+                                    @csrf
+
+                                    <label class="text-sm text-gray-500">
+                                        Pindah ke:
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        name="to_order"
+                                        min="1"
+                                        max="{{ $exam->questions()->count() }}"
+                                        value="{{ $pq->order }}"
+                                        class="w-20 px-2 py-1 border rounded text-sm">
+
+                                    <button
+                                        type="submit"
+                                        class="text-xs px-2 py-1 bg-primary text-white rounded">
+                                        OK
+                                    </button>
+                                </form>
                                 <form method="POST"
                                     action="{{ route('ajax.exams.questions.detach', $exam) }}"
                                     class="sweet-confirm"
@@ -246,20 +275,11 @@
                         </div>
                     @endif
 
-                    {{-- PEMBAHASAN --}}
-                    @if($q->explanation)
-                        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-white/10">
-                            <h4 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                                Pembahasan:
-                            </h4>
-                            <div class="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-100">
-                                {!! $q->explanation !!}
-                            </div>
-                        </div>
-                    @endif
-
                 </div>
             @endforeach
         </div>
     @endif
+    <div class="mt-6">
+        {{ $questions->links() }}
+    </div>
 </div>

@@ -106,27 +106,42 @@
                                 </span>
                             </div>
 
-                            {{-- MEETINGS --}}
+                            {{-- MEETINGS / TRYOUTS --}}
                             <div class="space-y-1 overflow-y-auto">
-                                @foreach ($meetings[$dateKey] ?? [] as $meeting)
+                                @foreach ($items[$dateKey] ?? [] as $item)
                                     @php
-                                        $courseId = $meeting->course_id;
+                                        if ($item['type'] === 'meeting') {
+                                            $courseId = $item['course_id'];
 
-                                        if (! isset($courseColors[$courseId])) {
-                                            $courseColors[$courseId] =
-                                                $palette[count($courseColors) % count($palette)];
+                                            if (! isset($courseColors[$courseId])) {
+                                                $courseColors[$courseId] =
+                                                    $palette[count($courseColors) % count($palette)];
+                                            }
+
+                                            $bgClass = $courseColors[$courseId];
+                                        } else {
+                                            // TRYOUT → MERAH FIX
+                                            $bgClass = 'bg-red-600';
                                         }
                                     @endphp
 
-                                    <a href="{{ route('meeting.show', $meeting) }}"
-                                       class="block text-xs text-white rounded-md px-2 py-1
-                                              {{ $courseColors[$courseId] }}
-                                              hover:opacity-90 transition">
+                                    <a href="{{ $item['url'] }}"
+                                    class="block text-xs text-white rounded-md px-2 py-1
+                                            {{ $bgClass }}
+                                            hover:opacity-90 transition">
+
                                         <div class="font-semibold truncate">
-                                            {{ $meeting->title }}
+                                            {{ $item['title'] }}
                                         </div>
-                                        <div class="opacity-90">
-                                            {{ $meeting->scheduled_at->format('H:i') }}
+
+                                        <div class="opacity-90 flex items-center justify-between">
+                                            <span>{{ $item['time']->format('H:i') }}</span>
+
+                                            @if ($item['type'] === 'tryout')
+                                                <span class="ml-2 text-[10px] uppercase tracking-wide font-bold">
+                                                    📝
+                                                </span>
+                                            @endif
                                         </div>
                                     </a>
                                 @endforeach

@@ -68,7 +68,7 @@
                          a2 2 0 012-2h3.5a2 2 0 004 0H17
                          a2 2 0 012 2v12a2 2 0 01-2 2z"/>
             </svg>
-            Exams
+            Tryout dan Quiz
         </div>
 
         <svg :class="open ? 'rotate-180' : ''"
@@ -102,7 +102,7 @@
         <a href="{{ route('leaderboard.detail') }}"
            class="menu-subitem {{ request()->routeIs('leaderboard.*') ? 'active' : '' }}">
             <span class="w-1 h-1 rounded-full bg-current"></span>
-            Leaderboard
+            Rangking
         </a>
     </div>
 </div>

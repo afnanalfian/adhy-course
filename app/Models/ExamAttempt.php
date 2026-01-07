@@ -14,8 +14,9 @@ class ExamAttempt extends Model
         'user_id',
         'started_at',
         'submitted_at',
-        'duration_seconds',
         'score',
+        'correct_count',
+        'wrong_count',
         'is_submitted',
     ];
 

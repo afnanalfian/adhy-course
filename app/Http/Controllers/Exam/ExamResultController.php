@@ -5,301 +5,271 @@ namespace App\Http\Controllers\Exam;
 use App\Http\Controllers\Controller;
 use App\Models\Exam;
 use App\Models\ExamAttempt;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class ExamResultController extends Controller
 {
     /**
-     * ===============================
+     * =========================================
      * ADMIN / TENTOR RESULT
-     * ===============================
-     * Ranking + analisis soal
+     * =========================================
      */
     public function admin(Exam $exam)
     {
-        // Load dengan relationships yang lengkap untuk semua tipe soal
         $exam->load([
+            'questions' => fn ($q) => $q->orderBy('order'),
             'questions.question.options',
-            'questions.question.subItems' => function ($query) {
-                $query->orderBy('order');
-            },
             'questions.question.subItems.answers',
             'attempts.user',
             'attempts.answers',
         ]);
 
-        // hanya attempt yang sudah submit
         $attempts = $exam->attempts
             ->where('is_submitted', true)
             ->sortByDesc('score')
             ->values();
 
+        $totalParticipants = $attempts->count();
+
+        $averageScore = round($attempts->avg('score') ?? 0, 2);
+        $averageDuration = round($attempts->avg(fn ($a) => $a->work_duration_seconds));
+
+        $ranking = $attempts->map(function ($attempt, $index) {
+            return [
+                'rank'     => $index + 1,
+                'user'     => $attempt->user,
+                'score'    => $attempt->score,
+                'duration' => $attempt->work_duration_seconds,
+            ];
+        });
+
         // ===============================
-        // HITUNG STATISTIK PER SOAL
+        // QUESTION STATS (SORT FIRST!)
         // ===============================
-        $questionStats = [];
+        $questionStats = collect();
 
         foreach ($exam->questions as $examQuestion) {
             $question = $examQuestion->question;
-            $questionId = $question->id;
 
             $total = 0;
             $correct = 0;
 
             foreach ($attempts as $attempt) {
                 $answer = $attempt->answers
-                    ->firstWhere('question_id', $questionId);
+                    ->firstWhere('question_id', $question->id);
 
-                if (!$answer) {
-                    continue;
-                }
+                if (!$answer) continue;
 
                 $total++;
-
-                if ($answer->is_correct) {
-                    $correct++;
-                }
+                if ($answer->is_correct) $correct++;
             }
 
-            $questionStats[$questionId] = [
-                'question' => $question,
-                'total'   => $total,
-                'correct' => $correct,
-                'accuracy' => $total > 0 ? round(($correct / $total) * 100, 1) : 0,
-                'type' => $question->type,
-            ];
-        }
-
-        // ===============================
-        // STATISTIK PER TIPE SOAL
-        // ===============================
-        $typeStats = [];
-        $typeBreakdown = [
-            'mcq' => ['total' => 0, 'correct' => 0],
-            'mcma' => ['total' => 0, 'correct' => 0],
-            'truefalse' => ['total' => 0, 'correct' => 0],
-            'short_answer' => ['total' => 0, 'correct' => 0],
-            'compound' => ['total' => 0, 'correct' => 0],
-        ];
-
-        foreach ($attempts as $attempt) {
-            $attempt->load('answers');
-            $scoreByType = $attempt->getScoreByType();
-
-            foreach ($scoreByType as $type => $data) {
-                if (!isset($typeStats[$type])) {
-                    $typeStats[$type] = [
-                        'total_questions' => 0,
-                        'total_correct' => 0,
-                        'attempts' => 0,
-                    ];
-                }
-
-                $typeStats[$type]['total_questions'] += $data['total'];
-                $typeStats[$type]['total_correct'] += $data['correct'];
-                $typeStats[$type]['attempts']++;
-            }
-
-            // Untuk breakdown per tipe
-            foreach ($attempt->answers as $answer) {
-                $question = $exam->questions->firstWhere('question_id', $answer->question_id)?->question;
-                if ($question && isset($typeBreakdown[$question->type])) {
-                    $typeBreakdown[$question->type]['total']++;
-                    if ($answer->is_correct) {
-                        $typeBreakdown[$question->type]['correct']++;
-                    }
-                }
-            }
-        }
-
-        // Hitung persentase per tipe
-        foreach ($typeBreakdown as $type => &$data) {
-            $data['accuracy'] = $data['total'] > 0
-                ? round(($data['correct'] / $data['total']) * 100, 1)
+            $accuracy = $total > 0
+                ? round(($correct / $total) * 100, 1)
                 : 0;
+
+            $questionStats->push([
+                'exam_order' => $examQuestion->order,
+                'question'   => $question,
+                'total'      => $total,
+                'correct'    => $correct,
+                'accuracy'   => $accuracy,
+            ]);
         }
 
-        return view('exams.result-admin', compact(
-            'exam',
-            'attempts',
-            'questionStats',
-            'typeStats',
-            'typeBreakdown'
-        ));
+        // ⬇⬇ SORT DI SINI (SEBELUM PAGINATE)
+        $questionStats = $questionStats
+            ->sortBy('exam_order')
+            ->values();
+
+        // ===============================
+        // PAGINATE (LAST STEP)
+        // ===============================
+        $page = request('page', 1);
+        $perPage = 10;
+
+        $questionStats = new LengthAwarePaginator(
+            $questionStats->forPage($page, $perPage),
+            $questionStats->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url()]
+        );
+
+        return view('exams.result-admin', [
+            'exam'              => $exam,
+            'totalParticipants' => $totalParticipants,
+            'averageScore'      => $averageScore,
+            'averageDuration'   => $averageDuration,
+            'ranking'           => $ranking,
+            'questionStats'     => $questionStats,
+        ]);
     }
 
     /**
-     * ===============================
-     * SISWA RESULT
-     * ===============================
-     * Jawaban + pembahasan
+     * =========================================
+     * STUDENT RESULT - PERBAIKAN totalParticipants
+     * =========================================
      */
     public function student(Exam $exam)
     {
+        // ===============================
+        // ATTEMPT SISWA
+        // ===============================
         $attempt = $exam->attempts()
             ->where('user_id', auth()->id())
             ->where('is_submitted', true)
             ->firstOrFail();
 
-        // Load dengan semua relationships yang dibutuhkan
+        // ===============================
+        // LOAD RELATIONS
+        // ===============================
         $exam->load([
-            'questions' => function ($query) {
-                $query->orderBy('order');
-            },
             'questions.question.options',
-            'questions.question.subItems' => function ($query) {
-                $query->orderBy('order');
-            },
             'questions.question.subItems.answers',
         ]);
 
-        // Load answers dengan question untuk akses yang mudah
         $attempt->load([
-            'answers.question',
             'answers.question.options',
-            'answers.question.subItems' => function ($query) {
-                $query->orderBy('order');
-            },
             'answers.question.subItems.answers',
         ]);
 
-        // Group questions by type untuk display yang lebih terorganisir
-        $questionsByType = [
-            'mcq' => collect(),
-            'mcma' => collect(),
-            'truefalse' => collect(),
-            'short_answer' => collect(),
-            'compound' => collect(),
-        ];
+        // ===============================
+        // TOTAL PARTICIPANTS
+        // ===============================
+        $totalParticipants = $exam->attempts()
+            ->where('is_submitted', true)
+            ->count();
 
-        foreach ($exam->questions as $examQuestion) {
-            $question = $examQuestion->question;
-            $answer = $attempt->answers->firstWhere('question_id', $question->id);
+        // ===============================
+        // RANKING (SCORE DESC, DURASI ASC)
+        // ===============================
+        $ranking = ExamAttempt::where('exam_id', $exam->id)
+            ->where('is_submitted', true)
+            ->get()
+            ->sortBy([
+                ['score', 'desc'],
+                fn ($a, $b) =>
+                    $a->started_at->diffInSeconds($a->submitted_at)
+                    <=>
+                    $b->started_at->diffInSeconds($b->submitted_at)
+            ])
+            ->values();
 
-            // Cek jika key type ada
-            if (isset($questionsByType[$question->type])) {
-                $questionsByType[$question->type]->push([
-                    'question' => $question,
-                    'exam_question' => $examQuestion,
-                    'answer' => $answer,
-                    'is_correct' => $answer ? $answer->is_correct : false,
-                ]);
-            }
-        }
+        $rankIndex = $ranking->search(fn ($a) => $a->id === $attempt->id);
+        $rank = $rankIndex !== false ? $rankIndex + 1 : null;
 
-        // Hitung score breakdown per tipe
-        $scoreByType = $attempt->getScoreByType();
+        // ===============================
+        // DURASI KERJA SISWA (FINAL)
+        // ===============================
+        $duration = $attempt->started_at && $attempt->submitted_at
+            ? $attempt->started_at->diffInSeconds($attempt->submitted_at)
+            : null;
 
-        // Format data untuk compound questions
-        $compoundQuestions = [];
-        if (isset($questionsByType['compound']) && $questionsByType['compound']->isNotEmpty()) {
-            foreach ($questionsByType['compound'] as $index => $compoundData) {
-                $question = $compoundData['question'];
-                $answer = $compoundData['answer'];
+        // ===============================
+        // QUESTIONS + ANSWERS (DENGAN COMPOUND)
+        // ===============================
+        $questions = $exam->questions()
+            ->orderBy('order')
+            ->get()
+            ->map(function ($examQuestion) use ($attempt) {
+                $question = $examQuestion->question;
+                $answer = $attempt->answers
+                    ->firstWhere('question_id', $question->id);
 
-                $formattedSubItems = [];
-                if ($question->subItems) {
+                $data = [
+                    'order'     => $examQuestion->order,
+                    'question'  => $question,
+                    'answer'    => $answer,
+                    'is_correct'=> $answer?->is_correct ?? false,
+                ];
+
+                // compound handling (tetap seperti sebelumnya)
+                if ($question->type === 'compound') {
+                    $subItems = [];
+
                     foreach ($question->subItems as $subItem) {
-                        $subAnswer = $answer ? $answer->getCompoundAnswerBySubId($subItem->id) : null;
-                        $correctAnswer = $this->getCorrectAnswerForSubItem($subItem);
+                        $studentAnswer = $answer
+                            ? $answer->getCompoundAnswerBySubId($subItem->id)
+                            : null;
 
-                        $formattedSubItems[] = [
-                            'subItem' => $subItem,
-                            'studentAnswer' => $subAnswer,
-                            'correctAnswer' => $correctAnswer,
-                            'isCorrect' => $this->isSubItemAnswerCorrect($subItem, $subAnswer),
+                        $isCorrect = false;
+                        $correctAnswer = null;
+
+                        if ($subItem->type === 'truefalse') {
+                            $correctBool = (bool) optional($subItem->answers->first())->boolean_answer;
+
+                            if ($studentAnswer) {
+                                $isCorrect = (bool) ($studentAnswer['boolean'] ?? null) === $correctBool;
+                            }
+
+                            $correctAnswer = [
+                                'primary' => $correctBool ? 'Benar' : 'Salah',
+                            ];
+                        }
+
+                        if ($subItem->type === 'short_answer') {
+                            if ($studentAnswer) {
+                                $normalized = strtolower(trim($studentAnswer['normalized'] ?? ''));
+                                $isCorrect = $subItem->answers
+                                    ->pluck('answer_text')
+                                    ->map(fn ($v) => strtolower(trim($v)))
+                                    ->contains($normalized);
+                            }
+
+                            $correctAnswer = [
+                                'answers' => $subItem->answers
+                                    ->pluck('answer_text')
+                                    ->toArray(),
+                            ];
+                        }
+
+                        $subItems[] = [
+                            'subItem'       => $subItem,
+                            'studentAnswer' => $studentAnswer,
+                            'isCorrect'     => $isCorrect,
+                            'correctAnswer' => $correctAnswer, // ← SELALU ADA
                         ];
                     }
+
+                    $data['subItems'] = $subItems;
                 }
 
-                $compoundQuestions[] = [
-                    'question' => $question,
-                    'answer' => $answer,
-                    'subItems' => $formattedSubItems,
-                    'is_correct' => collect($formattedSubItems)->every(fn($i) => $i['isCorrect']),
-                ];
-            }
-        }
+                return $data;
+            });
 
-        return view('exams.result-student', compact(
-            'exam',
-            'attempt',
-            'questionsByType',
-            'scoreByType',
-            'compoundQuestions'
-        ));
+        // ===============================
+        // PAGINATION (10 SOAL)
+        // ===============================
+        $page    = request('page', 1);
+        $perPage = 10;
+
+        $questions = new LengthAwarePaginator(
+            $questions->forPage($page, $perPage)->values(),
+            $questions->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url()]
+        );
+
+        // ===============================
+        // RETURN VIEW
+        // ===============================
+        return view('exams.result-student', [
+            'exam'              => $exam,
+            'attempt'           => $attempt,
+            'rank'              => $rank,
+            'duration'          => $duration,
+            'questions'         => $questions,
+            'totalParticipants' => $totalParticipants,
+        ]);
     }
 
     /**
-     * Helper: Get correct answer for sub-item
-     */
-    private function getCorrectAnswerForSubItem($subItem): ?array
-    {
-        if ($subItem->type === 'truefalse') {
-            $answer = $subItem->answers->first();
-            return $answer ? ['boolean' => (bool) $answer->boolean_answer] : null;
-        }
-
-        if ($subItem->type === 'short_answer') {
-            $answers = $subItem->answers->map(function ($ans) {
-                return $ans->answer_text;
-            })->toArray();
-
-            $primaryAnswer = $subItem->answers->where('is_primary', true)->first();
-
-            return [
-                'answers' => $answers,
-                'primary' => $primaryAnswer ? $primaryAnswer->answer_text : null,
-            ];
-        }
-
-        return null;
-    }
-
-    /**
-     * Helper: Check if sub-item answer is correct
-     */
-    private function isSubItemAnswerCorrect($subItem, ?array $studentAnswer): bool
-    {
-        if (!$studentAnswer) {
-            return false;
-        }
-
-        if ($subItem->type === 'truefalse') {
-            $correctAnswer = $subItem->answers->first();
-            if (!$correctAnswer) {
-                return false;
-            }
-
-            $studentBoolean = $studentAnswer['boolean'] ?? null;
-            return $studentBoolean === (bool) $correctAnswer->boolean_answer;
-        }
-
-        if ($subItem->type === 'short_answer') {
-            $studentValue = $studentAnswer['normalized'] ?? $studentAnswer['value'] ?? null;
-            if (!$studentValue) {
-                return false;
-            }
-
-            $studentValue = strtolower(trim(preg_replace('/\s+/', ' ', $studentValue)));
-
-            foreach ($subItem->answers as $correctAnswer) {
-                $correctValue = strtolower(trim(preg_replace('/\s+/', ' ', $correctAnswer->answer_text ?? '')));
-                if ($studentValue === $correctValue) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        return false;
-    }
-
-    /**
-     * ===============================
-     * DETAILED QUESTION ANALYSIS
-     * ===============================
-     * Untuk melihat detail jawaban per soal
+     * =========================================
+     * QUESTION ANALYSIS (ADMIN)
+     * =========================================
      */
     public function questionAnalysis(Exam $exam, $questionId)
     {
@@ -310,105 +280,153 @@ class ExamResultController extends Controller
             'attempts.answers',
         ]);
 
-        $examQuestion = $exam->questions->firstWhere('question_id', $questionId);
+        $examQuestion = $exam->questions
+            ->firstWhere('question_id', $questionId);
+
         abort_if(!$examQuestion, 404);
 
         $question = $examQuestion->question;
 
-        // Get all attempts with answers for this question
-        $attemptsWithAnswers = [];
+        $attempts = $exam->attempts
+            ->where('is_submitted', true);
 
-        foreach ($exam->attempts->where('is_submitted', true) as $attempt) {
-            $answer = $attempt->answers->firstWhere('question_id', $questionId);
+        /**
+         * ===============================
+         * ANSWERS + USER
+         * ===============================
+         */
+        $answersWithUsers = $attempts->map(function ($attempt) use ($questionId) {
+            $answer = $attempt->answers
+                ->firstWhere('question_id', $questionId);
 
-            if ($answer) {
-                $attemptsWithAnswers[] = [
-                    'attempt' => $attempt,
-                    'answer' => $answer,
-                    'is_correct' => $answer->is_correct,
-                ];
+            if (!$answer) {
+                return null;
             }
-        }
 
-        // Analyze answer patterns for multiple choice
+            return [
+                'user'   => $attempt->user,
+                'answer' => $answer,
+            ];
+        })->filter();
+
+        /**
+         * ===============================
+         * OPTION STATS (MCQ / MCMA / TF)
+         * ===============================
+         */
         $optionStats = [];
+
         if (in_array($question->type, ['mcq', 'mcma', 'truefalse'])) {
             foreach ($question->options as $option) {
                 $optionStats[$option->id] = [
-                    'option' => $option,
-                    'count' => 0,
+                    'option'     => $option,
+                    'count'      => 0,
                     'percentage' => 0,
                 ];
             }
 
-            foreach ($attemptsWithAnswers as $item) {
-                $selectedIds = $item['answer']->selected_ids;
-                foreach ($selectedIds as $id) {
+            foreach ($answersWithUsers as $row) {
+                foreach ($row['answer']->selected_ids as $id) {
                     if (isset($optionStats[$id])) {
                         $optionStats[$id]['count']++;
                     }
                 }
             }
 
-            $totalAnswers = count($attemptsWithAnswers);
-            foreach ($optionStats as $id => &$stat) {
-                $stat['percentage'] = $totalAnswers > 0
-                    ? round(($stat['count'] / $totalAnswers) * 100, 1)
+            $total = $answersWithUsers->count();
+
+            foreach ($optionStats as &$stat) {
+                $stat['percentage'] = $total > 0
+                    ? round(($stat['count'] / $total) * 100, 1)
                     : 0;
             }
         }
 
-        // Analyze short answer responses
-        $shortAnswerResponses = [];
+        /**
+         * ===============================
+         * SHORT ANSWER RESPONSES
+         * ===============================
+         */
+        $shortAnswers = [];
+
         if ($question->type === 'short_answer') {
-            foreach ($attemptsWithAnswers as $item) {
-                $value = $item['answer']->short_answer_value;
-                if ($value) {
-                    $shortAnswerResponses[] = [
-                        'user' => $item['attempt']->user->name,
-                        'answer' => $value,
-                        'is_correct' => $item['is_correct'],
-                    ];
-                }
+            foreach ($answersWithUsers as $row) {
+                $shortAnswers[] = [
+                    'user'       => $row['user'],
+                    'answer'     => $row['answer']->short_answer_value,
+                    'is_correct' => $row['answer']->is_correct,
+                ];
             }
         }
 
-        // Analyze compound sub-item responses
-        $compoundSubStats = [];
+        /**
+         * ===============================
+         * COMPOUND STATS (PER SUB ITEM)
+         * ===============================
+         */
+        $compoundStats = [];
+
         if ($question->type === 'compound') {
             foreach ($question->subItems as $subItem) {
-                $compoundSubStats[$subItem->id] = [
+                $compoundStats[$subItem->id] = [
                     'subItem' => $subItem,
-                    'total' => 0,
+                    'total'   => 0,
                     'correct' => 0,
+                    'accuracy'=> 0,
                 ];
             }
 
-            foreach ($attemptsWithAnswers as $item) {
-                foreach ($question->subItems as $subItem) {
-                    $compoundSubStats[$subItem->id]['total']++;
+            foreach ($answersWithUsers as $row) {
+                $answer = $row['answer'];
 
-                    $studentAnswer = $item['answer']->getCompoundAnswerBySubId($subItem->id);
-                    if ($this->isSubItemAnswerCorrect($subItem, $studentAnswer)) {
-                        $compoundSubStats[$subItem->id]['correct']++;
+                foreach ($question->subItems as $subItem) {
+                    $compoundStats[$subItem->id]['total']++;
+
+                    $student = $answer->getCompoundAnswerBySubId($subItem->id);
+                    if (!$student) {
+                        continue;
+                    }
+
+                    $isCorrect = false;
+
+                    // TRUE / FALSE
+                    if ($subItem->type === 'truefalse') {
+                        $correct = (bool) $subItem->answers->first()?->boolean_answer;
+                        $isCorrect = isset($student['boolean'])
+                            && (bool) $student['boolean'] === $correct;
+                    }
+
+                    // SHORT ANSWER
+                    if ($subItem->type === 'short_answer') {
+                        $normalized = $student['normalized'] ?? null;
+
+                        $isCorrect = $normalized && $subItem->answers
+                            ->pluck('answer_text')
+                            ->map(fn ($v) => strtolower(trim($v)))
+                            ->contains($normalized);
+                    }
+
+                    if ($isCorrect) {
+                        $compoundStats[$subItem->id]['correct']++;
                     }
                 }
             }
 
-            foreach ($compoundSubStats as $subId => &$stat) {
+            foreach ($compoundStats as &$stat) {
                 $stat['accuracy'] = $stat['total'] > 0
                     ? round(($stat['correct'] / $stat['total']) * 100, 1)
                     : 0;
             }
         }
-        $attemptsWithAnswers = collect($attemptsWithAnswers);
-        return view('exams.question-analysis', compact(
-            'exam',
-            'question',
-            'attemptsWithAnswers',
-            'optionStats',
-            'shortAnswerResponses',
-            'compoundSubStats'
-        ));
+
+        return view('exams.question-analysis', [
+            'exam'          => $exam,
+            'question'      => $question,
+            'answers'       => $answersWithUsers,
+            'optionStats'   => $optionStats,
+            'shortAnswers'  => $shortAnswers,
+            'compoundStats' => $compoundStats,
+        ]);
     }
+
 }

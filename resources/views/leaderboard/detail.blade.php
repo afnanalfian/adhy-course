@@ -22,9 +22,9 @@
                 class="rounded-lg border-gray-300 dark:border-white/10
                        dark:bg-secondary dark:text-white">
             <option value="">Pilih Tipe Evaluasi</option>
+            <option value="tryout">Tryout</option>
             <option value="post_test">Post Test</option>
             <option value="quiz">Quiz Harian</option>
-            <option value="tryout">Tryout</option>
         </select>
 
         {{-- EXAM --}}

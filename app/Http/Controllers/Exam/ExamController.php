@@ -131,33 +131,35 @@ class ExamController extends Controller
     /* ================= EDIT ================= */
     public function edit(Exam $exam)
     {
-        // Load soal yang sudah dipilih
-        $exam->load([
-            'questions.question.options',
-            'questions.question.subItems.answers'
-        ]);
-
-        // Ambil ID soal yang sudah dipakai
-        $usedQuestionIds = $exam->questions
+        $questions = $exam->questions()
+            ->with([
+                'question.options',
+                'question.subItems.answers'
+            ])
+            ->orderBy('order', 'asc')
+            ->paginate(10);
+        $usedQuestionIds = $exam->questions()
             ->pluck('question_id')
             ->toArray();
         $allowedQuestionTypes = $exam->allowedQuestionTypes();
-        // Load kategori + materi (UNTUK MODAL PICKER)
+
         $categories = QuestionCategory::with([
-            'materials' => function ($q) {
-                $q->orderBy('name');
-            }
-        ])
-        ->orderBy('name')
-        ->get();
+                'materials' => function ($q) {
+                    $q->orderBy('name');
+                }
+            ])
+            ->orderBy('name')
+            ->get();
 
         return view('exams.edit', compact(
             'exam',
+            'questions',
             'categories',
             'usedQuestionIds',
             'allowedQuestionTypes'
         ));
     }
+
     public function update(Request $request, Exam $exam)
     {
         if ($exam->status !== 'inactive') {
@@ -245,24 +247,17 @@ class ExamController extends Controller
             return back();
         }
 
-        // Validasi examable untuk post test
-        if (
-            $exam->examable_type === Meeting::class &&
-            !$exam->examable
-        ) {
-            toast('error', 'Meeting tidak ditemukan');
-            return back();
-        }
+        // Simpan owner sebelum delete
+        $owner = $exam->owner;
 
         // Soft delete
         $exam->delete();
 
         toast('success', 'Ujian berhasil dihapus');
 
-        // Redirect aman
-        if ($exam->examable_type === Meeting::class && $exam->examable) {
-            return redirect()
-                ->route('meeting.show', $exam->examable);
+        // Redirect berdasarkan owner
+        if ($owner instanceof Meeting) {
+            return redirect()->route('meeting.show', $owner);
         }
 
         return redirect()->route(

@@ -48,7 +48,7 @@
             </h3>
 
             <div class="grid grid-cols-4 md:grid-cols-3 gap-2">
-                @foreach($attempt->exam->questions as $i => $eq)
+                @foreach($questions as $i => $eq)
                     @php
                         $question = $eq->question;
                         $answer = $attempt->answers
@@ -79,7 +79,7 @@
         {{-- ================= QUESTION AREA ================= --}}
         <main class="flex-1 overflow-y-auto p-4 md:p-6">
 
-            @foreach($attempt->exam->questions as $i => $eq)
+            @foreach($questions as $i => $eq)
                 @php
                     $question = $eq->question;
                     $answer = $attempt->answers

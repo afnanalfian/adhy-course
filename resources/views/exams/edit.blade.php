@@ -61,6 +61,28 @@
                 </div>
             @endif
 
+            {{-- ================= TEST TYPE (READ ONLY) ================= --}}
+            <div>
+                <label class="block text-sm font-medium mb-1 dark:text-azwara-lightest">
+                    Tipe Tes
+                </label>
+
+                <div
+                    class="w-full sm:w-64 rounded-lg
+                        px-3 py-2
+                        bg-gray-100 dark:bg-white/5
+                        border border-gray-300 dark:border-white/10
+                        text-gray-700 dark:text-gray-200
+                        cursor-not-allowed">
+
+                    {{ strtoupper($exam->test_type) }}
+                </div>
+
+                <p class="text-xs text-gray-500 mt-1">
+                    Tipe tes tidak dapat diubah setelah ujian dibuat.
+                </p>
+            </div>
+            
             {{-- ================= TANGGAL & JAM (QUIZ / TRYOUT) ================= --}}
             @if(in_array($exam->type, ['quiz', 'tryout']))
                 <div>
