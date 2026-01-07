@@ -23,6 +23,9 @@ class QuestionController extends Controller
             ->when($request->filled('type'), fn ($q) =>
                 $q->where('type', $request->type)
             )
+            ->when($request->filled('test_type'), function ($q) use ($request) {
+                $q->where('test_type', $request->test_type);
+            })
             ->when($request->filled('q'), fn ($q) =>
                 $q->where('question_text', 'like', "%{$request->q}%")
             )
@@ -51,6 +54,7 @@ class QuestionController extends Controller
             $question = Question::create([
                 'material_id'   => $material->id,
                 'type'          => $request->type,
+                'test_type'     => $request->test_type,
                 'question_text' => $request->question_text,
                 'image'         => $image,
                 'explanation'   => $request->explanation,
@@ -72,6 +76,20 @@ class QuestionController extends Controller
     public function update(Request $request, Question $question)
     {
         $this->validateRequest($request);
+        // validasi  test_type
+        $this->validateTypeByTestType(
+            $question->test_type,
+            $request->type
+        );
+
+        // khusus TKP
+        if ($question->test_type === 'tkp') {
+            foreach ($request->options as $opt) {
+                if (!isset($opt['weight'])) {
+                    abort(422, 'Bobot wajib diisi untuk soal TKP');
+                }
+            }
+        }
 
         DB::transaction(function () use ($request, $question) {
 
@@ -123,30 +141,75 @@ class QuestionController extends Controller
     private function validateRequest(Request $request): void
     {
         $request->validate([
-            'type'           => 'required|in:mcq,mcma,truefalse,short_answer,compound',
+            'test_type'     => 'required|in:general,tiu,twk,tkp,mtk_stis,mtk_tka',
+            'type'          => 'required',
             'question_text'  => 'required',
             'explanation'    => 'nullable',
             'question_image' => 'nullable|image|max:2048',
         ]);
+        $this->validateTypeByTestType(
+            $request->test_type,
+            $request->type
+        );
+    }
+    private function validateTypeByTestType(string $testType, string $type): void
+    {
+        $rules = [
+            'general'   => ['mcq', 'mcma', 'truefalse', 'short_answer', 'compound'],
+            'tiu'       => ['mcq'],
+            'twk'       => ['mcq'],
+            'mtk_stis'  => ['mcq'],
+            'tkp'       => ['mcq'],
+            'mtk_tka'   => ['mcq', 'mcma', 'truefalse', 'compound'],
+        ];
+
+        if (! in_array($type, $rules[$testType])) {
+            abort(422, "Tipe soal tidak valid untuk jenis tes {$testType}");
+        }
     }
     /* =========================================================
      | STORE OPTIONS
      ========================================================= */
     private function storeQuestionOptions(Question $question, Request $request): void
     {
+        if ($question->test_type === 'tkp') {
+            $this->storeTkp($question, $request);
+            return;
+        }
+
         match ($request->type) {
-            'mcq', 'mcma'      => $this->storeMcq($question, $request),
-            'truefalse'       => $this->storeTrueFalse($question, $request),
-            'short_answer'    => $this->storeShortAnswer($question, $request),
-            'compound'        => $this->storeCompound($question, $request),
-            default           => null
+            'mcq', 'mcma'  => $this->storeMcq($question, $request),
+            'truefalse'    => $this->storeTrueFalse($question, $request),
+            'short_answer' => $this->storeShortAnswer($question, $request),
+            'compound'     => $this->storeCompound($question, $request),
         };
+    }
+    //Khusus TKP
+    private function storeTkp(Question $question, Request $request): void
+    {
+        foreach ($request->options as $i => $opt) {
+            if (empty($opt['text'])) continue;
+
+            QuestionOption::create([
+                'question_id' => $question->id,
+                'option_text' => $opt['text'],
+                'weight'      => (int) ($opt['weight'] ?? 0),
+                'order'       => $i + 1,
+                'is_correct'  => false,
+                'image'       => null,
+            ]);
+        }
     }
     /* =========================================================
      | UPDATE OPTIONS
      ========================================================= */
     private function updateQuestionOptions(Question $question, Request $request): void
     {
+        // khusus tkp
+        if ($question->test_type === 'tkp') {
+            $this->updateTkp($question, $request);
+            return;
+        }
         match ($request->type) {
             'mcq', 'mcma'      => $this->updateMcq($question, $request),
             'truefalse'       => $this->updateTrueFalse($question, $request),
@@ -154,6 +217,35 @@ class QuestionController extends Controller
             'compound'        => $this->updateCompound($question, $request),
             default           => null
         };
+    }
+    private function updateTkp(Question $question, Request $request): void
+    {
+        $sentIds = [];
+
+        foreach ($request->options as $i => $opt) {
+            if (empty($opt['text'])) continue;
+
+            $option = QuestionOption::updateOrCreate(
+                [
+                    'id'          => $opt['id'] ?? null,
+                    'question_id'=> $question->id,
+                ],
+                [
+                    'option_text' => $opt['text'],
+                    'weight'      => (int) ($opt['weight'] ?? 0),
+                    'order'       => $i + 1,
+                    'is_correct'  => null,
+                    'image'       => null,
+                ]
+            );
+
+            $sentIds[] = $option->id;
+        }
+
+        // hapus option yang dihapus di form
+        $question->options()
+            ->whereNotIn('id', $sentIds)
+            ->delete();
     }
     /* =========================================================
      | MCQ / MCMA
@@ -167,9 +259,16 @@ class QuestionController extends Controller
         foreach ($request->options as $i => $opt) {
             if (empty($opt['text'])) continue;
 
+            $imagePath = null;
+            if ($request->hasFile("options.$i.image")) {
+                $imagePath = $request->file("options.$i.image")
+                    ->store('question-options', 'public');
+            }
+
             QuestionOption::create([
                 'question_id' => $question->id,
                 'option_text' => $opt['text'],
+                'image'       => $imagePath,
                 'is_correct'  => in_array($i, $correct),
                 'order'       => $i + 1,
             ]);
@@ -187,13 +286,29 @@ class QuestionController extends Controller
         foreach ($request->options as $i => $opt) {
             if (empty($opt['text'])) continue;
 
+            $existing = isset($opt['id'])
+                ? QuestionOption::find($opt['id'])
+                : null;
+
+            $imagePath = $existing?->image;
+
+            if ($request->hasFile("options.$i.image")) {
+                if ($imagePath) {
+                    Storage::disk('public')->delete($imagePath);
+                }
+
+                $imagePath = $request->file("options.$i.image")
+                    ->store('question-options', 'public');
+            }
+
             $option = QuestionOption::updateOrCreate(
                 [
-                    'id' => $opt['id'] ?? null,
-                    'question_id' => $question->id,
+                    'id'           => $opt['id'] ?? null,
+                    'question_id'  => $question->id,
                 ],
                 [
                     'option_text' => $opt['text'],
+                    'image'       => $imagePath,
                     'is_correct'  => in_array($i, $correct),
                     'order'       => $i + 1,
                 ]
@@ -202,9 +317,15 @@ class QuestionController extends Controller
             $sentIds[] = $option->id;
         }
 
+        // hapus option yang dihapus dari form
         $question->options()
             ->whereNotIn('id', $sentIds)
-            ->delete();
+            ->each(function ($opt) {
+                if ($opt->image) {
+                    Storage::disk('public')->delete($opt->image);
+                }
+                $opt->delete();
+            });
     }
 
     /* =========================================================

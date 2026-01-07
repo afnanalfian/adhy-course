@@ -192,41 +192,77 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function addOption(option = null, customIndex = null) {
-        const isMcq = typeSelect.value === 'mcq';
-        const index = customIndex !== null ? customIndex : optionIndex;
-        const optionId = option ? option.id : '';
+
+        const testType = document.getElementById('test-type').value;
+        const type     = typeSelect.value;
+
+        const isTkp  = testType === 'tkp';
+        const isMcq  = type === 'mcq';
+        const isMcma = type === 'mcma';
+
+        const index   = customIndex !== null ? customIndex : optionIndex;
+        const optionId = option?.id ?? '';
 
         optionsWrapper.insertAdjacentHTML('beforeend', `
-        <div class="option-item flex gap-3 items-start">
-            <input type="hidden" name="options[${index}][id]" value="${optionId}">
-            <input type="${isMcq ? 'radio' : 'checkbox'}"
-                   name="${isMcq ? 'correct' : 'correct[]'}"
-                   value="${index}"
-                   class="mt-3"
-                   ${option && option.is_correct ? 'checked' : ''}>
+            <div class="option-item flex gap-3 items-start">
 
-            <div class="flex-1 space-y-2">
-                <textarea name="options[${index}][text]"
-                    class="option-text w-full rounded-lg border p-2
-                           bg-azwara-lightest dark:bg-secondary/30
-                           text-slate-800 dark:text-white"
-                    placeholder="Teks opsi...">${option ? option.text : ''}</textarea>
+                <input type="hidden" name="options[${index}][id]" value="${optionId}">
 
-                <div class="flex gap-3 text-xs">
-                    <button type="button" class="btn-open-math underline">
-                        + Rumus
-                    </button>
-                    <button type="button" class="btn-remove-option text-red-500 ${index < 2 ? 'hidden' : ''}">
-                        Hapus
-                    </button>
+                ${!isTkp ? `
+                    <input type="${isMcq ? 'radio' : 'checkbox'}"
+                        name="${isMcq ? 'correct' : 'correct[]'}"
+                        value="${index}"
+                        class="mt-3"
+                        ${option?.is_correct ? 'checked' : ''}>
+                ` : ''}
+
+                <div class="flex-1 space-y-2">
+
+                    <textarea name="options[${index}][text]"
+                        class="option-text w-full rounded-lg border p-2
+                            bg-azwara-lightest dark:bg-secondary/30
+                            text-slate-800 dark:text-white"
+                        placeholder="Teks opsi...">${option?.text ?? ''}</textarea>
+
+                    ${!isTkp ? `
+                        <input type="file"
+                            name="options[${index}][image]"
+                            accept="image/*"
+                            class="block text-xs text-gray-600 dark:text-gray-300">
+                    ` : ''}
+
+                    ${option?.image && !isTkp ? `
+                        <div class="text-xs opacity-70">
+                            Gambar saat ini: ${option.image.split('/').pop()}
+                        </div>
+                    ` : ''}
+
+                    ${isTkp ? `
+                        <input type="number"
+                            name="options[${index}][weight]"
+                            value="${option?.weight ?? ''}"
+                            class="input-weight w-32 rounded border p-1 text-sm"
+                            placeholder="Bobot">
+                    ` : ''}
+
+                    <div class="flex gap-3 text-xs">
+                        <button type="button" class="btn-open-math underline">
+                            + Rumus
+                        </button>
+
+                        <button type="button"
+                                class="btn-remove-option text-red-500 ${index < 2 ? 'hidden' : ''}">
+                            Hapus
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
         `);
 
         if (customIndex === null) {
             optionIndex++;
         }
+
         updateRemoveButtons();
     }
 

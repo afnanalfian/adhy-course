@@ -130,10 +130,12 @@ document.addEventListener('DOMContentLoaded', () => {
     /* =====================
        QUESTION TYPE & SECTIONS
     ====================== */
+    const testTypeSelect = document.getElementById('test-type');
     const typeSelect = document.getElementById('question-type');
     const optionsSection = document.getElementById('options-section');
     const shortAnswerSection = document.getElementById('short-answer-section');
     const compoundSection = document.getElementById('compound-section');
+
 
     function toggleSections() {
         const type = typeSelect.value;
@@ -182,38 +184,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function addOption() {
-        const isMcq = typeSelect.value === 'mcq';
-        const isMcma = typeSelect.value === 'mcma';
+        const testType = document.getElementById('test-type')?.value ?? 'general';
+        const type = typeSelect.value;
+
+        const isTkp  = testType === 'tkp';
+        const isMcq  = type === 'mcq';
+        const isMcma = type === 'mcma';
 
         optionsWrapper.insertAdjacentHTML('beforeend', `
-        <div class="option-item flex gap-3 items-start">
+            <div class="option-item flex gap-3 items-start">
 
-            <input type="${isMcq ? 'radio' : 'checkbox'}"
-                   name="${isMcq ? 'correct' : 'correct[]'}"
-                   value="${optionIndex}"
-                   class="mt-3">
+                ${!isTkp ? `
+                    <input type="${isMcq ? 'radio' : 'checkbox'}"
+                        name="${isMcq ? 'correct' : 'correct[]'}"
+                        value="${optionIndex}"
+                        class="mt-3">
+                ` : ''}
 
-            <div class="flex-1 space-y-2">
+                <div class="flex-1 space-y-2">
 
-                <textarea name="options[${optionIndex}][text]"
-                    class="option-text w-full rounded-lg border p-2
-                           bg-azwara-lightest dark:bg-secondary/30
-                           text-slate-800 dark:text-white"
-                    placeholder="Teks opsi..."></textarea>
+                    <textarea name="options[${optionIndex}][text]"
+                        class="option-text w-full rounded-lg border p-2
+                            bg-azwara-lightest dark:bg-secondary/30
+                            text-slate-800 dark:text-white"
+                        placeholder="Teks opsi..."></textarea>
 
-                <div class="flex gap-3 text-xs">
-                    <button type="button"
-                            class="btn-open-math underline">
-                        + Rumus
-                    </button>
+                    ${!isTkp ? `
+                        <input type="file"
+                            name="options[${optionIndex}][image]"
+                            accept="image/*"
+                            class="block text-xs text-gray-600">
+                    ` : ''}
 
-                    <button type="button"
-                            class="btn-remove-option text-red-500 ${optionIndex < 2 ? 'hidden' : ''}">
-                        Hapus
-                    </button>
+                    ${isTkp ? `
+                        <input type="number"
+                            name="options[${optionIndex}][weight]"
+                            class="w-32 rounded border p-1 text-sm"
+                            placeholder="Bobot">
+                    ` : ''}
+
+                    <div class="flex gap-3 text-xs">
+                        <button type="button"
+                                class="btn-open-math underline">
+                            + Rumus
+                        </button>
+
+                        <button type="button"
+                                class="btn-remove-option text-red-500 ${optionIndex < 2 ? 'hidden' : ''}">
+                            Hapus
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
         `);
 
         optionIndex++;

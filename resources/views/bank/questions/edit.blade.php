@@ -23,6 +23,35 @@
         </p>
     </div>
 
+    {{-- =========================
+    | TIPE TEST (EDIT)
+    ========================= --}}
+    <div class="bg-azwara-lightest dark:bg-azwara-darker rounded-xl p-4 shadow-sm">
+        <label class="block text-sm font-semibold mb-1">
+            Tipe Test
+        </label>
+
+        <select id="test-type"
+                class="w-full rounded-lg border p-2
+                    bg-azwara-lightest dark:bg-secondary/40
+                    cursor-not-allowed opacity-80"
+                disabled>
+            <option value="general" {{ $question->test_type === 'general' ? 'selected' : '' }}>General</option>
+            <option value="tiu" {{ $question->test_type === 'tiu' ? 'selected' : '' }}>TIU</option>
+            <option value="twk" {{ $question->test_type === 'twk' ? 'selected' : '' }}>TWK</option>
+            <option value="mtk_stis" {{ $question->test_type === 'mtk_stis' ? 'selected' : '' }}>MTK STIS</option>
+            <option value="tkp" {{ $question->test_type === 'tkp' ? 'selected' : '' }}>TKP</option>
+            <option value="mtk_tka" {{ $question->test_type === 'mtk_tka' ? 'selected' : '' }}>MTK TKA</option>
+        </select>
+
+        {{-- kirim value ke backend --}}
+        <input type="hidden" name="test_type" value="{{ $question->test_type }}">
+
+        <p class="text-xs text-gray-500 mt-1">
+            Tipe test tidak dapat diubah saat edit soal.
+        </p>
+    </div>
+
     {{-- TIPE SOAL --}}
     <div class="bg-azwara-lightest text-secondary dark:bg-azwara-darker dark:text-azwara-lighter rounded-xl shadow p-6 space-y-2">
         <label class="font-semibold">Tipe Soal</label>
@@ -241,6 +270,64 @@
             </button>
         </div>
     </div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const testTypeSelect = document.getElementById('test-type');
+    const typeSelect     = document.getElementById('question-type');
+    const optionsWrapper = document.getElementById('options-wrapper');
+
+    /* =========================
+     | RULE TIPE TEST
+     ========================= */
+    const allowedTypes = {
+        general: ['mcq','mcma','truefalse','short_answer','compound'],
+        tiu: ['mcq'],
+        twk: ['mcq'],
+        mtk_stis: ['mcq'],
+        tkp: ['mcq'],
+        mtk_tka: ['mcq','mcma','truefalse','compound'],
+    };
+
+    function filterQuestionTypes() {
+        const testType = testTypeSelect.value;
+
+        [...typeSelect.options].forEach(opt => {
+            if (!opt.value) return;
+            opt.hidden = !allowedTypes[testType].includes(opt.value);
+        });
+
+        if (!allowedTypes[testType].includes(typeSelect.value)) {
+            typeSelect.value = '';
+        }
+
+        toggleOptionMode();
+    }
+
+    /* =========================
+     | MODE OPSI (TKP / NORMAL)
+     ========================= */
+    function toggleOptionMode() {
+        const isTkp = testTypeSelect.value === 'tkp';
+
+        // hide radio/checkbox
+        optionsWrapper.querySelectorAll('input[type=radio], input[type=checkbox]')
+            .forEach(el => el.style.display = isTkp ? 'none' : '');
+
+        // toggle weight
+        optionsWrapper.querySelectorAll('.input-weight')
+            .forEach(el => el.style.display = isTkp ? 'block' : 'none');
+    }
+
+    /* =========================
+     | EVENTS
+     ========================= */
+    filterQuestionTypes();
+    toggleOptionMode();
+
+    typeSelect.addEventListener('change', toggleOptionMode);
+});
+</script>
 </div>
 
 @include('layouts.partials.math_documentation')

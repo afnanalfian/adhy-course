@@ -18,6 +18,20 @@
         </p>
     </div>
 
+    {{-- TEST TYPE --}}
+    <div class="bg-azwara-lightest dark:bg-azwara-darker rounded-xl shadow p-6 space-y-2">
+        <label class="font-semibold dark:text-azwara-lighter">Jenis Tes</label>
+        <select id="test-type" name="test_type"
+                class="w-full rounded-lg border p-2">
+            <option value="general">General</option>
+            <option value="tiu">TIU</option>
+            <option value="twk">TWK</option>
+            <option value="tkp">TKP</option>
+            <option value="mtk_stis">MTK STIS</option>
+            <option value="mtk_tka">MTK TKA</option>
+        </select>
+    </div>
+
     {{-- TIPE SOAL --}}
     <div class="bg-azwara-lightest text-secondary dark:bg-azwara-darker dark:text-azwara-lighter rounded-xl shadow p-6 space-y-2">
         <label class="font-semibold">Tipe Soal</label>
@@ -242,6 +256,43 @@
             </button>
         </div>
     </div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const testTypeSelect = document.getElementById('test-type');
+    const typeSelect = document.getElementById('question-type');
+
+    if (!testTypeSelect || !typeSelect) return;
+
+    const allowed = {
+        general: ['mcq','mcma','truefalse','short_answer','compound'],
+        tiu: ['mcq'],
+        twk: ['mcq'],
+        mtk_stis: ['mcq'],
+        tkp: ['mcq'],
+        mtk_tka: ['mcq','mcma','truefalse','compound']
+    };
+
+    function filterQuestionTypes() {
+        const testType = testTypeSelect.value;
+
+        [...typeSelect.options].forEach(opt => {
+            if (!opt.value) return;
+            opt.hidden = !allowed[testType]?.includes(opt.value);
+        });
+
+        if (!allowed[testType]?.includes(typeSelect.value)) {
+            typeSelect.value = '';
+        }
+    }
+
+    // trigger saat ganti test type
+    testTypeSelect.addEventListener('change', filterQuestionTypes);
+
+    // trigger saat halaman pertama kali load
+    filterQuestionTypes();
+});
+</script>
 </div>
 
 @include('layouts.partials.math_documentation')

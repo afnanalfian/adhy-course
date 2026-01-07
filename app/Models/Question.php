@@ -13,6 +13,7 @@ class Question extends Model
     protected $fillable = [
         'material_id',
         'type',
+        'test_type',
         'question_text',
         'image',
         'explanation',
@@ -72,6 +73,36 @@ class Question extends Model
     {
         return $this->type === 'truefalse';
     }
+    // Helper boolean
+    public function isGeneral(): bool
+    {
+        return $this->test_type === 'general';
+    }
+    public function isTIU(): bool
+    {
+        return $this->test_type === 'tiu';
+    }
+
+    public function isTWK(): bool
+    {
+        return $this->test_type === 'twk';
+    }
+
+    public function isTKP(): bool
+    {
+        return $this->test_type === 'tkp';
+    }
+
+    public function isMtkStis(): bool
+    {
+        return $this->test_type === 'mtk_stis';
+    }
+
+    public function isMtkTka(): bool
+    {
+        return $this->test_type === 'mtk_tka';
+    }
+
     public function checkCompoundAnswer(array $userAnswers): array
     {
         $results = [

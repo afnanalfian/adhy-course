@@ -16,10 +16,12 @@ class QuestionOption extends Model
         'image',
         'is_correct',
         'order',
+        'weight',
     ];
 
     protected $casts = [
         'is_correct' => 'boolean',
+        'weight' => 'integer',
     ];
 
     public function question()

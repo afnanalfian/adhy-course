@@ -44,32 +44,73 @@
 {{-- FILTERS --}}
 <div class="mb-6 bg-azwara-lightest dark:bg-azwara-darker rounded-xl p-4 shadow-sm">
     <form method="GET" class="flex flex-wrap gap-3 items-end">
+
+        {{-- Test Type --}}
         <div>
-            <label class="block text-sm dark:text-azwara-lightest font-medium mb-1">Tipe Soal</label>
-            <select name="type" class="rounded-lg border p-2 text-sm">
-                <option value="">Semua Tipe</option>
-                <option value="mcq" {{ request('type') === 'mcq' ? 'selected' : '' }}>Pilihan Ganda (1 Benar)</option>
-                <option value="mcma" {{ request('type') === 'mcma' ? 'selected' : '' }}>Pilihan Ganda (Banyak Benar)</option>
-                <option value="truefalse" {{ request('type') === 'truefalse' ? 'selected' : '' }}>Benar/Salah</option>
-                <option value="short_answer" {{ request('type') === 'short_answer' ? 'selected' : '' }}>Isian Singkat</option>
-                <option value="compound" {{ request('type') === 'compound' ? 'selected' : '' }}>Soal Kompleks</option>
+            <label class="block text-sm dark:text-azwara-lightest font-medium mb-1">
+                Tipe Tes
+            </label>
+            <select name="test_type" class="rounded-lg border p-2 text-sm">
+                <option value="">Semua Tes</option>
+                <option value="general" {{ request('test_type') === 'general' ? 'selected' : '' }}>No Type</option>
+                <option value="tiu" {{ request('test_type') === 'tiu' ? 'selected' : '' }}>TIU</option>
+                <option value="twk" {{ request('test_type') === 'twk' ? 'selected' : '' }}>TWK</option>
+                <option value="tkp" {{ request('test_type') === 'tkp' ? 'selected' : '' }}>TKP</option>
+                <option value="mtk_stis" {{ request('test_type') === 'mtk_stis' ? 'selected' : '' }}>Matematika STIS</option>
+                <option value="mtk_tka" {{ request('test_type') === 'mtk_tka' ? 'selected' : '' }}>Matematika TKA</option>
             </select>
         </div>
+
+        {{-- Tipe Soal --}}
         <div>
-            <label class="block text-sm dark:text-azwara-lightest font-medium mb-1">Pencarian</label>
-            <input type="text" name="q" value="{{ request('q') }}"
+            <label class="block text-sm dark:text-azwara-lightest font-medium mb-1">
+                Tipe Soal
+            </label>
+            <select name="type" class="rounded-lg border p-2 text-sm">
+                <option value="">Semua Tipe</option>
+                <option value="mcq" {{ request('type') === 'mcq' ? 'selected' : '' }}>
+                    Pilihan Ganda (1 Benar)
+                </option>
+                <option value="mcma" {{ request('type') === 'mcma' ? 'selected' : '' }}>
+                    Pilihan Ganda (Banyak Benar)
+                </option>
+                <option value="truefalse" {{ request('type') === 'truefalse' ? 'selected' : '' }}>
+                    Benar / Salah
+                </option>
+                <option value="short_answer" {{ request('type') === 'short_answer' ? 'selected' : '' }}>
+                    Isian Singkat
+                </option>
+                <option value="compound" {{ request('type') === 'compound' ? 'selected' : '' }}>
+                    Soal Kompleks
+                </option>
+            </select>
+        </div>
+
+        {{-- Search --}}
+        <div>
+            <label class="block text-sm dark:text-azwara-lightest font-medium mb-1">
+                Pencarian
+            </label>
+            <input type="text"
+                   name="q"
+                   value="{{ request('q') }}"
                    placeholder="Cari soal..."
                    class="rounded-lg border p-2 text-sm">
         </div>
+
+        {{-- Actions --}}
         <div>
-            <button type="submit" class="px-4 py-2 bg-azwara-medium text-white rounded-lg hover:bg-azwara-dark">
+            <button type="submit"
+                    class="px-4 py-2 bg-azwara-medium text-white rounded-lg hover:bg-azwara-dark">
                 Filter
             </button>
+
             <a href="{{ route('bank.material.questions.index', $material) }}"
                class="px-4 py-2 dark:text-azwara-lighter bg-gray-200 dark:bg-gray-700 rounded-lg ml-2">
                 Reset
             </a>
         </div>
+
     </form>
 </div>
 
@@ -114,9 +155,71 @@
         <div class="prose dark:prose-invert max-w-none leading-relaxed mb-4 text-gray-800 dark:text-gray-100">
             {!! $q->question_text !!}
         </div>
+        {{-- OPTIONS (TKP) --}}
+        @if ($q->test_type === 'tkp')
+            @php
+                $maxWeight = $q->options->max('weight');
+            @endphp
+
+            <div class="space-y-3 mb-4">
+                @foreach ($q->options as $opt)
+
+                    @php
+                        $isBest = $opt->weight === $maxWeight;
+                    @endphp
+
+                    <div class="border rounded-lg px-4 py-3
+                                flex items-start justify-between gap-3
+                                transition
+                                {{ $isBest
+                                    ? 'bg-green-50 border-green-400 dark:bg-green-900/30'
+                                    : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                                }}">
+
+                        {{-- KONTEN OPSI --}}
+                        <div class="flex-1 text-gray-800 dark:text-gray-100 space-y-2">
+
+                            {{-- LABEL + TEKS --}}
+                            <div class="flex items-start gap-2">
+                                <span class="font-semibold">
+                                    {{ $opt->label }}.
+                                </span>
+
+                                <div class="prose dark:prose-invert max-w-none">
+                                    {!! $opt->option_text !!}
+                                </div>
+                            </div>
+
+                        </div>
+
+                        {{-- BOBOT --}}
+                        <div class="text-right min-w-[80px]">
+                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                Bobot
+                            </div>
+
+                            <div class="text-lg font-bold
+                                {{ $isBest
+                                    ? 'text-green-700 dark:text-green-400'
+                                    : 'text-gray-700 dark:text-gray-300'
+                                }}">
+                                {{ $opt->weight }}
+                            </div>
+
+                            @if ($isBest)
+                                <div class="text-xs text-green-600 dark:text-green-400 font-semibold">
+                                    Tertinggi
+                                </div>
+                            @endif
+                        </div>
+
+                    </div>
+                @endforeach
+            </div>
+        @endif
 
         {{-- OPTIONS (MCQ & MCMA) --}}
-        @if (in_array($q->type, ['mcq', 'mcma']))
+        @if (in_array($q->type, ['mcq', 'mcma']) && $q->test_type !== 'tkp')
             <div class="space-y-3 mb-4">
 
             @foreach ($q->options as $opt)

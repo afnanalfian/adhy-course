@@ -16,6 +16,7 @@ class Exam extends Model
     protected $fillable = [
         'type',
         'title',
+        'test_type',
         'exam_date',
         'duration_minutes',
         'status',
@@ -114,6 +115,22 @@ class Exam extends Model
     {
         return $this->status === 'active';
     }
+    // Helper boolean
+    public function isSKD(): bool
+    {
+        return $this->test_type === 'skd';
+    }
+
+    public function isMtkStis(): bool
+    {
+        return $this->test_type === 'mtk_stis';
+    }
+
+    public function isMtkTka(): bool
+    {
+        return $this->test_type === 'mtk_tka';
+    }
+
 
     public function hasTimeWindow(): bool
     {
