@@ -81,7 +81,8 @@
                 Jumlah Soal
             </p>
             <p class="mt-1 text-lg font-semibold text-azwara-darkest dark:text-azwara-lighter">
-                {{ $exam->questions->count() }} soal
+                {{-- {{ $exam->questions->count() }} soal --}}
+                110 Soal
             </p>
         </div>
 
