@@ -100,11 +100,11 @@
                             <div class="flex items-center justify-between mb-1">
                                 <span class="text-xs font-semibold
                                     {{ $date->isToday()
-                                        ? 'text-primary'
+                                        ? 'text-primary dark:text-azwara-lighter'
                                         : 'text-gray-500 dark:text-gray-400' }}">
                                     {{ $date->day }}
                                     @if($date->isToday())
-                                        <span class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
+                                        <span class="w-1.5 h-1.5 rounded-full text-primary dark:text-azwara-lighter bg-primary dark:bg-azwara-lighter">----</span>
                                     @endif
                                 </span>
                             </div>
