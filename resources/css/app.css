@@ -69,7 +69,7 @@ html {
         @apply relative flex items-center gap-3
                px-4 py-3 rounded-xl
                cursor-pointer font-medium text-sm
-               text-azwara-darkest dark:text-azwara-light
+               text-azwara-darkest dark:text-azwara-lighter
                transition-all duration-200
                hover:bg-azwara-light/40
                dark:hover:bg-azwara-darkest/80;
@@ -95,6 +95,7 @@ html {
     .menu-item.active {
         @apply bg-azwara-light/60
                dark:bg-azwara-darkest
+               dark:text-azwara-lightest
                text-primary;
     }
 
@@ -114,7 +115,7 @@ html {
         @apply relative flex items-center gap-2
                px-3 py-2 rounded-lg
                text-xs font-medium
-               text-azwara-darkest/80 dark:text-azwara-light/70
+               text-azwara-darkest/80 dark:text-azwara-lighter/70
                transition-all duration-150
                hover:bg-azwara-light/30
                dark:hover:bg-azwara-darkest;

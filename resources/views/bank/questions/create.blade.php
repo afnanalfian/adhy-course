@@ -29,6 +29,8 @@
             <option value="mcq">Pilihan Ganda (1 Benar)</option>
             <option value="mcma">Pilihan Ganda (Banyak Benar)</option>
             <option value="truefalse">Benar / Salah</option>
+            <option value="short_answer">Isian Singkat</option>
+            <option value="compound">Soal Kompleks</option>
         </select>
     </div>
 
@@ -68,14 +70,53 @@
     </div>
 
     {{-- OPSI JAWABAN --}}
-    <div class="bg-azwara-lightest text-secondary dark:bg-azwara-darker dark:text-azwara-lighter rounded-xl shadow p-6 space-y-4">
+    <div id="options-section" class="bg-azwara-lightest text-secondary dark:bg-azwara-darker dark:text-azwara-lighter rounded-xl shadow p-6 space-y-4 hidden">
         <h2 class="text-lg font-semibold">Opsi Jawaban</h2>
 
-        <div id="options-wrapper" class="space-y-4 hidden"></div>
+        <div id="options-wrapper" class="space-y-4"></div>
 
         <button type="button" id="add-option"
-                class="hidden px-3 py-1 rounded bg-primary text-white">
+                class="px-3 py-1 rounded bg-primary text-white">
             + Tambah Opsi
+        </button>
+    </div>
+
+    {{-- SHORT ANSWER SECTION --}}
+    <div id="short-answer-section" class="bg-azwara-lightest text-secondary dark:bg-azwara-darker dark:text-azwara-lighter rounded-xl shadow p-6 space-y-4 hidden">
+        <h2 class="text-lg font-semibold">Jawaban Isian Singkat</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-300">
+            Tambahkan semua kemungkinan jawaban yang benar (non-case-sensitive, spasi diabaikan).
+        </p>
+
+        <div id="short-answers-wrapper" class="space-y-3">
+            <div class="short-answer-item flex items-center gap-3 p-3 border rounded-lg">
+                <input type="text" name="short_answers[0][text]"
+                       class="flex-1 rounded-lg border p-2 bg-azwara-lightest dark:bg-secondary/30 text-slate-800 dark:text-white"
+                       placeholder="Masukkan jawaban...">
+                <button type="button" class="remove-short-answer text-red-500 hidden">
+                    Hapus
+                </button>
+            </div>
+        </div>
+
+        <button type="button" id="add-short-answer" class="px-3 py-1 rounded bg-primary text-white">
+            + Tambah Jawaban
+        </button>
+    </div>
+
+    {{-- COMPOUND SECTION --}}
+    <div id="compound-section" class="bg-azwara-lightest text-secondary dark:bg-azwara-darker dark:text-azwara-lighter rounded-xl shadow p-6 space-y-4 hidden">
+        <h2 class="text-lg font-semibold">Sub Pertanyaan (Kompleks)</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-300">
+            Tambahkan sub pertanyaan. Jika satu sub salah, seluruh soal dianggap salah.
+        </p>
+
+        <div id="compound-items-wrapper" class="space-y-6">
+            <!-- Sub items will be added here -->
+        </div>
+
+        <button type="button" id="add-compound-item" class="px-3 py-2 rounded bg-primary text-white">
+            + Tambah Sub Pertanyaan
         </button>
     </div>
 
@@ -211,238 +252,4 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.css">
 @endpush
 
-@push('scripts')
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.js"></script>
-
-<script>
-window.MathJax = {
-    tex: { inlineMath: [['\\(', '\\)']] }
-};
-</script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-
-    /* =====================
-       MATHQUILL INIT
-    ====================== */
-    const MQ = MathQuill.getInterface(2);
-    const mathField = MQ.MathField(
-        document.getElementById('math-editor'),
-        { spaceBehavesLikeTab: true }
-    );
-
-    const mathModal = document.getElementById('math-modal');
-    let activeTextarea = null;
-
-    /* =====================
-       QUESTION PREVIEW
-    ====================== */
-    const questionInput  = document.getElementById('question-text');
-    const previewBox     = document.getElementById('question-preview');
-
-    function renderPreview() {
-        if (!questionInput || !previewBox) return;
-
-        if (!questionInput.value.trim()) {
-            previewBox.innerHTML =
-                '<span class="opacity-50">Belum ada isi...</span>';
-            return;
-        }
-
-        previewBox.innerHTML = questionInput.value;
-        MathJax.typesetPromise([previewBox]);
-    }
-
-    if (questionInput) {
-        questionInput.addEventListener('input', renderPreview);
-    }
-
-    /* =====================
-    EXPLANATION PREVIEW
-    ===================== */
-    const explanationInput  = document.getElementById('explanation-text');
-    const explanationPreview = document.getElementById('explanation-preview');
-
-    function renderExplanationPreview() {
-        if (!explanationInput || !explanationPreview) return;
-
-        if (!explanationInput.value.trim()) {
-            explanationPreview.innerHTML =
-                '<span class="opacity-50">Belum ada isi...</span>';
-            return;
-        }
-
-        explanationPreview.innerHTML = explanationInput.value;
-        MathJax.typesetPromise([explanationPreview]);
-    }
-
-    if (explanationInput) {
-        explanationInput.addEventListener('input', renderExplanationPreview);
-    }
-
-    /* =====================
-       OPEN MATH MODAL
-    ====================== */
-    document.addEventListener('click', e => {
-
-        if (e.target.classList.contains('btn-open-math')) {
-
-            // Target dari soal
-            if (e.target.dataset.target) {
-                activeTextarea =
-                    document.getElementById(e.target.dataset.target);
-            }
-            // Target dari opsi
-            else {
-                activeTextarea = e.target
-                    .closest('.option-item')
-                    ?.querySelector('textarea');
-            }
-
-            if (!activeTextarea) return;
-
-            mathModal.classList.remove('hidden');
-            mathField.focus();
-        }
-    });
-
-    /* =====================
-       CONFIRM MATH
-    ====================== */
-    document.getElementById('btn-confirm-math').onclick = () => {
-        if (!activeTextarea) return;
-
-        activeTextarea.value += ` \\(${mathField.latex()}\\) `;
-        mathField.latex('');
-        closeMathModal();
-        renderPreview();
-    };
-
-    /* =====================
-       CLOSE MODAL
-    ====================== */
-    function closeMathModal() {
-        mathModal.classList.add('hidden');
-        mathField.latex('');
-        activeTextarea = null;
-    }
-
-    document.getElementById('btn-cancel-math')
-        .onclick = closeMathModal;
-
-    document.getElementById('close-math-modal')
-        .onclick = closeMathModal;
-
-    /* =====================
-       QUESTION TYPE & OPTIONS
-    ====================== */
-    const typeSelect     = document.getElementById('question-type');
-    const optionsWrapper = document.getElementById('options-wrapper');
-    const addBtn         = document.getElementById('add-option');
-
-    let optionIndex = 0;
-
-    typeSelect?.addEventListener('change', () => {
-        optionsWrapper.innerHTML = '';
-        optionsWrapper.classList.add('hidden');
-        addBtn.classList.add('hidden');
-        optionIndex = 0;
-
-        if (['mcq','mcma'].includes(typeSelect.value)) {
-            addOption();
-            addOption();
-            addBtn.classList.remove('hidden');
-        }
-
-        if (typeSelect.value === 'truefalse') {
-            renderTrueFalse();
-        }
-    });
-
-    addBtn?.addEventListener('click', addOption);
-
-    function addOption() {
-        const isMcq = typeSelect.value === 'mcq';
-        optionsWrapper.classList.remove('hidden');
-
-        optionsWrapper.insertAdjacentHTML('beforeend', `
-        <div class="option-item flex gap-3 items-start">
-
-            <input type="${isMcq ? 'radio' : 'checkbox'}"
-                   name="correct${isMcq ? '' : '[]'}"
-                   value="${optionIndex}"
-                   class="mt-3">
-
-            <div class="flex-1 space-y-2">
-
-                <textarea name="options[]"
-                    class="option-text w-full rounded-lg border p-2
-                           bg-azwara-lightest dark:bg-secondary/30
-                           text-slate-800 dark:text-white"
-                    placeholder="Teks opsi..."></textarea>
-
-                <input type="file" name="option_images[]"
-                       class="block text-sm">
-
-                <div class="flex gap-3 text-xs">
-                    <button type="button"
-                            class="btn-open-math underline">
-                        + Rumus
-                    </button>
-
-                    <button type="button"
-                            class="btn-remove-option text-red-500">
-                        Hapus
-                    </button>
-                </div>
-            </div>
-        </div>
-        `);
-
-        optionIndex++;
-        updateRemoveButtons();
-    }
-
-    function updateRemoveButtons() {
-        const items = optionsWrapper.querySelectorAll('.option-item');
-        const canRemove = items.length > 2;
-
-        optionsWrapper
-            .querySelectorAll('.btn-remove-option')
-            .forEach(btn => btn.disabled = !canRemove);
-    }
-
-    document.addEventListener('click', e => {
-        if (e.target.classList.contains('btn-remove-option')) {
-            e.target.closest('.option-item')?.remove();
-            updateRemoveButtons();
-        }
-    });
-
-    function renderTrueFalse() {
-        optionsWrapper.classList.remove('hidden');
-        optionsWrapper.innerHTML = `
-        <label class="flex gap-2">
-            <input type="radio" name="truefalse_correct[0]" value="1">
-            Benar
-        </label>
-        <label class="flex gap-2">
-            <input type="radio" name="truefalse_correct[0]" value="0">
-            Salah
-        </label>
-        `;
-    }
-
-});
-// sidebar docs
-const docs = document.getElementById('math-docs');
-document.getElementById('btn-open-docs').onclick =
-    () => docs.classList.remove('translate-x-full');
-document.getElementById('close-docs').onclick =
-    () => docs.classList.add('translate-x-full');
-</script>
-@endpush
-
+@include('bank.questions.js.create')

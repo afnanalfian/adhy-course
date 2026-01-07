@@ -127,6 +127,7 @@ class ExamController extends Controller
         // Load soal yang sudah dipilih
         $exam->load([
             'questions.question.options',
+            'questions.question.subItems.answers'
         ]);
 
         // Ambil ID soal yang sudah dipakai

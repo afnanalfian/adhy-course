@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const header = document.getElementById("site-header");
+    if (!header) return; //jangan eksekusi jika bukan landing page
+
     const mobileBtn = document.getElementById("mobile-menu-btn");
     const mobileMenu = document.getElementById("mobile-menu");
     const toTop = document.getElementById("scroll-to-top");

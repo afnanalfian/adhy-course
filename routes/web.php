@@ -301,6 +301,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('detach', [ExamQuestionController::class, 'detach'])->name('ajax.exams.questions.detach');
         });
         Route::post('/exams/{exam}/prerequisites', [ExamController::class, 'updatePrerequisites'])->name('exams.prerequisites.update');
+        Route::get('/{exam}/questions/{questionId}/analysis', [ExamResultController::class, 'questionAnalysis'])->name('exams.question.analysis');
     });
     Route::middleware('role:siswa')->group(function () {
         // Attempt

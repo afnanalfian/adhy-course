@@ -41,6 +41,38 @@
     </a>
 </div>
 
+{{-- FILTERS --}}
+<div class="mb-6 bg-azwara-lightest dark:bg-azwara-darker rounded-xl p-4 shadow-sm">
+    <form method="GET" class="flex flex-wrap gap-3 items-end">
+        <div>
+            <label class="block text-sm dark:text-azwara-lightest font-medium mb-1">Tipe Soal</label>
+            <select name="type" class="rounded-lg border p-2 text-sm">
+                <option value="">Semua Tipe</option>
+                <option value="mcq" {{ request('type') === 'mcq' ? 'selected' : '' }}>Pilihan Ganda (1 Benar)</option>
+                <option value="mcma" {{ request('type') === 'mcma' ? 'selected' : '' }}>Pilihan Ganda (Banyak Benar)</option>
+                <option value="truefalse" {{ request('type') === 'truefalse' ? 'selected' : '' }}>Benar/Salah</option>
+                <option value="short_answer" {{ request('type') === 'short_answer' ? 'selected' : '' }}>Isian Singkat</option>
+                <option value="compound" {{ request('type') === 'compound' ? 'selected' : '' }}>Soal Kompleks</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm dark:text-azwara-lightest font-medium mb-1">Pencarian</label>
+            <input type="text" name="q" value="{{ request('q') }}"
+                   placeholder="Cari soal..."
+                   class="rounded-lg border p-2 text-sm">
+        </div>
+        <div>
+            <button type="submit" class="px-4 py-2 bg-azwara-medium text-white rounded-lg hover:bg-azwara-dark">
+                Filter
+            </button>
+            <a href="{{ route('bank.material.questions.index', $material) }}"
+               class="px-4 py-2 dark:text-azwara-lighter bg-gray-200 dark:bg-gray-700 rounded-lg ml-2">
+                Reset
+            </a>
+        </div>
+    </form>
+</div>
+
 {{-- QUESTION LIST --}}
 <div class="space-y-6">
 
@@ -54,9 +86,17 @@
                 Soal {{ ($questions->currentPage() - 1) * $questions->perPage() + ($index + 1) }}
             </h2>
 
-            <span class="px-3 py-1.5 text-sm rounded-lg bg-primary/10 text-primary font-semibold">
-                {{ strtoupper($q->type) }}
-            </span>
+            <div class="flex items-center gap-2">
+                <span class="px-3 py-1.5 text-sm rounded-lg dark:text-white dark:bg-azwara-light bg-primary/10 text-primary font-semibold">
+                    {{ \App\Models\Question::TYPES[$q->type] ?? strtoupper($q->type) }}
+                </span>
+
+                @if($q->type === 'compound')
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                    ({{ $q->subItems->count() }} sub)
+                </span>
+                @endif
+            </div>
         </div>
 
         {{-- QUESTION IMAGE --}}
@@ -140,6 +180,121 @@
             </div>
         @endif
 
+        {{-- SHORT ANSWER --}}
+        @if ($q->type === 'short_answer')
+            <div class="mb-4">
+                <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700
+                            rounded-lg p-4">
+                    <h3 class="font-semibold text-blue-800 dark:text-blue-300 mb-2">
+                        Jawaban Isian Singkat:
+                    </h3>
+
+                    @php
+                        $correctOptions = $q->options->where('is_correct', true);
+                    @endphp
+
+                    @if($correctOptions->count() > 0)
+                        @php
+                            $primaryAnswer = $correctOptions->first();
+                        @endphp
+
+                        @if($primaryAnswer)
+                            <p class="text-gray-800 dark:text-gray-100 font-medium">
+                                Jawaban utama: <span class="text-green-600 dark:text-green-400">{{ $primaryAnswer->option_text }}</span>
+                            </p>
+                        @endif
+
+                        @if($correctOptions->count() > 1)
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Semua kemungkinan jawaban:</p>
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach($correctOptions as $answer)
+                                        <span class="px-2 py-1 bg-gray-100 dark:text-azwara-lighter dark:bg-gray-700 rounded text-sm">
+                                            {{ $answer->option_text }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    @else
+                        <p class="text-gray-500 dark:text-gray-400">Belum ada jawaban</p>
+                    @endif
+                </div>
+            </div>
+        @endif
+
+        {{-- COMPOUND --}}
+        @if ($q->type === 'compound')
+            <div class="space-y-4 mb-4">
+                <div class="bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-700
+                            rounded-lg p-4">
+                    <h3 class="font-semibold text-purple-800 dark:text-purple-300 mb-3">
+                        Sub Pertanyaan ({{ $q->subItems->count() }}):
+                    </h3>
+
+                    <div class="space-y-4">
+                        @foreach($q->subItems->sortBy('order') as $subIndex => $subItem)
+                            <div class="border rounded-lg p-4 bg-white/50 dark:bg-gray-800/50">
+                                <div class="flex items-start justify-between mb-2">
+                                    <div class="font-medium text-gray-800 dark:text-gray-100">
+                                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ $subItem->label }}.</span>
+                                        <span class="ml-1">{{ $subItem->prompt }}</span>
+                                    </div>
+                                    <span class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700">
+                                        {{ $subItem->type === 'truefalse' ? 'Benar/Salah' : 'Isian Singkat' }}
+                                    </span>
+                                </div>
+
+                                {{-- Answers for sub item --}}
+                                @if($subItem->type === 'truefalse')
+                                    @php
+                                        $correctAnswer = $subItem->answers->first();
+                                    @endphp
+                                    @if($correctAnswer)
+                                        <div class="mt-2 text-sm dark:text-azwara-lightest">
+                                            Jawaban:
+                                            <span class="font-semibold {{ $correctAnswer->boolean_answer ? 'text-green-600' : 'text-red-600' }}">
+                                                {{ $correctAnswer->boolean_answer ? 'BENAR' : 'SALAH' }}
+                                            </span>
+                                        </div>
+                                    @endif
+                                @elseif($subItem->type === 'short_answer')
+                                    @php
+                                        $primaryAnswer = $subItem->answers->where('is_primary', true)->first();
+                                        $allAnswers = $subItem->answers;
+                                    @endphp
+                                    <div class="mt-2">
+                                        @if($primaryAnswer)
+                                            <p class="text-sm text-gray-800 dark:text-gray-100">
+                                                Jawaban utama: <span class="font-medium">{{ $primaryAnswer->answer_text }}</span>
+                                            </p>
+                                        @endif
+
+                                        @if($allAnswers->count() > 1)
+                                            <div class="mt-1">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">Semua kemungkinan:</p>
+                                                <div class="flex flex-wrap gap-1 mt-1">
+                                                    @foreach($allAnswers as $answer)
+                                                        <span class="px-2 py-0.5 text-xs dark:text-white bg-gray-100 dark:bg-gray-700 rounded">
+                                                            {{ $answer->answer_text }}
+                                                        </span>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-3">
+        <em>Catatan: Jika satu sub salah, seluruh soal dianggap salah.</em>
+    </p>
+                </div>
+            </div>
+        @endif
+
 
         {{-- TOGGLE PEMBAHASAN --}}
         <div x-data="{ open: false }">
@@ -154,19 +309,80 @@
 
             <div x-show="open" x-collapse class="mt-4 border-t pt-4">
 
-                <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Jawaban benar:</h3>
+            @if($q->type === 'short_answer')
+                <div class="mb-4">
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Jawaban Isian Singkat:</h3>
+                    @php
+                        $correctOptions = $q->options->where('is_correct', true);
+                        $primaryAnswer = $correctOptions->first();
+                    @endphp
 
-                    <ul class="list-disc ml-6 text-gray-900 dark:text-gray-100">
+                    @if($primaryAnswer)
+                        <div class="bg-green-50 dark:bg-green-900/30 p-3 rounded-lg border border-green-200 dark:border-green-700">
+                            <p class="text-gray-800 dark:text-gray-100 font-medium">{{ $primaryAnswer->option_text }}</p>
+                            @if($correctOptions->count() > 1)
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                    <em>Jawaban lain juga diterima (case-insensitive, spasi diabaikan)</em>
+                                </p>
+                            @endif
+                        </div>
+                    @endif
+                </div>
+                @elseif($q->type === 'compound')
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Jawaban Sub Pertanyaan:</h3>
+                        <div class="space-y-3">
+                            @foreach($q->subItems->sortBy('order') as $subItem)
+                                <div class="border rounded-lg p-3">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="font-medium text-gray-800 dark:text-gray-100">{{ $subItem->label }}. {{ $subItem->prompt }}</span>
+                                    </div>
+
+                                    @if($subItem->type === 'truefalse')
+                                        @php
+                                            $correctAnswer = $subItem->answers->first();
+                                        @endphp
+                                        @if($correctAnswer)
+                                            <div class="text-sm {{ $correctAnswer->boolean_answer ? 'text-green-600' : 'text-red-600' }}">
+                                                Jawaban: <span class="font-semibold">{{ $correctAnswer->boolean_answer ? 'BENAR' : 'SALAH' }}</span>
+                                            </div>
+                                        @endif
+                                    @elseif($subItem->type === 'short_answer')
+                                        @php
+                                            $primaryAnswer = $subItem->answers->where('is_primary', true)->first();
+                                        @endphp
+                                        @if($primaryAnswer)
+                                            <div class="text-sm">
+                                                Jawaban: <span class="font-semibold text-green-600">{{ $primaryAnswer->answer_text }}</span>
+                                                @if($subItem->answers->count() > 1)
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                        <em>Jawaban lain juga diterima</em>
+                                                    </p>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @else
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Jawaban benar:</h3>
+                    <ul class="list-disc ml-6 text-gray-900 dark:text-gray-100 mb-4">
                     @foreach ($q->options->where('is_correct', true) as $i => $opt)
                         <li>{!! $opt->option_text !!}</li>
                     @endforeach
                     </ul>
+                @endif
 
-                <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Pembahasan:</h3>
-
-                <div class="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-100">
-                    {!! $q->explanation !!}
-                </div>
+                @if($q->explanation)
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Pembahasan:</h3>
+                    <div class="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-100">
+                        {!! $q->explanation !!}
+                    </div>
+                @else
+                    <p class="text-gray-500 dark:text-gray-400 italic">Belum ada pembahasan</p>
+                @endif
 
             </div>
         </div>
@@ -221,20 +437,4 @@
 
 @endsection
 
-@push('scripts')
-<script>
-window.MathJax = {
-    tex: {
-        inlineMath: [['\\(', '\\)']]
-    }
-};
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    MathJax.typesetPromise();
-});
-</script>
-@endpush
+@include('bank.questions.js.index')

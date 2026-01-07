@@ -51,9 +51,10 @@
                 @foreach($attempt->exam->questions as $i => $eq)
                     @php
                         $question = $eq->question;
-                        $answered = $attempt->answers
+                        $answer = $attempt->answers
                             ->where('question_id', $question->id)
-                            ->isNotEmpty();
+                            ->first();
+                        $answered = $answer && !$answer->isEmpty;
                     @endphp
 
                     <button
@@ -61,7 +62,8 @@
                         class="nav-btn
                                w-full py-2 rounded text-sm font-semibold text-white
                                {{ $answered ? 'bg-green-600' : 'bg-red-600' }}"
-                        data-index="{{ $i }}">
+                        data-index="{{ $i }}"
+                        data-question-type="{{ $question->type }}">
                         {{ $i + 1 }}
                     </button>
                 @endforeach
@@ -83,13 +85,14 @@
                     $answer = $attempt->answers
                         ->where('question_id', $question->id)
                         ->first();
-                    $selected = $answer?->selected_options ?? [];
+                    $selectedOptions = $answer?->selected_options ?? [];
                 @endphp
 
                 <div
                     class="question-slide {{ $i === 0 ? '' : 'hidden' }}"
                     data-index="{{ $i }}"
-                    data-question-id="{{ $question->id }}">
+                    data-question-id="{{ $question->id }}"
+                    data-question-type="{{ $question->type }}">
 
                     {{-- SOAL --}}
                     <div class="mb-6">
@@ -111,49 +114,137 @@
                         @endif
                     </div>
 
-                    {{-- OPSI --}}
-                    <div class="space-y-4">
-                        @foreach($question->options as $option)
-                            <label
-                                class="block p-3 rounded-lg
-                                       border border-gray-200 dark:border-white/10
-                                       cursor-pointer hover:bg-gray-100 dark:hover:bg-white/5">
+                    {{-- MCQ, MCMA, TrueFalse --}}
+                    @if(in_array($question->type, ['mcq', 'mcma', 'truefalse']))
+                        <div class="space-y-4 answer-section">
+                            @foreach($question->options as $option)
+                                <label
+                                    class="block p-3 rounded-lg
+                                           border border-gray-200 dark:border-white/10
+                                           cursor-pointer hover:bg-gray-100 dark:hover:bg-white/5">
 
-                                <div class="flex items-start gap-3">
-                                    <input
-                                        type="{{ $question->type === 'mcma' ? 'checkbox' : 'radio' }}"
-                                        name="question_{{ $question->id }}[]"
-                                        value="{{ $option->id }}"
-                                        @checked(in_array($option->id, $selected))
-                                        class="answer-input mt-1"
-                                    >
+                                    <div class="flex items-start gap-3">
+                                        <input
+                                            type="{{ $question->type === 'mcma' ? 'checkbox' : 'radio' }}"
+                                            name="question_{{ $question->id }}[]"
+                                            value="{{ $option->id }}"
+                                            @checked(in_array($option->id, $answer?->selected_ids ?? []))
+                                            class="answer-input mt-1"
+                                        >
 
-                                    <div class="flex-1">
-                                        {{-- label + teks --}}
-                                        @if($question->type !== 'truefalse')
-                                            <span class="font-semibold mr-1">
-                                                {{ $option->label }}.
+                                        <div class="flex-1">
+                                            {{-- label + teks --}}
+                                            @if($question->type !== 'truefalse')
+                                                <span class="font-semibold mr-1">
+                                                    {{ $option->label }}.
+                                                </span>
+                                            @endif
+
+                                            <span class="prose dark:prose-invert max-w-none text-sm inline">
+                                                {!! $option->option_text !!}
                                             </span>
-                                        @endif
-
-                                        <span class="prose dark:prose-invert max-w-none text-sm inline">
-                                            {!! $option->option_text !!}
-                                        </span>
+                                        </div>
                                     </div>
+
+                                    {{-- gambar opsi --}}
+                                    @if($option->image)
+                                        <div class="mt-2 ml-7">
+                                            <img
+                                                src="{{ asset('storage/'.$option->image) }}"
+                                                class="max-w-[160px] rounded"
+                                                alt="Gambar Opsi">
+                                        </div>
+                                    @endif
+                                </label>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    {{-- SHORT ANSWER --}}
+                    @if($question->type === 'short_answer')
+                        <div class="space-y-4 answer-section">
+                            <div class="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                                <p class="text-sm text-blue-800 dark:text-blue-300 mb-2">
+                                    Masukkan jawaban:
+                                </p>
+                                <textarea
+                                    name="short_answer_{{ $question->id }}"
+                                    class="short-answer-input w-full p-3 rounded-lg border
+                                           bg-white dark:bg-secondary/50
+                                           text-gray-800 dark:text-gray-100"
+                                    rows="3"
+                                    placeholder="Tulis jawaban di sini...">{{ $answer?->short_answer_value ?? '' }}</textarea>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- COMPOUND --}}
+                    @if($question->type === 'compound')
+                        <div class="space-y-4 answer-section">
+                            <div class="p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
+                                <p class="text-sm text-purple-800 dark:text-purple-300 mb-4">
+                                    Jawab semua pertanyaan berikut:
+                                </p>
+
+                                <div class="space-y-6">
+                                    @foreach($question->subItems->sortBy('order') as $subIndex => $subItem)
+                                        @php
+                                            $subAnswer = $answer?->getCompoundAnswerBySubId($subItem->id);
+                                        @endphp
+
+                                        <div class="border rounded-lg p-4 bg-white/50 dark:bg-gray-800/50">
+                                            <div class="flex items-start justify-between mb-3">
+                                                <h4 class="font-semibold text-gray-800 dark:text-gray-100">
+                                                    <span class="text-sm text-gray-500 dark:text-gray-400">{{ $subItem->label }}.</span>
+                                                    <span class="ml-1">{{ $subItem->prompt }}</span>
+                                                </h4>
+                                                <span class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700">
+                                                    {{ $subItem->type === 'truefalse' ? 'BENAR/SALAH' : 'ISIAN SINGKAT' }}
+                                                </span>
+                                            </div>
+
+                                            @if($subItem->type === 'truefalse')
+                                                <div class="flex gap-4">
+                                                    <label class="flex items-center gap-2">
+                                                        <input type="radio"
+                                                               name="compound_{{ $question->id }}_sub_{{ $subItem->id }}"
+                                                               value="1"
+                                                               class="compound-answer-input"
+                                                               data-sub-id="{{ $subItem->id }}"
+                                                               data-type="truefalse"
+                                                               {{ $subAnswer && ($subAnswer['boolean'] ?? false) ? 'checked' : '' }}>
+                                                        <span>Benar</span>
+                                                    </label>
+                                                    <label class="flex items-center gap-2">
+                                                        <input type="radio"
+                                                               name="compound_{{ $question->id }}_sub_{{ $subItem->id }}"
+                                                               value="0"
+                                                               class="compound-answer-input"
+                                                               data-sub-id="{{ $subItem->id }}"
+                                                               data-type="truefalse"
+                                                               {{ $subAnswer && !($subAnswer['boolean'] ?? true) ? 'checked' : '' }}>
+                                                        <span>Salah</span>
+                                                    </label>
+                                                </div>
+                                            @elseif($subItem->type === 'short_answer')
+                                                <div>
+                                                    <textarea
+                                                        name="compound_{{ $question->id }}_sub_{{ $subItem->id }}"
+                                                        class="compound-answer-input w-full p-3 rounded-lg border
+                                                               bg-white dark:bg-secondary/50
+                                                               text-gray-800 dark:text-gray-100"
+                                                        rows="2"
+                                                        data-sub-id="{{ $subItem->id }}"
+                                                        data-type="short_answer"
+                                                        placeholder="Jawaban...">{{ $subAnswer['value'] ?? '' }}</textarea>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endforeach
                                 </div>
-
-                                {{-- gambar opsi --}}
-                                @if($option->image)
-                                    <div class="mt-2 ml-7">
-                                        <img
-                                            src="{{ asset('storage/'.$option->image) }}"
-                                            class="max-w-[160px] rounded"
-                                            alt="Gambar Opsi">
-                                    </div>
-                                @endif
-                            </label>
-                        @endforeach
-                    </div>
+                            </div>
+                        </div>
+                    @endif
 
                 </div>
             @endforeach
@@ -190,127 +281,4 @@
 
 </div>
 @endsection
-
-@push('script')
-<script>
-/* ================= TIMER ================= */
-const timerEl = document.getElementById('timer');
-let remaining = parseInt(timerEl.dataset.remaining, 10);
-
-function formatTime(seconds) {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
-}
-
-timerEl.innerText = formatTime(remaining);
-
-setInterval(() => {
-    if (remaining <= 0) {
-        document.getElementById('auto-submit-form')?.submit();
-        return;
-    }
-    remaining--;
-    timerEl.innerText = formatTime(remaining);
-}, 1000);
-
-/* ================= SIDEBAR TOGGLE ================= */
-const sidebar = document.getElementById('sidebar');
-const overlay = document.getElementById('sidebarOverlay');
-const toggleBtn = document.getElementById('toggleSidebar');
-
-toggleBtn?.addEventListener('click', () => {
-    sidebar.classList.toggle('-translate-x-full');
-    overlay.classList.toggle('hidden');
-});
-
-overlay?.addEventListener('click', () => {
-    sidebar.classList.add('-translate-x-full');
-    overlay.classList.add('hidden');
-});
-
-/* ================= QUESTION NAV ================= */
-let currentIndex = 0;
-const slides = document.querySelectorAll('.question-slide');
-const navButtons = document.querySelectorAll('.nav-btn');
-
-function setActiveNav(index) {
-    navButtons.forEach(btn => {
-        btn.classList.remove(
-            'ring-2',
-            'ring-blue-500',
-            'bg-blue-700',
-            'scale-95',
-            'shadow-inner'
-        );
-    });
-
-    navButtons[index].classList.add(
-        'ring-2',
-        'ring-blue-500',
-        'bg-blue-700',
-        'scale-95',
-        'shadow-inner'
-    );
-}
-
-setActiveNav(0);
-
-function showQuestion(index) {
-    slides.forEach(s => s.classList.add('hidden'));
-    slides[index].classList.remove('hidden');
-    currentIndex = index;
-
-    setActiveNav(index);
-
-    sidebar.classList.add('-translate-x-full');
-    overlay.classList.add('hidden');
-}
-
-navButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        showQuestion(parseInt(btn.dataset.index));
-    });
-});
-
-document.getElementById('prevBtn').onclick = () => {
-    if (currentIndex > 0) showQuestion(currentIndex - 1);
-};
-
-document.getElementById('nextBtn').onclick = () => {
-    if (currentIndex < slides.length - 1) showQuestion(currentIndex + 1);
-};
-
-/* ================= SAVE ANSWER ================= */
-document.querySelectorAll('.answer-input').forEach(input => {
-    input.addEventListener('change', () => {
-        const slide = input.closest('.question-slide');
-        const questionId = slide.dataset.questionId;
-
-        const checked = slide.querySelectorAll('.answer-input:checked');
-        let selected = [];
-        checked.forEach(i => selected.push(i.value));
-
-        fetch("{{ route('exams.answer.save', $attempt->exam) }}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            },
-            body: JSON.stringify({
-                question_id: questionId,
-                selected_options: selected
-            })
-        });
-
-        const nav = document.querySelector(
-            `.nav-btn[data-index="${slide.dataset.index}"]`
-        );
-        nav.classList.remove('bg-red-600');
-        nav.classList.add('bg-green-600');
-    });
-});
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-@endpush
+@include('exams.js.attempt')

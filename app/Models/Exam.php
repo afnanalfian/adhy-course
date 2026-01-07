@@ -167,4 +167,18 @@ class Exam extends Model
         // ================= FALLBACK =================
         return route('dashboard.redirect');
     }
+    public function getAnswerTypeAttribute(): ?string
+    {
+        return $this->selected_options['type'] ?? null;
+    }
+
+    public function getCompoundAnswersAttribute(): array
+    {
+        return $this->selected_options['answers'] ?? [];
+    }
+
+    public function getShortAnswerValueAttribute(): ?string
+    {
+        return $this->selected_options['value'] ?? null;
+    }
 }

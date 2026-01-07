@@ -12,6 +12,7 @@ class ExamQuestionController extends Controller
 {
     public function byMaterial(Exam $exam, $materialId, Request $request)
     {
+        $exam->load('questions');
         $material = QuestionMaterial::withTrashed()->findOrFail($materialId);
         // Pastikan materi milik kategori yang valid
         if (
@@ -26,7 +27,7 @@ class ExamQuestionController extends Controller
         // Filter type (whitelist)
         if ($request->filled('type')) {
             abort_unless(
-                in_array($request->type, ['mcq', 'mcma', 'truefalse']),
+                in_array($request->type, ['mcq', 'mcma', 'truefalse','short_answer', 'compound']),
                 403
             );
 
@@ -35,6 +36,7 @@ class ExamQuestionController extends Controller
 
         return $query
             ->whereNotIn('id', $exam->questions()->pluck('question_id'))
+            ->with(['options', 'subItems.answers'])
             ->paginate(10);
     }
 

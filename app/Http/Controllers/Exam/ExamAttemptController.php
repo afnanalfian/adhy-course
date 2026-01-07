@@ -8,8 +8,7 @@ use App\Models\ExamAttempt;
 use App\Models\ExamAnswer;
 use App\Services\ExamScoringService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-
+use Illuminate\Support\Str;
 
 class ExamAttemptController extends Controller
 {
@@ -58,6 +57,7 @@ class ExamAttemptController extends Controller
         return redirect()
             ->route('exams.attempt', $exam);
     }
+
     protected function forceSubmit(ExamAttempt $attempt)
     {
         if ($attempt->is_submitted) return;
@@ -73,6 +73,7 @@ class ExamAttemptController extends Controller
             'wrong_count'    => $result['wrong'],
         ]);
     }
+
     public function attempt(Exam $exam)
     {
         if (
@@ -83,6 +84,7 @@ class ExamAttemptController extends Controller
             toast('error', 'Silakan lakukan pembelian terlebih dahulu');
             return back();
         }
+
         $attempt = $exam->attempts()
             ->where('user_id', auth()->id())
             ->firstOrFail();
@@ -95,8 +97,15 @@ class ExamAttemptController extends Controller
                 ->with('info', 'Waktu ujian telah habis');
         }
 
+        // Load questions with proper relationships based on type
         $questions = $exam->questions()
-            ->with('question.options')
+            ->with([
+                'question.options',
+                'question.subItems' => function ($query) {
+                    $query->orderBy('order');
+                },
+                'question.subItems.answers'
+            ])
             ->orderBy('order')
             ->get();
 
@@ -117,10 +126,12 @@ class ExamAttemptController extends Controller
             toast('error', 'Silakan lakukan pembelian terlebih dahulu');
             return back();
         }
+
         $attempt = $exam->attempts()
             ->where('user_id', auth()->id())
             ->where('is_submitted', false)
             ->firstOrFail();
+
         if ($attempt->is_submitted) {
             return redirect()->route('exams.result.student', $exam);
         }
@@ -154,15 +165,10 @@ class ExamAttemptController extends Controller
                 'message' => 'Unauthorized'
             ], 403);
         }
+
         if (!$exam->isActive()) {
             abort(403);
         }
-
-        $request->validate([
-            'question_id'       => 'required|integer',
-            'selected_options'  => 'array',
-            'selected_options.*'=> 'integer',
-        ]);
 
         $attempt = $exam->attempts()
             ->where('user_id', auth()->id())
@@ -178,29 +184,192 @@ class ExamAttemptController extends Controller
         // pastikan soal milik exam
         $examQuestion = $exam->questions()
             ->where('question_id', $request->question_id)
-            ->with('question.options')
+            ->with('question')
             ->first();
 
         abort_unless($examQuestion, 403);
 
-        // filter option hanya milik soal
-        $validOptionIds = $examQuestion->question
-            ->options
-            ->pluck('id')
-            ->toArray();
+        $question = $examQuestion->question;
+        $selectedOptions = null;
 
-        $selected = array_values(array_intersect(
-            $request->selected_options ?? [],
-            $validOptionIds
-        ));
+        // Build selected_options based on question type
+        switch ($question->type) {
+            case 'mcq':
+            case 'mcma':
+            case 'truefalse':
+                $selectedOptions = $this->handleMultipleChoiceAnswer($request, $question);
+                break;
+
+            case 'short_answer':
+                $selectedOptions = $this->handleShortAnswer($request);
+                break;
+
+            case 'compound':
+                $selectedOptions = $this->handleCompoundAnswer($request, $question);
+                break;
+
+            default:
+                return response()->json(['error' => 'Invalid question type'], 400);
+        }
+
+        if ($selectedOptions === null) {
+            return response()->json(['error' => 'Invalid answer format'], 400);
+        }
 
         // simpan
         $attempt->answers()->updateOrCreate(
             ['question_id' => $request->question_id],
-            ['selected_options' => $selected]
+            ['selected_options' => $selectedOptions]
         );
 
         return response()->noContent();
     }
 
+    /**
+     * Handle multiple choice answers (MCQ, MCMA, TrueFalse)
+     */
+    private function handleMultipleChoiceAnswer(Request $request, $question): array
+    {
+        $request->validate([
+            'selected_options' => 'required|array',
+            'selected_options.*' => 'integer',
+        ]);
+
+        // Validasi option IDs
+        $validOptionIds = $question->options->pluck('id')->toArray();
+        $selectedIds = array_values(array_intersect(
+            $request->selected_options,
+            $validOptionIds
+        ));
+
+        return ExamAnswer::formatMcqAnswer($question->type, $selectedIds);
+    }
+
+    /**
+     * Handle short answer
+     */
+    private function handleShortAnswer(Request $request): array
+    {
+        $request->validate([
+            'short_answer_value' => 'required|string|max:1000',
+        ]);
+
+        return ExamAnswer::formatShortAnswer($request->short_answer_value);
+    }
+
+    /**
+     * Handle compound answer
+     */
+    private function handleCompoundAnswer(Request $request, $question): array
+    {
+        $request->validate([
+            'compound_answers' => 'required|array',
+            'compound_answers.*.sub_id' => 'required|integer',
+            'compound_answers.*.type' => 'required|in:truefalse,short_answer',
+        ]);
+
+        $answers = [];
+
+        foreach ($request->compound_answers as $subAnswer) {
+            $subId = $subAnswer['sub_id'];
+            $subType = $subAnswer['type'];
+
+            // Find sub item
+            $subItem = $question->subItems->firstWhere('id', $subId);
+            if (!$subItem) {
+                continue; // Skip invalid sub items
+            }
+
+            $answerData = [
+                'sub_id' => $subId,
+                'type' => $subType,
+            ];
+
+            if ($subType === 'truefalse') {
+                if (!isset($subAnswer['boolean'])) {
+                    continue;
+                }
+                $answerData['boolean'] = (bool) $subAnswer['boolean'];
+            }
+            elseif ($subType === 'short_answer') {
+                if (!isset($subAnswer['value']) || empty($subAnswer['value'])) {
+                    continue;
+                }
+                $answerData['value'] = $subAnswer['value'];
+                $answerData['normalized'] = Str::lower(trim(preg_replace('/\s+/', ' ', $subAnswer['value'])));
+            }
+
+            $answers[] = $answerData;
+        }
+
+        return ExamAnswer::formatCompoundAnswer($answers);
+    }
+    
+    /**
+     * Build selected_options array based on request data
+     */
+    private function buildSelectedOptions(Request $request): ?array
+    {
+        $answerType = $request->answer_type;
+
+        switch ($answerType) {
+            case 'mcq':
+            case 'mcma':
+            case 'truefalse':
+                $request->validate([
+                    'mcq_answers' => 'required|array',
+                    'mcq_answers.*' => 'integer',
+                ]);
+                return [
+                    'type' => $answerType,
+                    'mcq_answers' => $request->mcq_answers,
+                ];
+
+            case 'short_answer':
+                $request->validate([
+                    'value' => 'required|string|max:1000',
+                ]);
+                return [
+                    'type' => 'short_answer',
+                    'value' => $request->value,
+                    'normalized' => Str::lower(trim(preg_replace('/\s+/', ' ', $request->value))),
+                ];
+
+            case 'compound':
+                $request->validate([
+                    'answers' => 'required|array',
+                ]);
+
+                $answers = [];
+                foreach ($request->answers as $answer) {
+                    if (!isset($answer['sub_id']) || !isset($answer['type'])) {
+                        continue;
+                    }
+
+                    $formattedAnswer = [
+                        'sub_id' => (int) $answer['sub_id'],
+                        'type' => $answer['type'],
+                    ];
+
+                    if ($answer['type'] === 'truefalse' && isset($answer['boolean'])) {
+                        $formattedAnswer['boolean'] = (bool) $answer['boolean'];
+                    }
+                    elseif ($answer['type'] === 'short_answer' && isset($answer['value'])) {
+                        $formattedAnswer['value'] = $answer['value'];
+                        $formattedAnswer['normalized'] = Str::lower(trim(preg_replace('/\s+/', ' ', $answer['value'])));
+                    } else {
+                        continue; // Skip invalid answers
+                    }
+
+                    $answers[] = $formattedAnswer;
+                }
+
+                return [
+                    'type' => 'compound',
+                    'answers' => $answers,
+                ];
+        }
+
+        return null;
+    }
 }
