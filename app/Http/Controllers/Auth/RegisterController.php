@@ -49,6 +49,9 @@ class RegisterController extends Controller
 
         $user->assignRole('siswa');
         $user->sendEmailVerificationNotification();
+        $user->update([
+            'last_verification_sent_at' => now(),
+        ]);
         // auto login user
         auth()->login($user);
 

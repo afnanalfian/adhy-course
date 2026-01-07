@@ -28,13 +28,15 @@ class User extends Authenticatable implements MustVerifyEmail
         'province_id',
         'regency_id',
         'is_active',
-        'email_verified_at'
+        'email_verified_at',
+        'last_verification_sent_at',
     ];
 
     protected $hidden = ['password', 'remember_token'];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'last_verification_sent_at' => 'datetime',
         'is_active' => 'boolean',
     ];
 
