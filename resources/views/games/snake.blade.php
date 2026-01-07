@@ -149,22 +149,6 @@
                             </div>
                         </div>
                     </div>
-
-                    {{-- Instructions --}}
-                    <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        <div class="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
-                            <div class="w-4 h-4 bg-emerald-500 rounded"></div>
-                            <span>Snake Head</span>
-                        </div>
-                        <div class="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
-                            <div class="w-4 h-4 bg-green-400 rounded"></div>
-                            <span>Snake Body</span>
-                        </div>
-                        <div class="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
-                            <div class="w-4 h-4 bg-red-500 rounded"></div>
-                            <span>Food</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

@@ -85,7 +85,7 @@ class OrderController extends Controller
             $order->user,
             "Pembayaran Anda untuk Order #{$order->id} telah diverifikasi. Akses telah diberikan.",
             true,
-            route('orders.show', $order)
+            route('my.orders.show', $order)
         );
 
         toast('success', 'Pembayaran berhasil diverifikasi dan akses diberikan');
