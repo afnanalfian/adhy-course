@@ -159,9 +159,9 @@
         <td></td>
         <td class="right">
             <span class="muted">Hormat kami,</span><br>
-            <img src="{{ public_path('img/signature.png') }}" class="signature" alt="Tanda Tangan"><br>
-            <strong>Muhammad Afnan Alfian</strong><br>
-            <span class="muted">Owner Azwara Learning</span>
+            {{-- <img src="{{ public_path('img/signature.png') }}" class="signature" alt="Tanda Tangan"><br> --}}
+            <strong>Tim Azwara Learning</strong><br>
+            {{-- <span class="muted">Owner Azwara Learning</span> --}}
         </td>
     </tr>
 </table>
