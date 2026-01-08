@@ -118,7 +118,7 @@
         <div class="mt-8 grid grid-cols-2 sm:flex sm:flex-row gap-3">
 
             {{-- WA --}}
-            <a href="https://wa.me/{{ $teacher->user->phone }}" target="_blank"
+            <a href="https://wa.me/{{ $teacher->user->whatsapp_phone }}" target="_blank"
             class="flex items-center justify-center px-3 py-2 rounded-lg
                     bg-green-600 hover:bg-green-700 text-white text-sm w-full text-center">
                 WhatsApp

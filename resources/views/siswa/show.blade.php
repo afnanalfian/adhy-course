@@ -106,7 +106,7 @@
 
                 {{-- WhatsApp --}}
                 <a
-                    href="https://wa.me/{{ $user->phone }}"
+                    href="https://wa.me/{{ $user->whatsapp_phone }}"
                     target="_blank"
                     class="inline-flex items-center justify-center gap-2
                            px-4 py-3 rounded-xl

@@ -39,6 +39,35 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_verification_sent_at' => 'datetime',
         'is_active' => 'boolean',
     ];
+    public function getWhatsappPhoneAttribute(): ?string
+    {
+        if (empty($this->phone)) {
+            return null;
+        }
+
+        $phone = trim($this->phone);
+
+        // Hapus spasi, strip, dll
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        // Jika diawali 0 → ganti 62
+        if (str_starts_with($phone, '0')) {
+            return '62' . substr($phone, 1);
+        }
+
+        // Jika sudah diawali 62
+        if (str_starts_with($phone, '62')) {
+            return $phone;
+        }
+
+        // Jika pakai +62 (harusnya sudah hilang + di regex)
+        if (str_starts_with($phone, '62')) {
+            return $phone;
+        }
+
+        // Fallback (anggap sudah benar)
+        return $phone;
+    }
 
     public function province()
     {
