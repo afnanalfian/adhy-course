@@ -26,7 +26,10 @@ class Exam extends Model
         'owner_id',
         'created_by',
     ];
-
+    public function getRouteKeyName()
+    {
+        return 'exam_code';
+    }
     protected $casts = [
         'exam_date' => 'datetime',
         'test_type' => 'string',
