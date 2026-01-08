@@ -41,7 +41,7 @@
                 <div class="flex-1 space-y-1">
                     <div class="flex items-center gap-3 flex-wrap">
                         <span class="font-medium text-slate-800 dark:text-slate-100">
-                            Order #{{ $order->id }}
+                            {{ $order->order_code }}
                         </span>
 
                         {{-- STATUS BADGE --}}

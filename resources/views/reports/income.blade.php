@@ -206,7 +206,7 @@
                             </td>
                             <td class="py-3 px-4">
                                 <div class="text-sm text-gray-800 dark:text-white font-mono">
-                                    #{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}
+                                    #{{ $order->order_code }}
                                 </div>
                             </td>
                             <td class="py-3 px-4">

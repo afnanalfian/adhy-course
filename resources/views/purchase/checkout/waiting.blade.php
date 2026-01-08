@@ -48,7 +48,7 @@
             <div class="flex justify-between text-slate-600 dark:text-slate-400">
                 <span>Nomor Order</span>
                 <span class="font-medium text-slate-800 dark:text-slate-100">
-                    #{{ $order->id }}
+                    {{ $order->order_code }}
                 </span>
             </div>
         </div>

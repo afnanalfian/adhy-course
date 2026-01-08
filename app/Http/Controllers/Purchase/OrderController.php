@@ -83,7 +83,7 @@ class OrderController extends Controller
 
         notify_user(
             $order->user,
-            "Pembayaran Anda untuk Order #{$order->id} telah diverifikasi. Akses telah diberikan.",
+            "Pembayaran Anda untuk Order #{$order->order_code} telah diverifikasi. Akses telah diberikan.",
             true,
             route('my.orders.show', $order)
         );
@@ -119,7 +119,7 @@ class OrderController extends Controller
 
         notify_user(
             $order->user,
-            "Pembayaran Order #{$order->id} ditolak. Silakan upload ulang bukti pembayaran.",
+            "Pembayaran Order #{$order->order_code} ditolak. Silakan upload ulang bukti pembayaran.",
             true,
             route('checkout.payment', $order)
         );

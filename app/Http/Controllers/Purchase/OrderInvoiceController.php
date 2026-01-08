@@ -42,7 +42,7 @@ class OrderInvoiceController extends Controller
         ])->setPaper('A4');
 
         return $pdf->download(
-            'Invoice-' . $order->id . '.pdf'
+            'Invoice-' . $order->order_code . '.pdf'
         );
     }
 }

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Invoice #{{ $order->id }} - AZWARA LEARNING</title>
+    <title>Invoice #{{ $order->order_code }} - AZWARA LEARNING</title>
 
     <style>
         body {
@@ -71,7 +71,7 @@
             <td style="text-align:left;">
                 <div class="title">INVOICE</div>
                 <div class="subtitle">Pembelian Paket Belajar - AZWARA LEARNING</div>
-                <div class="muted">Order #{{ $order->id }}</div>
+                <div class="muted">Order #{{ $order->order_code }}</div>
             </td>
             <td style="text-align:right; width:100px;">
                 <img src="{{ public_path('img/logo.png') }}" class="logo" alt="AZWARA LEARNING">

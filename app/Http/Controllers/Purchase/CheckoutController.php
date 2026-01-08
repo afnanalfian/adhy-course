@@ -192,7 +192,7 @@ class CheckoutController extends Controller
         foreach ($admins as $admin) {
             notify_user(
                 $admin,
-                "Order #{$order->id} baru masuk dan menunggu konfirmasi pembayaran.",
+                "Order #{$order->order_code} baru masuk dan menunggu konfirmasi pembayaran.",
                 true,
                 route('orders.show', $order)
             );

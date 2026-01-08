@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 
 class Meeting extends Model
 {
@@ -25,7 +26,10 @@ class Meeting extends Model
         'started_at' => 'datetime',
         'is_free' => 'boolean',
     ];
-
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
     public function course()
     {
         return $this->belongsTo(Course::class);
@@ -100,4 +104,27 @@ class Meeting extends Model
         return $this->course && $this->course->is_free;
     }
 
+    // Generate Slug
+    protected static function booted()
+    {
+        static::creating(function (Meeting $meeting) {
+            if (empty($meeting->slug)) {
+                $meeting->slug = self::generateUniqueSlug($meeting->title);
+            }
+        });
+    }
+
+    public static function generateUniqueSlug(string $title): string
+    {
+        $base = Str::slug($title);
+        $slug = $base;
+        $i = 1;
+
+        while (self::where('slug', $slug)->exists()) {
+            $slug = "{$base}-{$i}";
+            $i++;
+        }
+
+        return $slug;
+    }
 }

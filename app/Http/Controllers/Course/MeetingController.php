@@ -80,19 +80,18 @@ class MeetingController extends Controller
             'is_free'      => 'nullable|boolean',
         ]);
 
-        $meeting = Meeting::create([
+        Meeting::create([
             'course_id'    => $course->id,
             'title'        => $request->title,
-            'slug'         => Str::slug($request->title) . '-' . uniqid(),
             'scheduled_at' => Carbon::createFromFormat(
                 'Y-m-d\TH:i',
                 $request->scheduled_at,
                 'Asia/Jakarta'
             ),
-            'zoom_link'    => $request->zoom_link,
-            'status'       => 'upcoming',
-            'is_free'      => $request->boolean('is_free'),
-            'created_by'   => auth()->id(),
+            'zoom_link'  => $request->zoom_link,
+            'status'     => 'upcoming',
+            'is_free'    => $request->boolean('is_free'),
+            'created_by' => auth()->id(),
         ]);
 
         toast('success', 'Meeting berhasil dibuat');

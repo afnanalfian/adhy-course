@@ -223,7 +223,7 @@
                             {{ $methodLabel }}
                         </span>
                     </td>
-                    <td>#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</td>
+                    <td>#{{ $order->order_code }}</td>
                     <td class="currency">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
                     <td>
                         <span class="status-badge">VERIFIED</span>

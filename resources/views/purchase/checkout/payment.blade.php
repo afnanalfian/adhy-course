@@ -22,7 +22,7 @@
         <div class="px-6 py-4 border-b border-slate-200 dark:border-white/10">
             <div class="flex justify-between items-center">
                 <div class="font-medium text-slate-800 dark:text-slate-100">
-                    Order #{{ $order->id }}
+                    Order #{{ $order->order_code }}
                 </div>
                 <div
                     class="text-xs px-2 py-1 rounded

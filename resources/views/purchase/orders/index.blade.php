@@ -63,7 +63,7 @@
                 @forelse($orders as $order)
                     <tr class="hover:bg-azwara-lighter dark:hover:bg-azwara-darker/50">
                         <td class="px-6 py-4 font-semibold dark:text-azwara-lightest">
-                            #{{ $order->id }}
+                            #{{ $order->order_code }}
                         </td>
 
                         <td class="px-6 py-4">
@@ -107,7 +107,7 @@
                                 <form method="POST"
                                     action="{{ route('orders.destroy', $order) }}"
                                     class="inline sweet-confirm"
-                                    data-message="Yakin ingin menghapus order #{{ $order->id }}? Data pembayaran akan ikut terhapus.">
+                                    data-message="Yakin ingin menghapus order #{{ $order->order_code }}? Data pembayaran akan ikut terhapus.">
                                     @csrf
                                     @method('DELETE')
 
@@ -147,7 +147,7 @@
 
                 <div class="flex items-center justify-between">
                     <div class="font-semibold text-gray-900 dark:text-azwara-lightest">
-                        #{{ $order->id }}
+                        {{ $order->order_code }}
                     </div>
 
                     <span class="px-3 py-1 rounded-lg text-xs font-semibold {{ $statusColor }}">
@@ -187,7 +187,7 @@
                     <form method="POST"
                         action="{{ route('orders.destroy', $order) }}"
                         class="sweet-confirm"
-                        data-message="Yakin ingin menghapus order #{{ $order->id }}? Data pembayaran akan ikut terhapus.">
+                        data-message="Yakin ingin menghapus order #{{ $order->order_code }}? Data pembayaran akan ikut terhapus.">
                         @csrf
                         @method('DELETE')
 

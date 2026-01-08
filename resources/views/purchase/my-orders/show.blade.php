@@ -10,7 +10,7 @@
                 Detail Pesanan
             </h1>
             <p class="text-sm text-slate-600 dark:text-slate-400">
-                Order #{{ $order->id }}
+                Order #{{ $order->order_code }}
             </p>
         </div>
 
