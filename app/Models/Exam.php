@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Exam extends Model
 {
     use SoftDeletes, HasFactory;
 
     protected $fillable = [
+        'exam_code',
         'type',
         'title',
         'test_type',
@@ -39,6 +41,33 @@ class Exam extends Model
     public function allowedQuestionTypes(): array
     {
         return self::QUESTION_TYPE_RULES[$this->test_type] ?? [];
+    }
+
+    //GENERATE EXAM CODE
+    protected static function booted()
+    {
+        static::creating(function (Exam $exam) {
+            if (empty($exam->exam_code)) {
+                $exam->exam_code = self::generateExamCode($exam);
+            }
+        });
+    }
+
+    public static function generateExamCode(Exam $exam): string
+    {
+        $prefix = match ($exam->type) {
+            'post_test' => 'POST',
+            'quiz'      => 'QUIZ',
+            'tryout'    => 'TRY',
+            default     => 'EXM',
+        };
+
+        return sprintf(
+            'EXM-%s-%s-%s',
+            $prefix,
+            now()->format('Ymd'),
+            strtoupper(Str::random(4))
+        );
     }
     /* ================= RELATIONS ================= */
 
