@@ -200,10 +200,6 @@
 
                         {{-- BOBOT --}}
                         <div class="text-right min-w-[80px]">
-                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                Bobot
-                            </div>
-
                             <div class="text-lg font-bold
                                 {{ $isBest
                                     ? 'text-green-700 dark:text-green-400'
@@ -211,12 +207,6 @@
                                 }}">
                                 {{ $opt->weight }}
                             </div>
-
-                            @if ($isBest)
-                                <div class="text-xs text-green-600 dark:text-green-400 font-semibold">
-                                    Tertinggi
-                                </div>
-                            @endif
                         </div>
 
                     </div>
