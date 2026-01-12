@@ -235,7 +235,7 @@ class QuestionController extends Controller
                     'option_text' => $opt['text'],
                     'weight'      => (int) ($opt['weight'] ?? 0),
                     'order'       => $i + 1,
-                    'is_correct'  => null,
+                    'is_correct'  => false,
                     'image'       => null,
                 ]
             );
