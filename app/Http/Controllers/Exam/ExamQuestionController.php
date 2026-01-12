@@ -12,38 +12,51 @@ use App\Models\ExamQuestion;
 
 class ExamQuestionController extends Controller
 {
-    public function byMaterial(Exam $exam, $materialId, Request $request)
-    {
-        $exam->load('questions');
-        $material = QuestionMaterial::withTrashed()->findOrFail($materialId);
-        // Pastikan materi milik kategori yang valid
-        if (
-            $request->category_id &&
-            $material->category_id != $request->category_id
-        ) {
-            abort(403, 'Materi tidak sesuai kategori');
-        }
+    public function byMaterial(
+        Exam $exam,
+        $materialId
+    ) {
+        $material = QuestionMaterial::withTrashed()
+            ->findOrFail($materialId);
 
-        $query = Question::where('material_id', $material->id);
-        $allowedTypes = $exam->allowedQuestionTypes();
-        $query->whereIn('test_type', $allowedTypes);
+        return Question::query()
+            ->where('material_id', $material->id)
 
-        // Filter type (whitelist)
-        if ($request->filled('type')) {
-            abort_unless(
-                in_array($request->type, ['mcq', 'mcma', 'truefalse','short_answer', 'compound']),
-                403
-            );
+            // FILTER OTOMATIS BERDASARKAN EXAM
+            ->whereIn(
+                'test_type',
+                $exam->allowedQuestionTypes()
+            )
 
-            $query->where('type', $request->type);
-        }
+            // CEGAH DUPLIKASI SOAL
+            ->whereNotIn(
+                'id',
+                $exam->questions()->pluck('question_id')
+            )
 
-        return $query
-            ->whereNotIn('id', $exam->questions()->pluck('question_id'))
-            ->with(['options', 'subItems.answers'])
+            ->with([
+                'options',
+                'subItems.answers'
+            ])
             ->withCount('examQuestions')
             ->paginate(10);
     }
+    public function idsByMaterial(Exam $exam, $materialId)
+    {
+        $material = QuestionMaterial::withTrashed()
+            ->findOrFail($materialId);
+
+        return Question::query()
+            ->where('material_id', $material->id)
+            ->whereIn('test_type', $exam->allowedQuestionTypes())
+            ->whereNotIn(
+                'id',
+                $exam->questions()->pluck('question_id')
+            )
+            ->pluck('id')
+            ->values(); // 🔑 WAJIB
+    }
+
     public function move(
         Request $request,
         Exam $exam,

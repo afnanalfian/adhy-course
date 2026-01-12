@@ -86,4 +86,8 @@ class QuestionCategoryController extends Controller
 
         return back();
     }
+    public function ajaxCategories()
+    {
+        return QuestionCategory::orderBy('name')->get(['id', 'name']);
+    }
 }

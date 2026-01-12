@@ -1,10 +1,12 @@
 {{-- ================= SOAL TERPILIH ================= --}}
-<div class="bg-azwara-lightest dark:bg-secondary/80
-            rounded-2xl p-6
+<div class="rounded-2xl p-6
             border border-azwara-light/30 dark:border-white/10 space-y-4">
 
     {{-- HEADER --}}
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-4
+                md:flex-row md:items-center md:justify-between">
+
+        {{-- LEFT: TITLE --}}
         <div>
             <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
                 Soal Ujian
@@ -14,13 +16,47 @@
             </p>
         </div>
 
-        @if($exam->status === 'inactive')
-            <button
-                @click="openAddQuestion = true"
-                class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90">
-                Tambah Soal
-            </button>
-        @endif
+        {{-- RIGHT: ACTIONS --}}
+        <div class="flex flex-wrap items-center gap-3">
+
+            {{-- PER PAGE SELECT --}}
+            <form method="GET" class="flex items-center gap-2 text-sm">
+                <label class="text-gray-600 dark:text-gray-300">
+                    Tampilkan
+                </label>
+
+                <select
+                    name="per_page"
+                    onchange="this.form.submit()"
+                    class="px-3 py-1.5 rounded-lg border
+                        bg-white dark:bg-slate-800
+                        text-gray-800 dark:text-gray-100
+                        border-gray-300 dark:border-white/10 w-20">
+
+                    @foreach ([10, 20, 30, 50, 100] as $size)
+                        <option value="{{ $size }}"
+                            @selected(request('per_page', 10) == $size)>
+                            {{ $size }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <span class="text-gray-600 dark:text-gray-300">
+                    soal / halaman
+                </span>
+            </form>
+
+            {{-- ADD QUESTION --}}
+            @if($exam->status === 'inactive')
+                <button
+                    @click="openAddQuestion = true"
+                    class="px-4 py-2 rounded-lg bg-primary text-white
+                        hover:bg-primary/90 whitespace-nowrap">
+                    Tambah Soal
+                </button>
+            @endif
+
+        </div>
     </div>
 
     @if($exam->questions->isEmpty())

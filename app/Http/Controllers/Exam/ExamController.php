@@ -129,24 +129,32 @@ class ExamController extends Controller
     }
 
     /* ================= EDIT ================= */
-    public function edit(Exam $exam)
+    public function edit(Exam $exam, Request $request)
     {
+        $perPage = in_array(
+            (int) $request->get('per_page'),
+            [10, 20, 30, 50, 100]
+        )
+            ? (int) $request->get('per_page')
+            : 10;
+
         $questions = $exam->questions()
             ->with([
                 'question.options',
                 'question.subItems.answers'
             ])
             ->orderBy('order', 'asc')
-            ->paginate(10);
+            ->paginate($perPage)
+            ->withQueryString(); // 🔑 penting
+
         $usedQuestionIds = $exam->questions()
             ->pluck('question_id')
             ->toArray();
+
         $allowedQuestionTypes = $exam->allowedQuestionTypes();
 
         $categories = QuestionCategory::with([
-                'materials' => function ($q) {
-                    $q->orderBy('name');
-                }
+                'materials' => fn ($q) => $q->orderBy('name')
             ])
             ->orderBy('name')
             ->get();

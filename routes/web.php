@@ -282,52 +282,121 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | EXAMS ROUTE
+    | EXAMS (PUBLIC)
     |--------------------------------------------------------------------------
     */
-    Route::get('/tryouts', [ExamController::class, 'indexTryout'])->name('tryouts.index');
-    Route::get('/quizzes', [ExamController::class, 'indexQuiz'])->name('quizzes.index');
-    Route::get('/exams/{exam}', [ExamController::class, 'show'])->name('exams.show');
+    Route::get('/tryouts', [ExamController::class, 'indexTryout'])
+        ->name('tryouts.index');
+
+    Route::get('/quizzes', [ExamController::class, 'indexQuiz'])
+        ->name('quizzes.index');
+
+    Route::get('/exams/{exam}', [ExamController::class, 'show'])
+        ->name('exams.show');
+    /*
+    |--------------------------------------------------------------------------
+    | EXAMS (ADMIN & TENTOR)
+    |--------------------------------------------------------------------------
+    */
     Route::middleware('role:admin|tentor')->group(function () {
-        Route::resource('exams', ExamController::class)->except(['show']);
-        Route::post('exams/{exam}/activate', [ExamController::class, 'activate'])->name('exams.activate');
-        Route::post('exams/{exam}/close', [ExamController::class, 'close'])->name('exams.close');
-        // RESULT ADMIN
-        Route::get('exams/{exam}/results',[ExamResultController::class, 'admin'])->name('exams.result.admin');
-        // AJAX Question Picker
-        Route::prefix('ajax/{exam}/questions')->group(function () {
-            Route::get('by-material/{material}', [ExamQuestionController::class, 'byMaterial'])->name('ajax.exams.questions.byMaterial');
-            Route::post('attach', [ExamQuestionController::class, 'attach'])->name('ajax.exams.questions.attach');
-            Route::post('detach', [ExamQuestionController::class, 'detach'])->name('ajax.exams.questions.detach');
+
+        Route::resource('exams', ExamController::class)
+            ->except(['show']);
+
+        Route::prefix('exams/{exam}')->group(function () {
+
+            Route::post('activate', [ExamController::class, 'activate'])
+                ->name('exams.activate');
+
+            Route::post('close', [ExamController::class, 'close'])
+                ->name('exams.close');
+
+            Route::post('prerequisites', [ExamController::class, 'updatePrerequisites'])
+                ->name('exams.prerequisites.update');
+
+            // RESULT (ADMIN)
+            Route::get('results', [ExamResultController::class, 'admin'])
+                ->name('exams.result.admin');
+
+            // QUESTION ANALYSIS
+            Route::get('questions/{question}/analysis', [ExamResultController::class, 'questionAnalysis'])
+                ->name('exams.question.analysis');
+
+            // MOVE QUESTION ORDER
+            Route::post('questions/{examQuestion}/move', [ExamQuestionController::class, 'move'])
+                ->name('exams.questions.move');
         });
-        Route::post('/exams/{exam}/questions/{examQuestion}/move',[ExamQuestionController::class, 'move'])->name('exams.questions.move');
-        Route::post('/exams/{exam}/prerequisites', [ExamController::class, 'updatePrerequisites'])->name('exams.prerequisites.update');
-        Route::get('/{exam}/questions/{questionId}/analysis', [ExamResultController::class, 'questionAnalysis'])->name('exams.question.analysis');
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | AJAX – EXAM QUESTIONS
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('role:admin|tentor')
+        ->prefix('ajax/exams/{exam}/questions')
+        ->group(function () {
+
+            Route::get('by-material/{materialId}',[ExamQuestionController::class, 'byMaterial'])
+                ->name('ajax.exams.questions.byMaterial');
+            Route::get(
+                'by-material/{materialId}/ids',
+                [ExamQuestionController::class, 'idsByMaterial']
+            )->name('ajax.exams.questions.byMaterial.ids');
+            Route::post('attach', [ExamQuestionController::class, 'attach'])
+                ->name('ajax.exams.questions.attach');
+
+            Route::post('detach', [ExamQuestionController::class, 'detach'])
+                ->name('ajax.exams.questions.detach');
+        });
+
+    /*
+    |--------------------------------------------------------------------------
+    | EXAMS – STUDENT
+    |--------------------------------------------------------------------------
+    */
     Route::middleware('role:siswa')->group(function () {
-        // Attempt
-        Route::post('exams/{exam}/start', [ExamAttemptController::class, 'start'])->name('exams.start');
-        Route::get('exams/{exam}/attempt', [ExamAttemptController::class, 'attempt'])->name('exams.attempt');
-        Route::post('exams/{exam}/submit', [ExamAttemptController::class, 'submit'])->name('exams.submit');
-        Route::post('exams/{exam}/answer',[ExamAttemptController::class, 'saveAnswer'])->name('exams.answer.save');
-        // RESULT SISWA
-        Route::get('exams/{exam}/result',[ExamResultController::class, 'student'])->name('exams.result.student');
+
+        Route::prefix('exams/{exam}')->group(function () {
+
+            Route::post('start', [ExamAttemptController::class, 'start'])
+                ->name('exams.start');
+
+            Route::get('attempt', [ExamAttemptController::class, 'attempt'])
+                ->name('exams.attempt');
+
+            Route::post('submit', [ExamAttemptController::class, 'submit'])
+                ->name('exams.submit');
+
+            Route::post('answer', [ExamAttemptController::class, 'saveAnswer'])
+                ->name('exams.answer.save');
+
+            Route::get('result', [ExamResultController::class, 'student'])
+                ->name('exams.result.student');
+        });
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | BANK SOAL (AJAX)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('role:admin|tentor')
+        ->prefix('ajax')
+        ->group(function () {
+
+            Route::get('categories', [QuestionCategoryController::class, 'ajaxCategories'])
+                ->name('ajax.categories.index');
+
+            Route::get('categories/{category}/materials', [QuestionMaterialController::class, 'ajaxByCategory'])
+                ->name('ajax.categories.materials');
+        });
 
     /*
     |--------------------------------------------------------------------------
     | BANK SOAL (QUESTIONS) ROUTES
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:admin|tentor'])
-    ->prefix('ajax')
-    ->group(function () {
-
-        Route::get(
-            'categories/{category}/materials',
-            [QuestionMaterialController::class, 'ajaxByCategory']
-        )->name('ajax.categories.materials');
-    });
     Route::middleware(['role:admin|tentor'])->prefix('bank-soal')->name('bank.')->group(function () {
 
         // KATEGORI SOAL
