@@ -77,6 +77,8 @@
                         class="w-full rounded-lg border p-2 mb-4">
                     <option value="">-- Pilih Tipe Tes --</option>
                     <option value="skd">SKD</option>
+                    <option value="tpa">TPA</option>
+                    <option value="tbi">TBI</option>
                     <option value="mtk_stis">Matematika STIS</option>
                     <option value="mtk_tka">Matematika TKA</option>
                     <option value="general">General</option>

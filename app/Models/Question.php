@@ -80,6 +80,14 @@ class Question extends Model
         return $this->type === 'truefalse';
     }
     // Helper boolean
+    public function isTBI(): bool
+    {
+        return $this->test_type === 'tbi';
+    }
+    public function isTPA(): bool
+    {
+        return $this->test_type === 'tpa';
+    }
     public function isGeneral(): bool
     {
         return $this->test_type === 'general';

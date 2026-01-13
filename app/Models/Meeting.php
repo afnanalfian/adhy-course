@@ -42,10 +42,21 @@ class Meeting extends Model
     {
         return $this->hasOne(MeetingMaterial::class);
     }
-    public function exam()
+    public function exams()
+    {
+        return $this->morphMany(Exam::class, 'owner');
+    }
+
+    public function postTest()
     {
         return $this->morphOne(Exam::class, 'owner')
             ->where('type', 'post_test');
+    }
+
+    public function blindTest()
+    {
+        return $this->morphOne(Exam::class, 'owner')
+            ->where('type', 'blind_test');
     }
     public function attendances()
     {

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Gate;
 
 use App\Observers\OrderObserver;
 use App\Observers\ProductAutoCreateObserver;
+use App\Observers\ExamObserver;
 use App\Models\Order;
 use Carbon\Carbon;
 
@@ -48,6 +49,7 @@ class AppServiceProvider extends ServiceProvider
         Meeting::observe(ProductAutoCreateObserver::class);
         Course::observe(ProductAutoCreateObserver::class);
         Exam::observe(ProductAutoCreateObserver::class);
+        Exam::observe(ExamObserver::class);
 
         // ===============================
         // POLICY REGISTRATION (Laravel 11)

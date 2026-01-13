@@ -22,14 +22,15 @@ class ExamPolicy
             // Quiz harian → global
             'quiz'   => $user->hasQuizAccess(),
 
-            // Post-test → ikut akses meeting
-            'post_test' => $this->canAccessPostTest($user, $exam),
+            // Blind-Post-test → ikut akses meeting
+            'blind_test',
+            'post_test' => $this->canAccessMeetingExam($user, $exam),
 
             default => false,
         };
     }
 
-    protected function canAccessPostTest(User $user, Exam $exam): bool
+    protected function canAccessMeetingExam(User $user, Exam $exam): bool
     {
         if ($exam->type !== 'post_test') {
             return false;

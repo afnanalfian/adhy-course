@@ -56,6 +56,8 @@
                 <option value="tiu" {{ request('test_type') === 'tiu' ? 'selected' : '' }}>TIU</option>
                 <option value="twk" {{ request('test_type') === 'twk' ? 'selected' : '' }}>TWK</option>
                 <option value="tkp" {{ request('test_type') === 'tkp' ? 'selected' : '' }}>TKP</option>
+                <option value="tpa" {{ request('test_type') === 'tpa' ? 'selected' : '' }}>TPA</option>
+                <option value="tbi" {{ request('test_type') === 'tbi' ? 'selected' : '' }}>TBI</option>
                 <option value="mtk_stis" {{ request('test_type') === 'mtk_stis' ? 'selected' : '' }}>Matematika STIS</option>
                 <option value="mtk_tka" {{ request('test_type') === 'mtk_tka' ? 'selected' : '' }}>Matematika TKA</option>
             </select>

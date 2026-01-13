@@ -15,6 +15,7 @@ class ExamAttempt extends Model
         'started_at',
         'submitted_at',
         'score',
+        'is_passed',
         'correct_count',
         'wrong_count',
         'is_submitted',
@@ -24,6 +25,7 @@ class ExamAttempt extends Model
         'started_at' => 'datetime',
         'submitted_at' => 'datetime',
         'is_submitted' => 'boolean',
+        'is_passed' => 'boolean',
     ];
 
     /* ================= RELATIONS ================= */

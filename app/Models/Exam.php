@@ -22,6 +22,7 @@ class Exam extends Model
         'exam_date',
         'duration_minutes',
         'status',
+        'passing_rules',
         'owner_type',
         'owner_id',
         'created_by',
@@ -33,12 +34,15 @@ class Exam extends Model
     protected $casts = [
         'exam_date' => 'datetime',
         'test_type' => 'string',
+        'passing_rules' => 'array',
     ];
     public const QUESTION_TYPE_RULES = [
         'skd' => ['tiu', 'twk', 'tkp'],
         'mtk_stis' => ['mtk_stis'],
+        'tpa' => ['tpa', 'tiu'],
+        'tbi' => ['tbi'],
         'mtk_tka' => ['mtk_tka'],
-        'general' => ['tiu', 'twk', 'mtk_stis', 'mtk_tka','general'], // EXCLUDE tkp
+        'general' => ['tiu', 'twk', 'mtk_stis', 'mtk_tka','general','tpa','tbi'], // tkp
     ];
 
     public function allowedQuestionTypes(): array
@@ -60,6 +64,7 @@ class Exam extends Model
     {
         $prefix = match ($exam->type) {
             'post_test' => 'POST',
+            'blind_test' => 'BLIND',
             'quiz'      => 'QUIZ',
             'tryout'    => 'TRY',
             default     => 'EXM',
@@ -138,7 +143,10 @@ class Exam extends Model
     }
 
     /* ================= METHODS ================= */
-
+    public function isBlindTest(): bool
+    {
+        return $this->type === 'blind_test';
+    }
     public function isPostTest(): bool
     {
         return $this->type === 'post_test';
@@ -172,6 +180,14 @@ class Exam extends Model
     public function isMtkTka(): bool
     {
         return $this->test_type === 'mtk_tka';
+    }
+    public function isTBI(): bool
+    {
+        return $this->test_type === 'tbi';
+    }
+    public function isTPA(): bool
+    {
+        return $this->test_type === 'tpa';
     }
     public function isGeneral(): bool
     {
@@ -209,9 +225,9 @@ class Exam extends Model
 
     public function backRoute(): string
     {
-        // ================= POST TEST =================
+        // ================= BLIND & POST TEST =================
         if (
-            $this->type === 'post_test' &&
+            in_array($this->type, ['post_test', 'blind_test']) &&
             $this->owner instanceof Meeting
         ) {
             return route('meeting.show', $this->owner);

@@ -215,22 +215,23 @@ class MeetingController extends Controller
 
     /**
      * ===============================
-     * POST TEST (EXAM) CREATOR
+     * POST TEST and BLIND TEST (EXAM) CREATOR
      * ===============================
      */
-    public function storePostTest(Request $request, Meeting $meeting)
+    public function storeMeetingExam(Request $request, Meeting $meeting)
     {
-        if ($meeting->exam) {
-            toast('error', 'Post Test sudah ada');
+        $data = $request->validate([
+            'type' => 'required|in:post_test,blind_test',
+            'test_type' => 'required|in:skd,mtk_stis,mtk_tka,tpa,tbi,general',
+        ]);
+
+        if ($meeting->exams()->where('type', $data['type'])->exists()) {
+            toast('error', ucfirst(str_replace('_',' ', $data['type'])) . ' sudah ada');
             return back();
         }
 
-        $data = $request->validate([
-            'test_type' => 'required|in:skd,mtk_stis,mtk_tka,general',
-        ]);
-
         $exam = Exam::create([
-            'type'       => 'post_test',
+            'type'       => $data['type'],
             'test_type'  => $data['test_type'],
             'status'     => 'inactive',
             'owner_type' => Meeting::class,
@@ -238,7 +239,8 @@ class MeetingController extends Controller
             'created_by' => auth()->id(),
         ]);
 
-        toast('success', 'Post Test berhasil dibuat');
+        toast('success', 'Exam berhasil dibuat');
         return redirect()->route('exams.edit', $exam);
     }
+
 }

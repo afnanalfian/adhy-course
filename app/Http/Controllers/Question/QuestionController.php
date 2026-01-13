@@ -142,7 +142,7 @@ class QuestionController extends Controller
     private function validateRequest(Request $request): void
     {
         $request->validate([
-            'test_type'     => 'required|in:general,tiu,twk,tkp,mtk_stis,mtk_tka',
+            'test_type'     => 'required|in:general,tiu,twk,tkp,mtk_stis,mtk_tka,tpa,tbi',
             'type'          => 'required',
             'question_text'  => 'required',
             'explanation'    => 'nullable',
@@ -161,6 +161,8 @@ class QuestionController extends Controller
             'twk'       => ['mcq'],
             'mtk_stis'  => ['mcq'],
             'tkp'       => ['mcq'],
+            'tpa'       => ['mcq'],
+            'tbi'       => ['mcq'],
             'mtk_tka'   => ['mcq', 'mcma', 'truefalse', 'compound'],
         ];
 

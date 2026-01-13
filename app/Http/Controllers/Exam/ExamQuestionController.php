@@ -54,7 +54,7 @@ class ExamQuestionController extends Controller
                 $exam->questions()->pluck('question_id')
             )
             ->pluck('id')
-            ->values(); // 🔑 WAJIB
+            ->values(); // WAJIB
     }
 
     public function move(

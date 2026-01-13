@@ -41,6 +41,8 @@
             <option value="twk" {{ $question->test_type === 'twk' ? 'selected' : '' }}>TWK</option>
             <option value="mtk_stis" {{ $question->test_type === 'mtk_stis' ? 'selected' : '' }}>MTK STIS</option>
             <option value="tkp" {{ $question->test_type === 'tkp' ? 'selected' : '' }}>TKP</option>
+            <option value="tpa" {{ $question->test_type === 'tpa' ? 'selected' : '' }}>TPA</option>
+            <option value="tbi" {{ $question->test_type === 'tbi' ? 'selected' : '' }}>TBI</option>
             <option value="mtk_tka" {{ $question->test_type === 'mtk_tka' ? 'selected' : '' }}>MTK TKA</option>
         </select>
 
