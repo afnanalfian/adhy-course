@@ -32,8 +32,7 @@ use App\Http\Controllers\Exam\{
     ExamController,
     ExamQuestionController,
     ExamAttemptController,
-    ExamResultController,
-    LeaderboardController
+    ExamResultController
 };
 
 use App\Http\Controllers\Question\{
@@ -217,7 +216,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/course/{course}/meetings',[MeetingController::class, 'store'])->name('meeting.store');
         Route::get('/meetings/{meeting}/edit',[MeetingController::class, 'edit'])->name('meeting.edit');
         Route::put('/meetings/{meeting}', [MeetingController::class, 'update'])->name('meeting.update');
-        Route::post('meetings/{meeting}/posttest',[MeetingController::class, 'storePostTest'])->name('meetings.posttest.store');
+        Route::post('meetings/{meeting}/meetingExam',[MeetingController::class, 'storeMeetingExam'])->name('meetings.exam.store');
 
         // MEETING STATE
         Route::post('/meetings/{meeting}/start',[MeetingController::class, 'start'])->name('meeting.start');
@@ -314,13 +313,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('prerequisites', [ExamController::class, 'updatePrerequisites'])
                 ->name('exams.prerequisites.update');
 
-            // RESULT (ADMIN)
-            Route::get('results', [ExamResultController::class, 'admin'])
-                ->name('exams.result.admin');
+            Route::get('/results',[ExamResultController::class, 'adminResult'])
+                ->name('exams.results');
 
-            // QUESTION ANALYSIS
-            Route::get('questions/{question}/analysis', [ExamResultController::class, 'questionAnalysis'])
-                ->name('exams.question.analysis');
+            Route::get('questions/{examQuestion}/analysis',[ExamResultController::class, 'adminQuestionAnalysis'])
+                ->name('exams.questions.analysis');
 
             // MOVE QUESTION ORDER
             Route::post('questions/{examQuestion}/move', [ExamQuestionController::class, 'move'])
@@ -371,8 +368,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('answer', [ExamAttemptController::class, 'saveAnswer'])
                 ->name('exams.answer.save');
 
-            Route::get('result', [ExamResultController::class, 'student'])
+            Route::get('/result',[ExamResultController::class, 'studentResult'])
                 ->name('exams.result.student');
+
+            Route::get('/ranking',[ExamResultController::class, 'studentRanking'])
+                ->name('exams.ranking.student');
         });
     });
 
@@ -431,15 +431,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/questions/{question}',[QuestionController::class, 'destroy'])->name('question.delete');
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | LEADERBOARD ROUTES
-    |--------------------------------------------------------------------------
-    */
-        Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
-        Route::get('/leaderboard/detail', [LeaderboardController::class, 'detail'])->name('leaderboard.detail');
-        Route::get('/leaderboard/load-exams', [LeaderboardController::class, 'loadExams'])->name('leaderboard.load-exams');
-        Route::get('/leaderboard/load-ranking', [LeaderboardController::class, 'loadRanking'])->name('leaderboard.load-ranking');
     /*
     |--------------------------------------------------------------------------
     | PURCHASE ROUTES

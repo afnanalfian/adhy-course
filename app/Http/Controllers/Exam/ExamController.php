@@ -114,11 +114,6 @@ class ExamController extends Controller
             'test_type' => 'required|in:skd,tpa,tbi,mtk_stis,mtk_tka,general',
             'title' => 'required|string|max:255',
             'exam_date' => 'required|date',
-            'passing_rules' => 'nullable|array',
-            'passing_rules.tiu' => 'nullable|integer|min:0',
-            'passing_rules.twk' => 'nullable|integer|min:0',
-            'passing_rules.tkp' => 'nullable|integer|min:0',
-            'passing_rules.mtk_stis' => 'nullable|integer|min:0',
         ]);
 
         $exam = Exam::create([

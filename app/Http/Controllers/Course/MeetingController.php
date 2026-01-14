@@ -31,9 +31,16 @@ class MeetingController extends Controller
         $meeting->load([
             'material',
             'video',
-            'exam.questions',
-            'exam.attempts',
             'creator',
+
+            // exams
+            'blindTest.questions.question.options',
+            'blindTest.attempts',
+
+            'postTest.questions.question.options',
+            'postTest.attempts',
+
+            // attendance
             'attendances' => function ($q) {
                 $q->whereHas('user.roles', function ($r) {
                     $r->where('name', 'siswa');
@@ -41,23 +48,36 @@ class MeetingController extends Controller
             },
         ]);
 
-        $attempt = null;
+        $blindAttempt = null;
+        $postAttempt  = null;
 
         // ===============================
-        // HITUNG ATTEMPT (KHUSUS SISWA)
+        // ATTEMPT KHUSUS SISWA
         // ===============================
-        if (
-            auth()->check() &&
-            auth()->user()->hasRole('siswa') &&
-            $meeting->exam
-        ) {
-            $attempt = $meeting->exam
-                ->attempts()
-                ->where('user_id', auth()->id())
-                ->first();
+        if (auth()->check() && auth()->user()->hasRole('siswa')) {
+
+            if ($meeting->blindTest) {
+                $blindAttempt = $meeting->blindTest
+                    ->attempts()
+                    ->where('user_id', auth()->id())
+                    ->first();
+            }
+
+            if ($meeting->postTest) {
+                $postAttempt = $meeting->postTest
+                    ->attempts()
+                    ->where('user_id', auth()->id())
+                    ->first();
+            }
         }
 
-        return view('meetings.show', compact('meeting', 'attempt'));
+        return view('meetings.show', [
+            'meeting'       => $meeting,
+            'blindTest'     => $meeting->blindTest,
+            'postTest'      => $meeting->postTest,
+            'blindAttempt'  => $blindAttempt,
+            'postAttempt'   => $postAttempt,
+        ]);
     }
 
     /**

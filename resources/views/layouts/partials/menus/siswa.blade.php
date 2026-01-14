@@ -49,7 +49,6 @@
     $evaluasiActive = request()->routeIs(
         'tryouts.*',
         'quizzes.*',
-        'leaderboard.*'
     );
 @endphp
 
@@ -97,12 +96,6 @@
            class="menu-subitem {{ request()->routeIs('quizzes.*') ? 'active' : '' }}">
             <span class="w-1 h-1 rounded-full bg-current"></span>
             Daily Quiz
-        </a>
-
-        <a href="{{ route('leaderboard.detail') }}"
-           class="menu-subitem {{ request()->routeIs('leaderboard.*') ? 'active' : '' }}">
-            <span class="w-1 h-1 rounded-full bg-current"></span>
-            Rangking
         </a>
     </div>
 </div>

@@ -57,59 +57,115 @@
 
     @include('meetings.partials.material')
     @include('meetings.partials.video')
-    @include('meetings.partials.posttest')
+    @include('meetings.partials.meetingExam')
 
-    {{-- Modal Post Test --}}
-    <div id="postTestModal"
-        class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
+    {{-- ================================================= --}}
+    {{-- MODAL : CREATE BLIND / POST TEST --}}
+    {{-- ================================================= --}}
+    <div id="meetingExamModal"
+        class="fixed inset-0 z-50 hidden items-center justify-center
+                bg-black/40 backdrop-blur-sm px-4">
 
-        <div class="bg-white dark:bg-azwara-darker rounded-xl p-6 w-full max-w-sm">
-            <h3 class="font-bold text-lg mb-4">
-                Pilih Tipe Post Test
+        <div class="w-full max-w-sm rounded-2xl
+                    bg-white dark:bg-azwara-darker
+                    p-6 shadow-xl">
+
+            <h3 class="text-lg font-bold mb-4
+                    text-gray-900 dark:text-white">
+                Buat Evaluasi
             </h3>
 
             <form method="POST"
-                action="{{ route('meetings.posttest.store', $meeting) }}">
+                action="{{ route('meetings.exam.store', $meeting) }}"
+                class="space-y-4">
                 @csrf
 
-                <select name="test_type"
-                        required
-                        class="w-full rounded-lg border p-2 mb-4">
-                    <option value="">-- Pilih Tipe Tes --</option>
-                    <option value="skd">SKD</option>
-                    <option value="tpa">TPA</option>
-                    <option value="tbi">TBI</option>
-                    <option value="mtk_stis">Matematika STIS</option>
-                    <option value="mtk_tka">Matematika TKA</option>
-                    <option value="general">General</option>
-                </select>
+                {{-- TYPE --}}
+                <div>
+                    <label class="text-sm font-medium
+                                text-gray-700 dark:text-gray-300">
+                        Jenis Evaluasi
+                    </label>
+                    <select name="type"
+                            required
+                            class="mt-1 w-full rounded-xl
+                                border-gray-300 dark:border-white/10
+                                bg-white dark:bg-secondary
+                                text-gray-900 dark:text-white
+                                focus:ring-primary focus:border-primary">
+                        <option value="">-- Pilih --</option>
+                        <option value="blind_test">Blind Test</option>
+                        <option value="post_test">Post Test</option>
+                    </select>
+                </div>
 
-                <div class="flex justify-end gap-2">
+                {{-- TEST TYPE --}}
+                <div>
+                    <label class="text-sm font-medium
+                                text-gray-700 dark:text-gray-300">
+                        Tipe Tes
+                    </label>
+                    <select name="test_type"
+                            required
+                            class="mt-1 w-full rounded-xl
+                                border-gray-300 dark:border-white/10
+                                bg-white dark:bg-secondary
+                                text-gray-900 dark:text-white
+                                focus:ring-primary focus:border-primary">
+                        <option value="">-- Pilih Tipe Tes --</option>
+                        <option value="skd">SKD</option>
+                        <option value="tpa">TPA</option>
+                        <option value="tbi">TBI</option>
+                        <option value="mtk_stis">Matematika STIS</option>
+                        <option value="mtk_tka">Matematika TKA</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+
+                {{-- ACTION --}}
+                <div class="flex justify-end gap-3 pt-4">
                     <button type="button"
-                            onclick="closePostTestModal()"
-                            class="px-4 py-2 rounded-lg bg-gray-200">
+                            onclick="closeMeetingExamModal()"
+                            class="px-4 py-2 rounded-xl
+                                bg-gray-200 dark:bg-gray-700
+                                text-gray-800 dark:text-gray-200
+                                hover:opacity-90">
                         Batal
                     </button>
+
                     <button type="submit"
-                            class="px-4 py-2 rounded-lg bg-primary text-white">
+                            class="px-5 py-2 rounded-xl
+                                bg-primary text-white
+                                font-semibold hover:bg-primary/90">
                         Buat
                     </button>
                 </div>
             </form>
         </div>
     </div>
-    <script>
-    function openPostTestModal() {
-        document.getElementById('postTestModal')
-            .classList.remove('hidden');
-        document.getElementById('postTestModal')
-            .classList.add('flex');
-    }
 
-    function closePostTestModal() {
-        document.getElementById('postTestModal')
-            .classList.add('hidden');
-    }
+    <script>
+        function openBlindTestModal() {
+            openMeetingExamModal('blind_test');
+        }
+
+        function openPostTestModal() {
+            openMeetingExamModal('post_test');
+        }
+
+        function openMeetingExamModal(type) {
+            const modal = document.getElementById('meetingExamModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            modal.querySelector('select[name="type"]').value = type;
+        }
+
+        function closeMeetingExamModal() {
+            const modal = document.getElementById('meetingExamModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     </script>
 
 </div>

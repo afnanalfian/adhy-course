@@ -27,60 +27,108 @@ class ExamScoringService
         return match ($exam->test_type) {
             'skd'       => $this->scoreSKD($attempt),
             'mtk_stis'  => $this->scoreMtkStis($attempt),
-            'mtk_tka'   => $this->scoreMtkTka($attempt),
-            'general'   => $this->scoreGeneral($attempt),
-            default     => $this->scoreDefault($attempt),
+            'tpa', 'tbi'=> $this->scoreTpaTbi($attempt),
+            'mtk_tka'   => $this->scoreScaled($attempt, false),
+            'general'   => $this->scoreScaled($attempt, true),
+            default     => throw new \LogicException('Unknown exam test_type'),
         };
     }
 
     /**
      * ======================================================
-     * 1. SKD
+     * 1. SKD (TIU / TWK / TKP)
      * ======================================================
      */
     protected function scoreSKD(ExamAttempt $attempt): array
     {
-        $score = 0;
-        $correct = 0;
-        $wrong = 0;
+        $subs = [
+            'tiu' => ['score' => 0, 'correct' => 0, 'wrong' => 0],
+            'twk' => ['score' => 0, 'correct' => 0, 'wrong' => 0],
+            'tkp' => ['score' => 0, 'correct' => 0, 'wrong' => 0],
+        ];
 
         foreach ($attempt->exam->questions as $examQuestion) {
-            $question = $examQuestion->question;
-            $answer   = $attempt->answers->firstWhere('question_id', $question->id);
+            $q = $examQuestion->question;
+            $a = $attempt->answers->firstWhere('question_id', $q->id);
+            $type = $q->test_type;
 
-            // kosong
-            if (!$answer || $answer->isEmpty) {
+            if (!isset($subs[$type])) {
                 continue;
             }
 
-            // TKP → pakai bobot
-            if ($question->test_type === 'tkp') {
-                $score += $this->getTkpScore($question, $answer);
-                $answer->update(['is_correct' => null]);
+            // ==========================
+            // TKP (tidak ada kosong)
+            // ==========================
+            if ($type === 'tkp') {
+                if (!$a || $a->isEmpty) {
+                    $subs['tkp']['wrong']++;
+                    continue;
+                }
+
+                $selectedWeight = $this->getTkpScore($q, $a);
+                $maxWeight = $q->options->max('weight');
+
+                $subs['tkp']['score'] += $selectedWeight;
+
+                if ($selectedWeight === $maxWeight) {
+                    $subs['tkp']['correct']++;
+                } else {
+                    $subs['tkp']['wrong']++;
+                }
+
+                $a->update(['is_correct' => null]);
                 continue;
             }
 
-            // TIU / TWK → MCQ tunggal
-            $isCorrect = $this->checkMcqSingle($question, $answer);
+            // ==========================
+            // TIU / TWK
+            // ==========================
+            if (!$a || $a->isEmpty) {
+                $subs[$type]['wrong']++;
+                continue;
+            }
+
+            $isCorrect = $this->checkMcqSingle($q, $a);
 
             if ($isCorrect) {
-                $score += 5;
-                $correct++;
+                $subs[$type]['score'] += 5;
+                $subs[$type]['correct']++;
             } else {
-                $wrong++;
+                $subs[$type]['wrong']++;
             }
 
-            $answer->update(['is_correct' => $isCorrect]);
+            $a->update(['is_correct' => $isCorrect]);
         }
 
-        return $this->result($score, $correct, $wrong);
+        $totalScore =
+            $subs['tiu']['score'] +
+            $subs['twk']['score'] +
+            $subs['tkp']['score'];
+
+        $isPassed = null;
+        if ($attempt->exam->type === 'tryout') {
+            $rules = $attempt->exam->passing_rules ?? [];
+            $isPassed =
+                ($subs['tiu']['score'] >= ($rules['tiu'] ?? PHP_INT_MAX)) &&
+                ($subs['twk']['score'] >= ($rules['twk'] ?? PHP_INT_MAX)) &&
+                ($subs['tkp']['score'] >= ($rules['tkp'] ?? PHP_INT_MAX));
+        }
+
+        $attempt->update(['is_passed' => $isPassed]);
+
+        return [
+            'score'   => $totalScore,
+            'correct' => $subs['tiu']['correct'] + $subs['twk']['correct'] + $subs['tkp']['correct'],
+            'wrong'   => $subs['tiu']['wrong'] + $subs['twk']['wrong'] + $subs['tkp']['wrong'],
+            'detail'  => $subs,
+            'passed'  => $isPassed,
+        ];
     }
 
     /**
      * ======================================================
      * 2. MTK STIS
-     * - MCQ only
-     * - benar +4, salah -1, kosong 0
+     * benar +5 | salah -1 | kosong 0
      * ======================================================
      */
     protected function scoreMtkStis(ExamAttempt $attempt): array
@@ -90,95 +138,133 @@ class ExamScoringService
         $wrong = 0;
 
         foreach ($attempt->exam->questions as $examQuestion) {
-            $question = $examQuestion->question;
-            $answer   = $attempt->answers->firstWhere('question_id', $question->id);
+            $q = $examQuestion->question;
+            $a = $attempt->answers->firstWhere('question_id', $q->id);
 
-            if (!$answer || $answer->isEmpty) {
+            if (!$a || $a->isEmpty) {
                 continue;
             }
 
-            $isCorrect = $this->checkMcqSingle($question, $answer);
+            $isCorrect = $this->checkMcqSingle($q, $a);
 
             if ($isCorrect) {
-                $score += 4;
+                $score += 5;
                 $correct++;
             } else {
                 $score -= 1;
                 $wrong++;
             }
 
-            $answer->update(['is_correct' => $isCorrect]);
+            $a->update(['is_correct' => $isCorrect]);
         }
 
-        return $this->result($score, $correct, $wrong);
+        $isPassed = null;
+        if ($attempt->exam->type === 'tryout') {
+            $isPassed = $score >= ($attempt->exam->passing_rules['score'] ?? 65);
+        }
+
+        $attempt->update(['is_passed' => $isPassed]);
+
+        return [
+            'score'   => max(0, $score),
+            'correct' => $correct,
+            'wrong'   => $wrong,
+            'passed'  => $isPassed,
+        ];
     }
 
     /**
      * ======================================================
-     * 3. MTK TKA
-     * - Skala 0–100
-     * - MCMA harus persis
-     * - Compound: semua sub benar
+     * 3. TPA & TBI
+     * Skala 0 – 1000
+     * Benar + (1000 / total soal)
+     * Salah / Kosong = 0 (kosong dihitung salah)
      * ======================================================
      */
-    protected function scoreMtkTka(ExamAttempt $attempt): array
+    protected function scoreTpaTbi(ExamAttempt $attempt): array
     {
-        return $this->scoreScaled($attempt, allowShortAnswer: false);
-    }
+        $totalQuestions = $attempt->exam->questions->count();
+        $pointPerCorrect = $totalQuestions > 0
+            ? 1000 / $totalQuestions
+            : 0;
 
-    /**
-     * ======================================================
-     * 4. GENERAL
-     * - Skala 0–100
-     * - Semua tipe termasuk short answer
-     * ======================================================
-     */
-    protected function scoreGeneral(ExamAttempt $attempt): array
-    {
-        return $this->scoreScaled($attempt, allowShortAnswer: true);
-    }
-
-    /**
-     * ======================================================
-     * SHARED: SCALE 0–100
-     * ======================================================
-     */
-    protected function scoreScaled(
-        ExamAttempt $attempt,
-        bool $allowShortAnswer
-    ): array {
+        $score = 0;
         $correct = 0;
         $wrong = 0;
-        $total = 0;
 
         foreach ($attempt->exam->questions as $examQuestion) {
-            $question = $examQuestion->question;
-            $answer   = $attempt->answers->firstWhere('question_id', $question->id);
+            $q = $examQuestion->question;
+            $a = $attempt->answers->firstWhere('question_id', $q->id);
 
-            $total++;
-
-            if (!$answer || $answer->isEmpty) {
+            // ==========================
+            // Kosong → salah
+            // ==========================
+            if (!$a || $a->isEmpty) {
                 $wrong++;
                 continue;
             }
 
-            $isCorrect = match ($question->type) {
-                'mcq', 'truefalse' => $this->checkMcqSingle($question, $answer),
-                'mcma'             => $this->checkMcmaExact($question, $answer),
-                'compound'         => $this->checkCompound($question, $answer),
+            // ==========================
+            // Jawaban ada
+            // ==========================
+            if ($this->checkMcqSingle($q, $a)) {
+                $score += $pointPerCorrect;
+                $correct++;
+                $a->update(['is_correct' => true]);
+            } else {
+                $wrong++;
+                $a->update(['is_correct' => false]);
+            }
+        }
+
+        return [
+            'score'   => (int) round($score),
+            'correct' => $correct,
+            'wrong'   => $wrong,
+        ];
+    }
+
+    /**
+     * ======================================================
+     * 4. MTK TKA & GENERAL (0–100)
+     * ======================================================
+     */
+    protected function scoreScaled(ExamAttempt $attempt, bool $allowShortAnswer): array
+    {
+        $correct = 0;
+        $wrong = 0;
+        $total = $attempt->exam->questions->count();
+
+        foreach ($attempt->exam->questions as $examQuestion) {
+            $q = $examQuestion->question;
+            $a = $attempt->answers->firstWhere('question_id', $q->id);
+
+            if (!$a || $a->isEmpty) {
+                $wrong++;
+                continue;
+            }
+
+            $isCorrect = match ($q->type) {
+                'mcq', 'truefalse' => $this->checkMcqSingle($q, $a),
+                'mcma'             => $this->checkMcmaExact($q, $a),
+                'compound'         => $this->checkCompound($q, $a),
                 'short_answer'     => $allowShortAnswer
-                    ? $this->checkShortAnswer($question, $answer)
+                    ? $this->checkShortAnswer($q, $a)
                     : false,
                 default            => false,
             };
 
             $isCorrect ? $correct++ : $wrong++;
-            $answer->update(['is_correct' => $isCorrect]);
+            $a->update(['is_correct' => $isCorrect]);
         }
 
         $score = round(($correct / max(1, $total)) * 100);
 
-        return $this->result($score, $correct, $wrong);
+        return [
+            'score'   => $score,
+            'correct' => $correct,
+            'wrong'   => $wrong,
+        ];
     }
 
     /**
@@ -215,18 +301,21 @@ class ExamScoringService
 
     protected function checkCompound(Question $question, $answer): bool
     {
-        foreach ($question->subItems as $subItem) {
-            $student = $answer->getCompoundAnswerBySubId($subItem->id);
+        foreach ($question->subItems as $sub) {
+            $student = $answer->getCompoundAnswerBySubId($sub->id);
             if (!$student) return false;
 
-            if ($subItem->type === 'truefalse') {
-                $correct = (bool) $subItem->answers->first()?->boolean_answer;
-                if ((bool) $student['boolean'] !== $correct) return false;
+            if ($sub->type === 'truefalse') {
+                if ((bool) $student['boolean'] !== (bool) $sub->answers->first()?->boolean_answer) {
+                    return false;
+                }
             }
 
-            if ($subItem->type === 'short_answer') {
+            if ($sub->type === 'short_answer') {
                 $normalized = $student['normalized'] ?? null;
-                $valid = $subItem->answers
+                if (!$normalized) return false;
+
+                $valid = $sub->answers
                     ->pluck('answer_text')
                     ->map(fn ($v) => Str::lower(trim($v)))
                     ->contains($normalized);
@@ -241,51 +330,18 @@ class ExamScoringService
     protected function checkShortAnswer(Question $question, $answer): bool
     {
         $normalized = $answer->normalized_short_answer;
-        if (!$normalized) {
-            return false;
-        }
+        if (!$normalized) return false;
 
-        // STANDALONE SHORT ANSWER
-        if ($question->subItems->isEmpty()) {
-            return $question->options
-                ->pluck('option_text')
-                ->map(fn ($v) => Str::lower(trim($v)))
-                ->contains($normalized);
-        }
-
-        // FALLBACK (kalau suatu saat short_answer pakai subItem)
-        return $question->subItems
-            ->flatMap(fn ($s) => $s->answers)
-            ->pluck('answer_text')
+        return $question->options
+            ->pluck('option_text')
             ->map(fn ($v) => Str::lower(trim($v)))
             ->contains($normalized);
     }
 
     protected function getTkpScore(Question $question, $answer): int
     {
-        $selected = $answer->selected_ids;
-        if (empty($selected)) return 0;
-
         return (int) $question->options
-            ->whereIn('id', $selected)
+            ->whereIn('id', $answer->selected_ids ?? [])
             ->sum('weight');
-    }
-
-    protected function result(int|float $score, int $correct, int $wrong): array
-    {
-        return [
-            'score'   => max(0, $score),
-            'correct' => $correct,
-            'wrong'   => $wrong,
-            'total'   => $correct + $wrong,
-        ];
-    }
-
-    /**
-     * fallback
-     */
-    protected function scoreDefault(ExamAttempt $attempt): array
-    {
-        return $this->scoreScaled($attempt, true);
     }
 }

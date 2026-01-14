@@ -5,427 +5,227 @@ namespace App\Http\Controllers\Exam;
 use App\Http\Controllers\Controller;
 use App\Models\Exam;
 use App\Models\ExamAttempt;
-use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\ExamQuestion;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ExamResultController extends Controller
 {
     /**
-     * =========================================
-     * ADMIN / TENTOR RESULT
-     * =========================================
+     * ======================================================
+     * 1. ADMIN - RESULT EXAM
+     * ======================================================
      */
-    public function admin(Exam $exam)
+    public function adminResult(Exam $exam, Request $request)
     {
-        $exam->load([
-            'questions' => fn ($q) => $q->orderBy('order'),
-            'questions.question.options',
-            'questions.question.subItems.answers',
-            'attempts.user',
-            'attempts.answers',
-        ]);
+        $perPage = $request->integer('per_page', 20);
 
-        $attempts = $exam->attempts
-            ->where('is_submitted', true)
-            ->sortByDesc('score')
-            ->values();
+        // ========================
+        // AGREGASI
+        // ========================
+        $attemptsQuery = ExamAttempt::with('user')
+            ->where('exam_id', $exam->id)
+            ->where('is_submitted', true);
 
-        $totalParticipants = $attempts->count();
+        $totalParticipants = $attemptsQuery->count();
 
-        $averageScore = round($attempts->avg('score') ?? 0, 2);
-        $averageDuration = round($attempts->avg(fn ($a) => $a->work_duration_seconds));
+        $averageScore = round($attemptsQuery->avg('score'), 2);
+        $maxScore     = $attemptsQuery->max('score');
+        $minScore     = $attemptsQuery->min('score');
 
-        $ranking = $attempts->map(function ($attempt, $index) {
-            return [
-                'rank'     => $index + 1,
-                'user'     => $attempt->user,
-                'score'    => $attempt->score,
-                'duration' => $attempt->work_duration_seconds,
-            ];
-        });
+        // ========================
+        // RANKING (TRYOUT ONLY)
+        // ========================
+        $ranking = null;
 
-        // ===============================
-        // QUESTION STATS (SORT FIRST!)
-        // ===============================
-        $questionStats = collect();
+        $rankingQuery = ExamAttempt::with('user')
+            ->where('exam_id', $exam->id)
+            ->where('is_submitted', true);
 
-        foreach ($exam->questions as $examQuestion) {
-            $question = $examQuestion->question;
-
-            $total = 0;
-            $correct = 0;
-
-            foreach ($attempts as $attempt) {
-                $answer = $attempt->answers
-                    ->firstWhere('question_id', $question->id);
-
-                if (!$answer) continue;
-
-                $total++;
-                if ($answer->is_correct) $correct++;
-            }
-
-            $accuracy = $total > 0
-                ? round(($correct / $total) * 100, 1)
-                : 0;
-
-            $questionStats->push([
-                'exam_order' => $examQuestion->order,
-                'question'   => $question,
-                'total'      => $total,
-                'correct'    => $correct,
-                'accuracy'   => $accuracy,
-            ]);
+        if (
+            $exam->type === 'tryout' &&
+            in_array($exam->test_type, ['skd', 'mtk_stis'])
+        ) {
+            // Lulus dulu, baru score
+            $rankingQuery
+                ->orderByDesc('is_passed')
+                ->orderByDesc('score');
+        } else {
+            // Semua exam lain
+            $rankingQuery->orderByDesc('score');
         }
 
-        // ⬇⬇ SORT DI SINI (SEBELUM PAGINATE)
-        $questionStats = $questionStats
-            ->sortBy('exam_order')
-            ->values();
+        $ranking = $rankingQuery
+            ->get()
+            ->values()
+            ->map(function ($attempt, $index) {
+                $attempt->rank = $index + 1;
+                return $attempt;
+            });
 
-        // ===============================
-        // PAGINATE (LAST STEP)
-        // ===============================
-        $page = request('page', 1);
-        $perPage = 10;
+        // ========================
+        // SOAL + AKURASI
+        // ========================
+        $questions = ExamQuestion::with('question')
+            ->where('exam_id', $exam->id)
+            ->paginate($perPage);
 
-        $questionStats = new LengthAwarePaginator(
-            $questionStats->forPage($page, $perPage),
-            $questionStats->count(),
-            $perPage,
-            $page,
-            ['path' => request()->url()]
-        );
+        $questionStats = [];
 
-        return view('exams.result-admin', [
-            'exam'              => $exam,
-            'totalParticipants' => $totalParticipants,
-            'averageScore'      => $averageScore,
-            'averageDuration'   => $averageDuration,
-            'ranking'           => $ranking,
-            'questionStats'     => $questionStats,
-        ]);
+        foreach ($questions as $examQuestion) {
+            $qid = $examQuestion->question_id;
+
+            $totalAnswered = DB::table('exam_answers')
+                ->join('exam_attempts', 'exam_answers.attempt_id', '=', 'exam_attempts.id')
+                ->where('exam_attempts.exam_id', $exam->id)
+                ->where('exam_answers.question_id', $qid)
+                ->whereNotNull('exam_answers.selected_options')
+                ->count();
+
+            $totalCorrect = DB::table('exam_answers')
+                ->join('exam_attempts', 'exam_answers.attempt_id', '=', 'exam_attempts.id')
+                ->where('exam_attempts.exam_id', $exam->id)
+                ->where('exam_answers.question_id', $qid)
+                ->where('exam_answers.is_correct', true)
+                ->count();
+
+            $questionStats[$qid] = [
+                'answered' => $totalAnswered,
+                'correct'  => $totalCorrect,
+                'accuracy' => $totalAnswered > 0
+                    ? round(($totalCorrect / $totalAnswered) * 100, 2)
+                    : 0,
+            ];
+        }
+
+        return view('exams.results.admin', compact(
+            'exam',
+            'totalParticipants',
+            'averageScore',
+            'maxScore',
+            'minScore',
+            'ranking',
+            'questions',
+            'questionStats',
+            'perPage'
+        ));
     }
 
     /**
-     * =========================================
-     * STUDENT RESULT - PERBAIKAN totalParticipants
-     * =========================================
+     * ======================================================
+     * 2. ADMIN - ANALISIS SOAL
+     * ======================================================
      */
-    public function student(Exam $exam)
+    public function adminQuestionAnalysis(Exam $exam, ExamQuestion $examQuestion)
     {
-        // ===============================
-        // ATTEMPT SISWA
-        // ===============================
-        $attempt = $exam->attempts()
+        $question = $examQuestion->question;
+
+        $attempts = ExamAttempt::with(['user', 'answers' => function ($q) use ($question) {
+                $q->where('question_id', $question->id);
+            }])
+            ->where('exam_id', $exam->id)
+            ->where('is_submitted', true)
+            ->get();
+
+        $summary = [
+            'correct' => 0,
+            'wrong'   => 0,
+            'empty'   => 0,
+        ];
+
+        foreach ($attempts as $attempt) {
+            $answer = $attempt->answers->first();
+
+            if (!$answer || $answer->isEmpty) {
+                $summary['empty']++;
+            } elseif ($answer->is_correct) {
+                $summary['correct']++;
+            } else {
+                $summary['wrong']++;
+            }
+        }
+
+        return view('exams.results.analysis', compact(
+            'exam',
+            'examQuestion',
+            'question',
+            'attempts',
+            'summary'
+        ));
+    }
+
+    /**
+     * ======================================================
+     * 3. SISWA - RESULT PRIBADI
+     * ======================================================
+     */
+    public function studentResult(Exam $exam, Request $request)
+    {
+        $perPage = $request->integer('per_page', 20);
+
+        $attempt = ExamAttempt::with('answers')
+            ->where('exam_id', $exam->id)
             ->where('user_id', auth()->id())
             ->where('is_submitted', true)
             ->firstOrFail();
 
-        // ===============================
-        // LOAD RELATIONS
-        // ===============================
-        $exam->load([
-            'questions.question.options',
-            'questions.question.subItems.answers',
-        ]);
+        $duration = optional($attempt->submitted_at)
+            ->diffInSeconds($attempt->started_at);
 
-        $attempt->load([
-            'answers.question.options',
-            'answers.question.subItems.answers',
-        ]);
+        $questions = ExamQuestion::with('question')
+            ->where('exam_id', $exam->id)
+            ->paginate($perPage);
 
-        // ===============================
-        // TOTAL PARTICIPANTS
-        // ===============================
-        $totalParticipants = $exam->attempts()
-            ->where('is_submitted', true)
-            ->count();
-
-        // ===============================
-        // RANKING (SCORE DESC, DURASI ASC)
-        // ===============================
-        $ranking = ExamAttempt::where('exam_id', $exam->id)
-            ->where('is_submitted', true)
-            ->get()
-            ->sortBy([
-                ['score', 'desc'],
-                fn ($a, $b) =>
-                    $a->started_at->diffInSeconds($a->submitted_at)
-                    <=>
-                    $b->started_at->diffInSeconds($b->submitted_at)
-            ])
-            ->values();
-
-        $rankIndex = $ranking->search(fn ($a) => $a->id === $attempt->id);
-        $rank = $rankIndex !== false ? $rankIndex + 1 : null;
-
-        // ===============================
-        // DURASI KERJA SISWA (FINAL)
-        // ===============================
-        $duration = $attempt->started_at && $attempt->submitted_at
-            ? $attempt->started_at->diffInSeconds($attempt->submitted_at)
-            : null;
-
-        // ===============================
-        // QUESTIONS + ANSWERS (DENGAN COMPOUND)
-        // ===============================
-        $questions = $exam->questions()
-            ->orderBy('order')
-            ->get()
-            ->map(function ($examQuestion) use ($attempt) {
-                $question = $examQuestion->question;
-                $answer = $attempt->answers
-                    ->firstWhere('question_id', $question->id);
-
-                $data = [
-                    'order'     => $examQuestion->order,
-                    'question'  => $question,
-                    'answer'    => $answer,
-                    'is_correct'=> $answer?->is_correct ?? false,
-                ];
-
-                // compound handling (tetap seperti sebelumnya)
-                if ($question->type === 'compound') {
-                    $subItems = [];
-
-                    foreach ($question->subItems as $subItem) {
-                        $studentAnswer = $answer
-                            ? $answer->getCompoundAnswerBySubId($subItem->id)
-                            : null;
-
-                        $isCorrect = false;
-                        $correctAnswer = null;
-
-                        if ($subItem->type === 'truefalse') {
-                            $correctBool = (bool) optional($subItem->answers->first())->boolean_answer;
-
-                            if ($studentAnswer) {
-                                $isCorrect = (bool) ($studentAnswer['boolean'] ?? null) === $correctBool;
-                            }
-
-                            $correctAnswer = [
-                                'primary' => $correctBool ? 'Benar' : 'Salah',
-                            ];
-                        }
-
-                        if ($subItem->type === 'short_answer') {
-                            if ($studentAnswer) {
-                                $normalized = strtolower(trim($studentAnswer['normalized'] ?? ''));
-                                $isCorrect = $subItem->answers
-                                    ->pluck('answer_text')
-                                    ->map(fn ($v) => strtolower(trim($v)))
-                                    ->contains($normalized);
-                            }
-
-                            $correctAnswer = [
-                                'answers' => $subItem->answers
-                                    ->pluck('answer_text')
-                                    ->toArray(),
-                            ];
-                        }
-
-                        $subItems[] = [
-                            'subItem'       => $subItem,
-                            'studentAnswer' => $studentAnswer,
-                            'isCorrect'     => $isCorrect,
-                            'correctAnswer' => $correctAnswer, // ← SELALU ADA
-                        ];
-                    }
-
-                    $data['subItems'] = $subItems;
-                }
-
-                return $data;
-            });
-
-        // ===============================
-        // PAGINATION (10 SOAL)
-        // ===============================
-        $page    = request('page', 1);
-        $perPage = 10;
-
-        $questions = new LengthAwarePaginator(
-            $questions->forPage($page, $perPage)->values(),
-            $questions->count(),
-            $perPage,
-            $page,
-            ['path' => request()->url()]
-        );
-
-        // ===============================
-        // RETURN VIEW
-        // ===============================
-        return view('exams.result-student', [
-            'exam'              => $exam,
-            'attempt'           => $attempt,
-            'rank'              => $rank,
-            'duration'          => $duration,
-            'questions'         => $questions,
-            'totalParticipants' => $totalParticipants,
-        ]);
+        return view('exams.results.student', compact(
+            'exam',
+            'attempt',
+            'duration',
+            'questions',
+            'perPage'
+        ));
     }
 
     /**
-     * =========================================
-     * QUESTION ANALYSIS (ADMIN)
-     * =========================================
+     * ======================================================
+     * 4. SISWA - PERINGKAT
+     * ======================================================
      */
-    public function questionAnalysis(Exam $exam, $questionId)
+    public function studentRanking(Exam $exam)
     {
-        $exam->load([
-            'questions.question.options',
-            'questions.question.subItems.answers',
-            'attempts.user',
-            'attempts.answers',
-        ]);
-
-        $examQuestion = $exam->questions
-            ->firstWhere('question_id', $questionId);
-
-        abort_if(!$examQuestion, 404);
-
-        $question = $examQuestion->question;
-
-        $attempts = $exam->attempts
+        $query = ExamAttempt::with('user')
+            ->where('exam_id', $exam->id)
             ->where('is_submitted', true);
 
-        /**
-         * ===============================
-         * ANSWERS + USER
-         * ===============================
-         */
-        $answersWithUsers = $attempts->map(function ($attempt) use ($questionId) {
-            $answer = $attempt->answers
-                ->firstWhere('question_id', $questionId);
-
-            if (!$answer) {
-                return null;
-            }
-
-            return [
-                'user'   => $attempt->user,
-                'answer' => $answer,
-            ];
-        })->filter();
-
-        /**
-         * ===============================
-         * OPTION STATS (MCQ / MCMA / TF)
-         * ===============================
-         */
-        $optionStats = [];
-
-        if (in_array($question->type, ['mcq', 'mcma', 'truefalse'])) {
-            foreach ($question->options as $option) {
-                $optionStats[$option->id] = [
-                    'option'     => $option,
-                    'count'      => 0,
-                    'percentage' => 0,
-                ];
-            }
-
-            foreach ($answersWithUsers as $row) {
-                foreach ($row['answer']->selected_ids as $id) {
-                    if (isset($optionStats[$id])) {
-                        $optionStats[$id]['count']++;
-                    }
-                }
-            }
-
-            $total = $answersWithUsers->count();
-
-            foreach ($optionStats as &$stat) {
-                $stat['percentage'] = $total > 0
-                    ? round(($stat['count'] / $total) * 100, 1)
-                    : 0;
-            }
+        // ============================
+        // SORTING LOGIC
+        // ============================
+        if (
+            $exam->type === 'tryout' &&
+            in_array($exam->test_type, ['skd', 'mtk_stis'])
+        ) {
+            // Lulus dulu, baru score
+            $query->orderByDesc('is_passed')
+                ->orderByDesc('score');
+        } else {
+            // Semua exam lain
+            $query->orderByDesc('score');
         }
 
-        /**
-         * ===============================
-         * SHORT ANSWER RESPONSES
-         * ===============================
-         */
-        $shortAnswers = [];
+        $attempts = $query
+            ->get()
+            ->values()
+            ->map(function ($attempt, $index) {
+                $attempt->rank = $index + 1;
+                return $attempt;
+            });
 
-        if ($question->type === 'short_answer') {
-            foreach ($answersWithUsers as $row) {
-                $shortAnswers[] = [
-                    'user'       => $row['user'],
-                    'answer'     => $row['answer']->short_answer_value,
-                    'is_correct' => $row['answer']->is_correct,
-                ];
-            }
-        }
+        $myAttempt = $attempts->firstWhere('user_id', auth()->id());
 
-        /**
-         * ===============================
-         * COMPOUND STATS (PER SUB ITEM)
-         * ===============================
-         */
-        $compoundStats = [];
-
-        if ($question->type === 'compound') {
-            foreach ($question->subItems as $subItem) {
-                $compoundStats[$subItem->id] = [
-                    'subItem' => $subItem,
-                    'total'   => 0,
-                    'correct' => 0,
-                    'accuracy'=> 0,
-                ];
-            }
-
-            foreach ($answersWithUsers as $row) {
-                $answer = $row['answer'];
-
-                foreach ($question->subItems as $subItem) {
-                    $compoundStats[$subItem->id]['total']++;
-
-                    $student = $answer->getCompoundAnswerBySubId($subItem->id);
-                    if (!$student) {
-                        continue;
-                    }
-
-                    $isCorrect = false;
-
-                    // TRUE / FALSE
-                    if ($subItem->type === 'truefalse') {
-                        $correct = (bool) $subItem->answers->first()?->boolean_answer;
-                        $isCorrect = isset($student['boolean'])
-                            && (bool) $student['boolean'] === $correct;
-                    }
-
-                    // SHORT ANSWER
-                    if ($subItem->type === 'short_answer') {
-                        $normalized = $student['normalized'] ?? null;
-
-                        $isCorrect = $normalized && $subItem->answers
-                            ->pluck('answer_text')
-                            ->map(fn ($v) => strtolower(trim($v)))
-                            ->contains($normalized);
-                    }
-
-                    if ($isCorrect) {
-                        $compoundStats[$subItem->id]['correct']++;
-                    }
-                }
-            }
-
-            foreach ($compoundStats as &$stat) {
-                $stat['accuracy'] = $stat['total'] > 0
-                    ? round(($stat['correct'] / $stat['total']) * 100, 1)
-                    : 0;
-            }
-        }
-
-        return view('exams.question-analysis', [
-            'exam'          => $exam,
-            'question'      => $question,
-            'answers'       => $answersWithUsers,
-            'optionStats'   => $optionStats,
-            'shortAnswers'  => $shortAnswers,
-            'compoundStats' => $compoundStats,
+        return view('exams.results.ranking', [
+            'exam'        => $exam,
+            'attempts'    => $attempts,
+            'myAttemptId' => optional($myAttempt)->id,
+            'myRank'      => optional($myAttempt)->rank,
         ]);
     }
 

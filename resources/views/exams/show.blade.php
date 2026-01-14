@@ -215,7 +215,7 @@
                 </form>
 
                 <a
-                    href="{{ route('exams.result.admin', $exam) }}"
+                    href="{{ route('exams.results', $exam) }}"
                     class="px-4 py-2 rounded-xl text-sm font-medium
                            border border-gray-300
                            text-gray-700
@@ -228,7 +228,7 @@
             @else
 
                 <a
-                    href="{{ route('exams.result.admin', $exam) }}"
+                    href="{{ route('exams.results', $exam) }}"
                     class="px-4 py-2 rounded-xl text-sm font-medium
                            border border-gray-300
                            text-gray-700
