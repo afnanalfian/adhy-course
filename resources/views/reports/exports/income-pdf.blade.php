@@ -144,7 +144,7 @@
     {{-- HEADER --}}
     <div class="header">
         <h1>LAPORAN PEMASUKAN</h1>
-        <p>Azwara Learning Center</p>
+        <p>ENS Makassar Center</p>
         <p>Periode: {{ \Carbon\Carbon::parse($selectedMonth)->translatedFormat('F Y') }}</p>
     </div>
 
@@ -299,8 +299,8 @@
 
     {{-- FOOTER --}}
     <div class="footer">
-        <p>Laporan ini dibuat secara otomatis oleh sistem Azwara Learning Center</p>
-        <p>© {{ date('Y') }} Azwara Learning Center • www.azwaralearning.com</p>
+        <p>Laporan ini dibuat secara otomatis oleh sistem ENS Makassar Center</p>
+        <p>© {{ date('Y') }} ENS Makassar Center • www.azwaralearning.com</p>
     </div>
 </body>
 </html>

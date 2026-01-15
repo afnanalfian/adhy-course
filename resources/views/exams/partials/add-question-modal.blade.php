@@ -1,18 +1,11 @@
-<div
-    x-show="openAddQuestion"
-    x-cloak
-    class="absolute inset-0 z-50 flex items-center justify-center
+<div x-show="openAddQuestion" x-cloak class="absolute inset-0 z-50 flex items-center justify-center
            bg-black/40 backdrop-blur-sm">
 
-    <div
-        x-data="examQuestionPicker({
+    <div x-data="examQuestionPicker({
             examCode: '{{ $exam->exam_code }}',
             usedIds: @js($usedQuestionIds ?? []),
             categories: @js($categories)
-        })"
-        x-init="init()"
-        @click.outside="openAddQuestion = false"
-        class="bg-azwara-lightest dark:bg-secondary
+        })" x-init="init()" @click.outside="openAddQuestion = false" class="bg-ens-lightest dark:bg-secondary
                w-full max-w-6xl
                max-h-[90vh]
                rounded-2xl shadow-xl
@@ -36,13 +29,9 @@
                     grid grid-cols-1 md:grid-cols-2 gap-4">
 
             {{-- CATEGORY --}}
-            <div
-                x-data="{ open:false }"
-                class="relative">
+            <div x-data="{ open:false }" class="relative">
 
-                <button
-                    @click="open=!open"
-                    class="w-full text-left px-3 py-2 text-sm rounded-lg
+                <button @click="open=!open" class="w-full text-left px-3 py-2 text-sm rounded-lg
                         border bg-white text-gray-800
                         dark:bg-slate-800 dark:text-gray-100
                         dark:border-white/10">
@@ -54,22 +43,18 @@
                     "></span>
                 </button>
 
-                <div x-show="open" @click.outside="open=false"
-                    class="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto
+                <div x-show="open" @click.outside="open=false" class="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto
                         bg-white dark:bg-slate-800
                         border dark:border-white/10 rounded-lg">
 
                     <template x-for="c in categories" :key="c.id">
-                        <div
-                            @click="
+                        <div @click="
                                 categoryId = c.id;
                                 open = false;
                                 onCategoryChange();
-                            "
-                            class="px-3 py-2 text-sm cursor-pointer
+                            " class="px-3 py-2 text-sm cursor-pointer
                                 text-gray-800 dark:text-gray-100
-                                hover:bg-gray-100 dark:hover:bg-white/10"
-                            x-text="c.name">
+                                hover:bg-gray-100 dark:hover:bg-white/10" x-text="c.name">
                         </div>
                     </template>
                 </div>
@@ -78,10 +63,7 @@
             {{-- MATERIAL --}}
             <div x-data="{ open:false }" class="relative">
 
-                <button
-                    :disabled="!materials.length"
-                    @click="if(materials.length) open=!open"
-                    class="w-full text-left px-3 py-2 text-sm rounded-lg
+                <button :disabled="!materials.length" @click="if(materials.length) open=!open" class="w-full text-left px-3 py-2 text-sm rounded-lg
                         border bg-white text-gray-800
                         disabled:opacity-50
                         dark:bg-slate-800 dark:text-gray-100
@@ -94,22 +76,18 @@
                     "></span>
                 </button>
 
-                <div x-show="open" @click.outside="open=false"
-                    class="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto
+                <div x-show="open" @click.outside="open=false" class="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto
                         bg-white dark:bg-slate-800
                         border dark:border-white/10 rounded-lg">
 
                     <template x-for="m in materials" :key="m.id">
-                        <div
-                            @click="
+                        <div @click="
                                 materialId = m.id;
                                 open = false;
                                 onMaterialChange();
-                            "
-                            class="px-3 py-2 text-sm cursor-pointer
+                            " class="px-3 py-2 text-sm cursor-pointer
                                 text-gray-800 dark:text-gray-100
-                                hover:bg-gray-100 dark:hover:bg-white/10"
-                            x-text="m.name">
+                                hover:bg-gray-100 dark:hover:bg-white/10" x-text="m.name">
                         </div>
                     </template>
                 </div>
@@ -131,8 +109,7 @@
             </template>
 
             <template x-if="materialId && questions.length > 0">
-                <div
-                    class="flex items-center justify-between
+                <div class="flex items-center justify-between
                         p-3 rounded-lg
                         bg-gray-50 dark:bg-white/5
                         border dark:border-white/10">
@@ -142,18 +119,13 @@
                     </span>
 
                     <div class="flex gap-2">
-                        <button
-                            @click="selectAllFromMaterial()"
-                            :disabled="questions.every(q => q.is_selected)"
-                            class="px-3 py-1.5 text-sm rounded
+                        <button @click="selectAllFromMaterial()" :disabled="questions.every(q => q.is_selected)" class="px-3 py-1.5 text-sm rounded
                                 bg-primary/10 text-primary
                                 disabled:opacity-50">
                             Pilih Semua
                         </button>
 
-                        <button
-                            @click="unselectAllFromMaterial()"
-                            class="px-3 py-1.5 text-sm rounded
+                        <button @click="unselectAllFromMaterial()" class="px-3 py-1.5 text-sm rounded
                                 bg-gray-200 dark:bg-white/10
                                 hover:bg-gray-300 dark:hover:bg-white/20">
                             Batal Pilih
@@ -162,14 +134,11 @@
                 </div>
             </template>
             <template x-for="q in questions" :key="q.id">
-                <label
-                    class="block p-4 rounded-xl border
+                <label class="block p-4 rounded-xl border
                            hover:bg-gray-50 dark:text-white dark:hover:bg-white/5
                            cursor-pointer">
                     <div class="flex gap-3">
-                        <input type="checkbox"
-                               :checked="q.is_selected"
-                               @change="toggleQuestion(q.id)">
+                        <input type="checkbox" :checked="q.is_selected" @change="toggleQuestion(q.id)">
 
                         <div class="flex-1">
                             <div class="flex justify-between mb-2">
@@ -192,12 +161,10 @@
                             </div>
 
                             <template x-if="q.image_url">
-                                <img :src="q.image_url"
-                                     class="max-h-48 mx-auto mb-3 rounded">
+                                <img :src="q.image_url" class="max-h-48 mx-auto mb-3 rounded">
                             </template>
 
-                            <div class="prose dark:prose-invert max-w-none"
-                                 x-html="q.question_text"></div>
+                            <div class="prose dark:prose-invert max-w-none" x-html="q.question_text"></div>
                         </div>
                     </div>
                 </label>
@@ -212,11 +179,8 @@
 
         {{-- PAGINATION --}}
         <div class="px-6 py-4 border-t dark:border-white/10
-                    flex justify-between items-center"
-            x-show="pagination.last_page > 1 && questions.length > 0">
-            <button
-                @click="fetchQuestions(pagination.current_page - 1)"
-                :disabled="pagination.current_page === 1"
+                    flex justify-between items-center" x-show="pagination.last_page > 1 && questions.length > 0">
+            <button @click="fetchQuestions(pagination.current_page - 1)" :disabled="pagination.current_page === 1"
                 class="px-3 py-1 rounded bg-gray-200 dark:bg-white/10
                        disabled:opacity-50">
                 Prev
@@ -227,10 +191,8 @@
                 dari <span x-text="pagination.last_page"></span>
             </span>
 
-            <button
-                @click="fetchQuestions(pagination.current_page + 1)"
-                :disabled="pagination.current_page === pagination.last_page"
-                class="px-3 py-1 rounded bg-gray-200 dark:bg-white/10
+            <button @click="fetchQuestions(pagination.current_page + 1)"
+                :disabled="pagination.current_page === pagination.last_page" class="px-3 py-1 rounded bg-gray-200 dark:bg-white/10
                        disabled:opacity-50">
                 Next
             </button>
@@ -239,13 +201,11 @@
         {{-- FOOTER --}}
         <div class="px-6 py-4 border-t dark:border-white/10 flex justify-end gap-3">
             <button @click="openAddQuestion = false"
-                    class="px-4 py-2 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-white/10">
+                class="px-4 py-2 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-white/10">
                 Batal
             </button>
 
-            <button @click="save()"
-                    :disabled="selected.length === 0"
-                    class="px-5 py-2 rounded-lg bg-primary text-white
+            <button @click="save()" :disabled="selected.length === 0" class="px-5 py-2 rounded-lg bg-primary text-white
                            disabled:opacity-50 hover:bg-primary/90">
                 Tambahkan <span x-text="selected.length"></span> Soal
             </button>

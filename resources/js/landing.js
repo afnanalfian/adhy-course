@@ -11,9 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const updateHeader = () => {
         if (window.scrollY > 40) {
             header.classList.remove("bg-transparent");
-            header.classList.add("bg-azwara-lightest", "shadow-lg", "backdrop-blur-sm", "bg-opacity-95");
+            header.classList.add("bg-ens-lightest", "shadow-lg", "backdrop-blur-sm", "bg-opacity-95");
         } else {
-            header.classList.remove("bg-azwara-lightest", "shadow-lg", "backdrop-blur-sm", "bg-opacity-95");
+            header.classList.remove("bg-ens-lightest", "shadow-lg", "backdrop-blur-sm", "bg-opacity-95");
             header.classList.add("bg-transparent");
         }
     };

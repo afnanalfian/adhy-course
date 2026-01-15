@@ -1,6 +1,6 @@
-# 🎓 Azwara Learning – Online Tutoring Platform (Laravel 11)
+# 🎓 Adhy Course – Online Tutoring Platform (Laravel 11)
 
-Azwara Learning is a web-based **online tutoring (bimbel) platform** built with **Laravel 11**, designed to manage courses, meetings, exams (tryout & quiz), purchases, entitlements, notifications, and interactive learning features.
+Adhy Course is a web-based **online tutoring (bimbel) platform** built with **Laravel 11**, designed to manage courses, meetings, exams (tryout & quiz), purchases, entitlements, notifications, and interactive learning features.
 
 This project supports **Admin**, **Tentor (Teacher)**, and **Siswa (Student)** roles with a clear access control system.
 
@@ -121,8 +121,8 @@ This project supports **Admin**, **Tentor (Teacher)**, and **Siswa (Student)** r
 
 ### 1️⃣ Clone Repository
 ```bash
-git clone https://github.com/your-username/azwara-learning.git
-cd azwara-learning
+git clone https://github.com/your-username/adhy-course.git
+cd adhy-course
 ```
 
 ### 2️⃣ Install Dependencies
@@ -143,7 +143,7 @@ php artisan key:generate
 Edit .env:
 
 ```bash
-DB_DATABASE=azwara_learning
+DB_DATABASE=adhy_course
 DB_USERNAME=root
 DB_PASSWORD=
 ```

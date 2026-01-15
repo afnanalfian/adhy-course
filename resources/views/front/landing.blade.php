@@ -1,5 +1,5 @@
 @extends('front.layouts.app')
-@section('title', 'Azwara Learning')
+@section('title', 'ENS Makassar')
 @section('description', 'Tryout SKD CPNS Kedinasan gratis dan premium dengan pembahasan lengkap.')
 @section('content')
 

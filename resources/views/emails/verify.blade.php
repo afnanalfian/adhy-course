@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8" />
-    <title>Verifikasi Email — Azwara Learning</title>
+    <title>Verifikasi Email — ENS Makassar</title>
 </head>
 <body style="margin:0;padding:0;background:#f5f7fa;font-family:Inter,Arial;">
     <table width="100%" cellpadding="0" cellspacing="0">
@@ -12,7 +12,7 @@
                     <tr>
                         <td style="background:#052659;padding:32px;text-align:center;">
                             <h1 style="color:white;font-size:28px;margin:0;font-weight:700;">
-                                Azwara Learning
+                                ENS Makassar
                             </h1>
                             <p style="color:#C1E8FF;margin-top:8px;">Verifikasi Email Anda</p>
                         </td>
@@ -22,7 +22,7 @@
                         <td style="padding:32px;">
                             <p style="font-size:16px;color:#021024;">
                                 Halo {{ $user->name }},<br><br>
-                                Terima kasih telah mendaftar di <strong>Azwara Learning</strong> 🎉<br>
+                                Terima kasih telah mendaftar di <strong>ENS Makassar</strong> 🎉<br>
                                 Untuk mengaktifkan akun Anda, silakan verifikasi dengan menekan tombol berikut:
                             </p>
 
@@ -42,7 +42,7 @@
                             </p>
 
                             <p style="font-size:14px;color:#999;margin-top:40px;text-align:center;">
-                                © {{ date('Y') }} Azwara Learning
+                                © {{ date('Y') }} ENS Makassar
                             </p>
                         </td>
                     </tr>

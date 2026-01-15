@@ -26,19 +26,19 @@
     $subtotal = $cart->items->sum(fn($i) => $i->price_snapshot * $i->qty);
 @endphp
 
-<div class="bg-white dark:bg-azwara-darkest rounded-xl border border-gray-200 dark:border-azwara-medium
+<div class="bg-white dark:bg-ens-darkest rounded-xl border border-gray-200 dark:border-ens-medium
             shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
 
     <div class="p-6">
         {{-- Header --}}
         <div class="flex items-center gap-3 mb-6">
             <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <svg class="w-5 h-5 text-primary dark:text-azwara-lighter" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-primary dark:text-ens-lighter" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-azwara-darkest dark:text-azwara-lighter">
+                <h3 class="text-lg font-bold text-ens-darkest dark:text-ens-lighter">
                     Ringkasan Pembelian
                 </h3>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -60,13 +60,13 @@
             {{-- Items List --}}
             <div class="space-y-4 mb-6 max-h-64 overflow-y-auto pr-2">
                 @foreach($cart->items as $item)
-                    <div class="flex items-center justify-between gap-3 p-3 rounded-lg bg-gray-50 dark:bg-azwara-darker">
+                    <div class="flex items-center justify-between gap-3 p-3 rounded-lg bg-gray-50 dark:bg-ens-darker">
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">
                                 {{ $item->product->name }}
                             </p>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-xs px-2 py-0.5 rounded bg-white dark:bg-azwara-medium text-gray-700 dark:text-gray-300">
+                                <span class="text-xs px-2 py-0.5 rounded bg-white dark:bg-ens-medium text-gray-700 dark:text-gray-300">
                                     {{ $item->qty }}x
                                 </span>
                                 <span class="text-xs text-gray-500 dark:text-gray-400">
@@ -84,7 +84,7 @@
             {{-- Addon Section --}}
             @if ($addonAvailable && !$userHasQuiz && !$cartHasCourse)
                 <div class="mb-6">
-                    <div class="p-4 bg-gradient-to-r from-purple-50 to-white dark:from-purple-900/10 dark:to-azwara-darkest
+                    <div class="p-4 bg-gradient-to-r from-purple-50 to-white dark:from-purple-900/10 dark:to-ens-darkest
                                 rounded-xl border border-purple-200 dark:border-purple-500/30">
                         <div class="flex items-start gap-3 mb-3">
                             <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
@@ -108,7 +108,7 @@
                                     @disabled($cartHasAddon)
                                     class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
                                            {{ $cartHasAddon
-                                                ? 'bg-gray-100 dark:bg-azwara-medium/30 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                                                ? 'bg-gray-100 dark:bg-ens-medium/30 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                                                 : 'bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow' }}
                                            transition-all duration-200">
                                 @if($cartHasAddon)
@@ -129,7 +129,7 @@
             @endif
 
             {{-- Total Section --}}
-            <div class="pt-6 border-t border-gray-200 dark:border-azwara-medium">
+            <div class="pt-6 border-t border-gray-200 dark:border-ens-medium">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-gray-600 dark:text-gray-400">Subtotal</span>
@@ -148,9 +148,9 @@
                         </div>
                     @endif
 
-                    <div class="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-azwara-medium">
-                        <span class="text-base font-semibold text-azwara-darkest dark:text-azwara-lighter">Total</span>
-                        <span class="text-xl font-bold text-primary dark:text-azwara-lighter">
+                    <div class="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-ens-medium">
+                        <span class="text-base font-semibold text-ens-darkest dark:text-ens-lighter">Total</span>
+                        <span class="text-xl font-bold text-primary dark:text-ens-lighter">
                             Rp {{ number_format($cartHasAddon ? $subtotal + 10000 : $subtotal, 0, ',', '.') }}
                         </span>
                     </div>
@@ -161,8 +161,8 @@
                     <div class="mt-8">
                         <a href="{{ route('checkout.review') }}"
                            class="w-full inline-flex items-center justify-center px-6 py-3.5 rounded-lg
-                                  bg-gradient-to-r from-primary to-azwara-medium text-white
-                                  font-bold hover:from-primary/90 hover:to-azwara-medium/90
+                                  bg-gradient-to-r from-primary to-ens-medium text-white
+                                  font-bold hover:from-primary/90 hover:to-ens-medium/90
                                   transition-all duration-200 shadow-md hover:shadow-lg">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>

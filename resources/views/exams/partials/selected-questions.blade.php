@@ -1,6 +1,6 @@
 {{-- ================= SOAL TERPILIH ================= --}}
 <div class="rounded-2xl p-6
-            border border-azwara-light/30 dark:border-white/10 space-y-4">
+            border border-ens-light/30 dark:border-white/10 space-y-4">
 
     {{-- HEADER --}}
     <div class="flex flex-col gap-4
@@ -25,17 +25,13 @@
                     Tampilkan
                 </label>
 
-                <select
-                    name="per_page"
-                    onchange="this.form.submit()"
-                    class="px-3 py-1.5 rounded-lg border
+                <select name="per_page" onchange="this.form.submit()" class="px-3 py-1.5 rounded-lg border
                         bg-white dark:bg-slate-800
                         text-gray-800 dark:text-gray-100
                         border-gray-300 dark:border-white/10 w-20">
 
                     @foreach ([10, 20, 30, 50, 100] as $size)
-                        <option value="{{ $size }}"
-                            @selected(request('per_page', 10) == $size)>
+                        <option value="{{ $size }}" @selected(request('per_page', 10) == $size)>
                             {{ $size }}
                         </option>
                     @endforeach
@@ -48,10 +44,8 @@
 
             {{-- ADD QUESTION --}}
             @if($exam->status === 'inactive')
-                <button
-                    @click="openAddQuestion = true"
-                    class="px-4 py-2 rounded-lg bg-primary text-white
-                        hover:bg-primary/90 whitespace-nowrap">
+                <button @click="openAddQuestion = true" class="px-4 py-2 rounded-lg bg-primary text-white
+                            hover:bg-primary/90 whitespace-nowrap">
                     Tambah Soal
                 </button>
             @endif
@@ -71,17 +65,13 @@
                 @php $q = $pq->question; @endphp
 
                 {{-- ================= ITEM ================= --}}
-                <div
-                    data-id="{{ $pq->id }}"
-                    class="relative bg-azwara-lightest dark:bg-secondary
-                           border border-gray-200 dark:border-white/10 dark:text-white
-                           rounded-xl p-6 shadow-sm">
+                <div data-id="{{ $pq->id }}" class="relative bg-ens-lightest dark:bg-secondary
+                                   border border-gray-200 dark:border-white/10 dark:text-white
+                                   rounded-xl p-6 shadow-sm">
 
                     {{-- HEADER --}}
                     <div class="flex items-center justify-between mb-4">
-                        <h3
-                            data-question-number
-                            class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        <h3 data-question-number class="text-lg font-semibold text-gray-900 dark:text-gray-100">
                             Soal {{ $questions->firstItem() + $i }}
                         </h3>
 
@@ -107,9 +97,7 @@
                             @endif
 
                             @if($exam->status === 'inactive')
-                                <form
-                                    method="POST"
-                                    action="{{ route('exams.questions.move', [$exam, $pq]) }}"
+                                <form method="POST" action="{{ route('exams.questions.move', [$exam, $pq]) }}"
                                     class="flex items-center gap-2">
                                     @csrf
 
@@ -117,23 +105,14 @@
                                         Pindah ke:
                                     </label>
 
-                                    <input
-                                        type="number"
-                                        name="to_order"
-                                        min="1"
-                                        max="{{ $exam->questions()->count() }}"
-                                        value="{{ $pq->order }}"
-                                        class="w-20 px-2 py-1 border rounded text-sm">
+                                    <input type="number" name="to_order" min="1" max="{{ $exam->questions()->count() }}"
+                                        value="{{ $pq->order }}" class="w-20 px-2 py-1 border rounded text-sm">
 
-                                    <button
-                                        type="submit"
-                                        class="text-xs px-2 py-1 bg-primary text-white rounded">
+                                    <button type="submit" class="text-xs px-2 py-1 bg-primary text-white rounded">
                                         OK
                                     </button>
                                 </form>
-                                <form method="POST"
-                                    action="{{ route('ajax.exams.questions.detach', $exam) }}"
-                                    class="sweet-confirm"
+                                <form method="POST" action="{{ route('ajax.exams.questions.detach', $exam) }}" class="sweet-confirm"
                                     data-message="Yakin ingin menghapus soal ini?">
                                     @csrf
                                     <input type="hidden" name="question_id" value="{{ $q->id }}">
@@ -148,11 +127,8 @@
 
                     {{-- GAMBAR SOAL --}}
                     @if ($q->image)
-                        <img
-                            src="{{ Storage::url($q->image) }}"
-                            alt="Gambar Soal"
-                            class="max-h-[320px] mx-auto rounded-xl shadow
-                                object-contain bg-azwara-lightest dark:bg-gray-800 p-2">
+                        <img src="{{ Storage::url($q->image) }}" alt="Gambar Soal" class="max-h-[320px] mx-auto rounded-xl shadow
+                                            object-contain bg-ens-lightest dark:bg-gray-800 p-2">
                     @endif
 
                     {{-- TEKS SOAL --}}
@@ -165,8 +141,8 @@
                         <div class="space-y-3">
                             @foreach ($q->options as $opt)
                                 <div class="border border-black rounded-lg px-4 py-3
-                                            bg-azwara-lightest dark:bg-white/5
-                                            text-gray-800 dark:text-gray-100">
+                                                            bg-ens-lightest dark:bg-white/5
+                                                            text-gray-800 dark:text-gray-100">
 
                                     {{-- LABEL + TEKS (SATU BARIS) --}}
                                     <div class="flex items-start gap-2">
@@ -189,9 +165,7 @@
                                     {{-- GAMBAR OPSI (DI BAWAH TEKS) --}}
                                     @if ($opt->image)
                                         <div class="mt-3">
-                                            <img
-                                                src="{{ Storage::url($opt->image) }}"
-                                                alt="Gambar opsi"
+                                            <img src="{{ Storage::url($opt->image) }}" alt="Gambar opsi"
                                                 class="max-h-48 rounded-lg border bg-white p-2 object-contain">
                                         </div>
                                     @endif
@@ -218,7 +192,8 @@
                                 @endphp
 
                                 <p class="text-gray-800 dark:text-gray-100 font-medium">
-                                    Jawaban utama: <span class="text-green-600 dark:text-green-400">{{ $primaryAnswer->option_text }}</span>
+                                    Jawaban utama: <span
+                                        class="text-green-600 dark:text-green-400">{{ $primaryAnswer->option_text }}</span>
                                 </p>
 
                                 @if($correctOptions->count() > 1)
@@ -267,7 +242,8 @@
                                             @if($correctAnswer)
                                                 <div class="mt-2 text-sm">
                                                     Jawaban:
-                                                    <span class="font-semibold {{ $correctAnswer->boolean_answer ? 'text-green-600' : 'text-red-600' }}">
+                                                    <span
+                                                        class="font-semibold {{ $correctAnswer->boolean_answer ? 'text-green-600' : 'text-red-600' }}">
                                                         {{ $correctAnswer->boolean_answer ? 'BENAR' : 'SALAH' }}
                                                     </span>
                                                 </div>

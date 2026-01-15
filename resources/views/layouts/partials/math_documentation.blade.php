@@ -1,8 +1,7 @@
 {{-- SIDEBAR DOKUMENTASI MATH (FULL & AMAN UNTUK MATHQUILL) --}}
-<div id="math-docs"
-     class="fixed top-0 right-0 h-full w-[380px]
-            bg-azwara-lightest text-slate-800
-            dark:bg-gradient-to-b dark:from-azwara-darkest dark:to-azwara-darker
+<div id="math-docs" class="fixed top-0 right-0 h-full w-[380px]
+            bg-ens-lightest text-slate-800
+            dark:bg-gradient-to-b dark:from-ens-darkest dark:to-ens-darker
             dark:text-white
             shadow-2xl border-l border-slate-200/60 dark:border-white/10
             transform translate-x-full
@@ -13,16 +12,17 @@
     <div class="flex items-center justify-between p-4 border-b border-slate-200 dark:border-white/10">
         <h3 class="font-semibold text-lg tracking-wide">MathQuill · Cheat Sheet</h3>
         <button id="close-docs"
-                class="text-slate-500 hover:text-red-500 dark:text-white/70 dark:hover:text-red-400 text-xl">
+            class="text-slate-500 hover:text-red-500 dark:text-white/70 dark:hover:text-red-400 text-xl">
             ✕
         </button>
     </div>
 
     {{-- CONTENT --}}
-    <div class="flex-1 overflow-y-auto p-4 space-y-3 text-sm scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-white/20">
+    <div
+        class="flex-1 overflow-y-auto p-4 space-y-3 text-sm scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-white/20">
 
         {{-- AKAR & PANGKAT --}}
-        <details class="group bg-azwara-lighter dark:bg-white/5 rounded-xl">
+        <details class="group bg-ens-lighter dark:bg-white/5 rounded-xl">
             <summary class="cursor-pointer px-4 py-3 font-semibold flex justify-between items-center">
                 <span>√ · ⁿ√ · x² · xᵢ</span>
                 <span class="group-open:rotate-90 transition">›</span>
@@ -49,7 +49,7 @@
         </details>
 
         {{-- PECAHAN & DELIMITER --}}
-        <details class="group bg-azwara-lighter dark:bg-white/5 rounded-xl">
+        <details class="group bg-ens-lighter dark:bg-white/5 rounded-xl">
             <summary class="cursor-pointer px-4 py-3 font-semibold flex justify-between items-center">
                 <span>a/b · ( ) · |x|</span>
                 <span class="group-open:rotate-90 transition">›</span>
@@ -64,7 +64,7 @@
         </details>
 
         {{-- KALKULUS --}}
-        <details class="group bg-azwara-lighter dark:bg-white/5 rounded-xl">
+        <details class="group bg-ens-lighter dark:bg-white/5 rounded-xl">
             <summary class="cursor-pointer px-4 py-3 font-semibold flex justify-between items-center">
                 <span>∑ · ∫ · lim</span>
                 <span class="group-open:rotate-90 transition">›</span>
@@ -79,7 +79,7 @@
         </details>
 
         {{-- TRIGONOMETRI --}}
-        <details class="group bg-azwara-lighter dark:bg-white/5 rounded-xl">
+        <details class="group bg-ens-lighter dark:bg-white/5 rounded-xl">
             <summary class="cursor-pointer px-4 py-3 font-semibold flex justify-between items-center">
                 <span>sin · cos · tan</span>
                 <span class="group-open:rotate-90 transition">›</span>
@@ -94,7 +94,7 @@
         </details>
 
         {{-- RELASI --}}
-        <details class="group bg-azwara-lighter dark:bg-white/5 rounded-xl">
+        <details class="group bg-ens-lighter dark:bg-white/5 rounded-xl">
             <summary class="cursor-pointer px-4 py-3 font-semibold flex justify-between items-center">
                 <span>= · ≠ · ≤ · ≥</span>
                 <span class="group-open:rotate-90 transition">›</span>
@@ -109,7 +109,7 @@
         </details>
 
         {{-- SIMBOL UMUM --}}
-        <details class="group bg-azwara-lighter dark:bg-white/5 rounded-xl">
+        <details class="group bg-ens-lighter dark:bg-white/5 rounded-xl">
             <summary class="cursor-pointer px-4 py-3 font-semibold flex justify-between items-center">
                 <span>→ · ∞ · π</span>
                 <span class="group-open:rotate-90 transition">›</span>
@@ -124,7 +124,7 @@
         </details>
 
         {{-- HIMPUNAN --}}
-        <details class="group bg-azwara-lighter dark:bg-white/5 rounded-xl">
+        <details class="group bg-ens-lighter dark:bg-white/5 rounded-xl">
             <summary class="cursor-pointer px-4 py-3 font-semibold flex justify-between items-center">
                 <span>ℝ · ℕ · ℤ</span>
                 <span class="group-open:rotate-90 transition">›</span>
@@ -138,9 +138,8 @@
             </div>
         </details>
         {{-- TIPS --}}
-        <div
-            class="mt-6 p-4 rounded-xl
-                bg-azwara-lighter text-slate-700
+        <div class="mt-6 p-4 rounded-xl
+                bg-ens-lighter text-slate-700
                 dark:bg-white/5 dark:text-gray-300">
 
             <h4 class="font-semibold mb-2 text-slate-800 dark:text-white">

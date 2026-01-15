@@ -505,23 +505,18 @@ class ExamResultController extends Controller
      */
     public function studentRanking(Exam $exam, Request $request)
     {
+        // ============================
+        // BASE QUERY (TANPA SEARCH)
+        // ============================
         $query = ExamAttempt::with([
                 'user',
-                'answers.question.options', // penting utk TKP
+                'answers.question.options',
             ])
             ->where('exam_id', $exam->id)
             ->where('is_submitted', true);
+
         // ============================
-        // FILTER BERDASARKAN NAMA
-        // ============================
-        if ($request->has('search') && !empty($request->search)) {
-            $searchTerm = $request->search;
-            $query->whereHas('user', function($q) use ($searchTerm) {
-                $q->where('name', 'like', '%' . $searchTerm . '%');
-            });
-        }
-        // ============================
-        // SORTING LOGIC
+        // SORTING LOGIC (GLOBAL)
         // ============================
         if (
             $exam->type === 'tryout' &&
@@ -533,14 +528,20 @@ class ExamResultController extends Controller
             $query->orderByDesc('score');
         }
 
+        // ============================
+        // AMBIL SEMUA DATA (GLOBAL)
+        // ============================
         $attempts = $query->get();
+
+        $totalParticipants = $attempts->count();
         $totalQuestions = null;
 
         if ($exam->type === 'tryout' && $exam->test_type === 'mtk_stis') {
             $totalQuestions = ExamQuestion::where('exam_id', $exam->id)->count();
         }
+
         // ============================
-        // HITUNG SUB SCORE (SKD ONLY)
+        // HITUNG SUB SCORE (SKD)
         // ============================
         if ($exam->type === 'tryout' && $exam->test_type === 'skd') {
 
@@ -557,9 +558,7 @@ class ExamResultController extends Controller
 
                     $subtest = $question->test_type; // tiu | twk | tkp
 
-                    // ============================
-                    // TIU & TWK → benar × 5
-                    // ============================
+                    // TIU & TWK
                     if (in_array($subtest, ['tiu', 'twk'])) {
                         if ($answer->is_correct === true) {
                             $subtest === 'tiu'
@@ -568,32 +567,29 @@ class ExamResultController extends Controller
                         }
                     }
 
-                    // ============================
-                    // TKP → jumlah bobot option
-                    // ============================
+                    // TKP
                     if ($subtest === 'tkp' && !empty($answer->selected_ids)) {
-
                         $scoreTkp += $question->options
                             ->whereIn('id', $answer->selected_ids)
                             ->sum('weight');
                     }
                 }
 
-                // attach virtual attribute
                 $attempt->score_tiu = $scoreTiu;
                 $attempt->score_twk = $scoreTwk;
                 $attempt->score_tkp = $scoreTkp;
             }
         }
 
+        // ============================
+        // HITUNG BENAR / SALAH / KOSONG
+        // ============================
         foreach ($attempts as $attempt) {
 
-            // default
             $attempt->correct = $attempt->correct_count ?? 0;
             $attempt->wrong   = $attempt->wrong_count ?? 0;
             $attempt->empty   = 0;
 
-            // khusus MTK STIS
             if (
                 $exam->type === 'tryout' &&
                 $exam->test_type === 'mtk_stis' &&
@@ -605,8 +601,9 @@ class ExamResultController extends Controller
                 );
             }
         }
+
         // ============================
-        // RANKING
+        // HITUNG RANK GLOBAL
         // ============================
         $attempts = $attempts
             ->values()
@@ -615,15 +612,35 @@ class ExamResultController extends Controller
                 return $attempt;
             });
 
+        // ============================
+        // SIMPAN DATA USER LOGIN
+        // ============================
         $myAttempt = $attempts->firstWhere('user_id', auth()->id());
-        $totalParticipants = $attempts->count();
+
+        // ============================
+        // FILTER SEARCH (SETELAH RANK)
+        // ============================
+        if ($request->filled('search')) {
+            $search = strtolower($request->search);
+
+            $attempts = $attempts->filter(function ($attempt) use ($search) {
+                return str_contains(
+                    strtolower($attempt->user->name),
+                    $search
+                );
+            })->values();
+        }
+
+        // ============================
+        // RETURN VIEW
+        // ============================
         return view('exams.results.ranking', [
-            'exam'        => $exam,
-            'attempts'    => $attempts,
-            'totalParticipants' => $totalParticipants,
-            'myAttemptId' => optional($myAttempt)->id,
-            'myRank'      => optional($myAttempt)->rank,
-            'search'      => $request->search ?? '',
+            'exam'              => $exam,
+            'attempts'          => $attempts,
+            'totalParticipants' => $totalParticipants, // tetap global
+            'myAttemptId'       => optional($myAttempt)->id,
+            'myRank'            => optional($myAttempt)->rank,
+            'search'            => $request->search ?? '',
         ]);
     }
 

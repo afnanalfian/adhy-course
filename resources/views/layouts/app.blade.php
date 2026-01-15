@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id" class="h-full">
+
 <head>
     @include('layouts.partials.head')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -8,9 +9,8 @@
     @include('components.structured-data')
 </head>
 
-<body
-    class="flex h-screen overflow-hidden
-           bg-gradient-to-br from-azwara-lighter via-azwara-medium/20 to-white
+<body class="flex h-screen overflow-hidden
+           bg-gradient-to-br from-ens-lighter via-ens-medium/20 to-white
            dark:bg-brand-gradient
            bg-fixed bg-no-repeat bg-[length:200%_200%]
            transition-all duration-500">
@@ -28,4 +28,5 @@
     @include('layouts.partials.toast')
     @stack('scripts')
 </body>
+
 </html>

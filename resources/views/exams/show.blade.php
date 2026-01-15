@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $exam->title.' | Tryout Azwara Learning - Matematika, SKD, dll')
+@section('title', $exam->title.' | Tryout ENS Makassar - Matematika, SKD, dll')
 @section('description', 'Ikuti tryout '.$exam->title.' lengkap dengan pembahasan.')
 
 @section('content')
@@ -13,7 +13,7 @@
             <nav class="flex mb-4" aria-label="Breadcrumb">
                 <ol class="inline-flex items-center space-x-1 md:space-x-3">
                     <li class="inline-flex items-center">
-                        <a href="{{ $exam->backRoute() }}" class="inline-flex items-center text-sm text-azwara-medium hover:text-azwara-darkest dark:hover:text-azwara-lighter transition-colors">
+                        <a href="{{ $exam->backRoute() }}" class="inline-flex items-center text-sm text-ens-medium hover:text-ens-darkest dark:hover:text-ens-lighter transition-colors">
                             Daftar Ujian
                         </a>
                     </li>
@@ -32,7 +32,7 @@
             <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                 <div class="flex-1">
                     <div class="flex flex-wrap items-center gap-2 mb-3">
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-azwara-medium/10 text-primary dark:text-azwara-lighter">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-ens-medium/10 text-primary dark:text-ens-lighter">
                             {{ strtoupper($exam->test_type) }}
                         </span>
 
@@ -54,7 +54,7 @@
                         @endif
                     </div>
 
-                    <h1 class="text-2xl md:text-3xl font-bold text-azwara-darkest dark:text-azwara-lighter mb-3">
+                    <h1 class="text-2xl md:text-3xl font-bold text-ens-darkest dark:text-ens-lighter mb-3">
                         {{ $exam->title }}
                     </h1>
 
@@ -64,13 +64,13 @@
                                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
-                                <span class="font-medium text-azwara-darkest dark:text-azwara-light">{{ $exam->exam_date->format('d M Y') }}</span>
+                                <span class="font-medium text-ens-darkest dark:text-ens-light">{{ $exam->exam_date->format('d M Y') }}</span>
                             </div>
                             <div class="flex items-center">
                                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                <span class="font-medium text-azwara-darkest dark:text-azwara-light">{{ $exam->exam_date->format('H:i') }} WIB</span>
+                                <span class="font-medium text-ens-darkest dark:text-ens-light">{{ $exam->exam_date->format('H:i') }} WIB</span>
                             </div>
                         </div>
                     @endif
@@ -81,7 +81,7 @@
                 <div class="flex flex-wrap gap-2">
                     @if($exam->status === 'inactive')
                         <a href="{{ route('exams.edit', $exam) }}"
-                           class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-azwara-lightest dark:bg-azwara-darkest border border-gray-300 dark:border-azwara-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-azwara-medium/20 transition-colors">
+                           class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-ens-lightest dark:bg-ens-darkest border border-gray-300 dark:border-ens-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-ens-medium/20 transition-colors">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                             </svg>
@@ -115,7 +115,7 @@
                         </form>
 
                         <a href="{{ route('exams.results', $exam) }}"
-                           class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-azwara-lightest dark:bg-azwara-darkest border border-gray-300 dark:border-azwara-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-azwara-medium/20 transition-colors">
+                           class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-ens-lightest dark:bg-ens-darkest border border-gray-300 dark:border-ens-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-ens-medium/20 transition-colors">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                             </svg>
@@ -123,7 +123,7 @@
                         </a>
                     @else
                         <a href="{{ route('exams.results', $exam) }}"
-                           class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-azwara-lightest dark:bg-azwara-darkest border border-gray-300 dark:border-azwara-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-azwara-medium/20 transition-colors">
+                           class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-ens-lightest dark:bg-ens-darkest border border-gray-300 dark:border-ens-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-ens-medium/20 transition-colors">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
@@ -153,7 +153,7 @@
         {{-- ================= INFO CARDS ================= --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {{-- Durasi --}}
-            <div class="bg-azwara-lightest dark:bg-azwara-darkest rounded-xl p-5 border border-gray-200 dark:border-azwara-medium shadow-sm">
+            <div class="bg-ens-lightest dark:bg-ens-darkest rounded-xl p-5 border border-gray-200 dark:border-ens-medium shadow-sm">
                 <div class="flex items-center mb-3">
                     <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3">
                         <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,13 +162,13 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Durasi</p>
-                        <p class="text-xl font-bold text-azwara-darkest dark:text-azwara-lighter">{{ $exam->duration_minutes ?? '-' }} menit</p>
+                        <p class="text-xl font-bold text-ens-darkest dark:text-ens-lighter">{{ $exam->duration_minutes ?? '-' }} menit</p>
                     </div>
                 </div>
             </div>
 
             {{-- Jumlah Soal --}}
-            <div class="bg-azwara-lightest dark:bg-azwara-darkest rounded-xl p-5 border border-gray-200 dark:border-azwara-medium shadow-sm">
+            <div class="bg-ens-lightest dark:bg-ens-darkest rounded-xl p-5 border border-gray-200 dark:border-ens-medium shadow-sm">
                 <div class="flex items-center mb-3">
                     <div class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mr-3">
                         <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -177,13 +177,13 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Jumlah Soal</p>
-                        <p class="text-xl font-bold text-azwara-darkest dark:text-azwara-lighter">{{ $exam->questions->count() }} soal</p>
+                        <p class="text-xl font-bold text-ens-darkest dark:text-ens-lighter">{{ $exam->questions->count() }} soal</p>
                     </div>
                 </div>
             </div>
 
             {{-- Tanggal --}}
-            <div class="bg-azwara-lightest dark:bg-azwara-darkest rounded-xl p-5 border border-gray-200 dark:border-azwara-medium shadow-sm">
+            <div class="bg-ens-lightest dark:bg-ens-darkest rounded-xl p-5 border border-gray-200 dark:border-ens-medium shadow-sm">
                 <div class="flex items-center mb-3">
                     <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mr-3">
                         <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,13 +192,13 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Tanggal Ujian</p>
-                        <p class="text-xl font-bold text-azwara-darkest dark:text-azwara-lighter">{{ $exam->exam_date?->format('d M Y') ?? '-' }}</p>
+                        <p class="text-xl font-bold text-ens-darkest dark:text-ens-lighter">{{ $exam->exam_date?->format('d M Y') ?? '-' }}</p>
                     </div>
                 </div>
             </div>
 
             {{-- Jam --}}
-            <div class="bg-azwara-lightest dark:bg-azwara-darkest rounded-xl p-5 border border-gray-200 dark:border-azwara-medium shadow-sm">
+            <div class="bg-ens-lightest dark:bg-ens-darkest rounded-xl p-5 border border-gray-200 dark:border-ens-medium shadow-sm">
                 <div class="flex items-center mb-3">
                     <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mr-3">
                         <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -207,7 +207,7 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Jam Mulai</p>
-                        <p class="text-xl font-bold text-azwara-darkest dark:text-azwara-lighter">{{ $exam->exam_date?->format('H:i') ?? '-' }} WIB</p>
+                        <p class="text-xl font-bold text-ens-darkest dark:text-ens-lighter">{{ $exam->exam_date?->format('H:i') ?? '-' }} WIB</p>
                     </div>
                 </div>
             </div>
@@ -221,7 +221,7 @@
                     @if($exam->type === 'tryout')
                         <div class="mb-6" x-data="{ modalOpen: false }">
                             <div class="flex items-center justify-between mb-3">
-                                <h3 class="text-lg font-semibold text-azwara-darkest dark:text-azwara-lighter">Atur Prerequisite</h3>
+                                <h3 class="text-lg font-semibold text-ens-darkest dark:text-ens-lighter">Atur Prerequisite</h3>
                                 <button @click="modalOpen = true"
                                         class="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
                                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -265,12 +265,12 @@
                                         x-transition:leave="transition ease-in duration-150"
                                         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                                         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                                        class="inline-block align-bottom bg-white dark:bg-azwara-darkest rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                                        class="inline-block align-bottom bg-white dark:bg-ens-darkest rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                                         <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                                             <div class="sm:flex sm:items-start">
                                                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
                                                     <div class="flex justify-between items-center mb-4">
-                                                        <h3 class="text-lg leading-6 font-medium text-azwara-darkest dark:text-azwara-lighter" id="modal-title">
+                                                        <h3 class="text-lg leading-6 font-medium text-ens-darkest dark:text-ens-lighter" id="modal-title">
                                                             Prerequisite Tryout
                                                         </h3>
                                                         <button @click="modalOpen = false" type="button" class="text-gray-400 hover:text-gray-500">
@@ -287,7 +287,7 @@
                                                                 Tryout yang harus diselesaikan
                                                             </label>
                                                             <select name="required_exam_ids[]" multiple
-                                                                    class="w-full rounded-lg border border-gray-300 dark:border-azwara-medium bg-white dark:bg-azwara-darker text-gray-900 dark:text-gray-100 p-3 text-sm focus:ring-2 focus:ring-primary focus:border-transparent">
+                                                                    class="w-full rounded-lg border border-gray-300 dark:border-ens-medium bg-white dark:bg-ens-darker text-gray-900 dark:text-gray-100 p-3 text-sm focus:ring-2 focus:ring-primary focus:border-transparent">
                                                                 @foreach($allTryouts as $tryout)
                                                                     @if($tryout->id !== $exam->id)
                                                                         <option value="{{ $tryout->id }}"
@@ -308,7 +308,7 @@
                                                                 Simpan Perubahan
                                                             </button>
                                                             <button type="button" @click="modalOpen = false"
-                                                                    class="flex-1 border border-gray-300 dark:border-azwara-medium text-gray-700 dark:text-gray-300 py-2.5 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-azwara-medium/20 transition-colors">
+                                                                    class="flex-1 border border-gray-300 dark:border-ens-medium text-gray-700 dark:text-gray-300 py-2.5 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-ens-medium/20 transition-colors">
                                                                 Batal
                                                             </button>
                                                         </div>
@@ -322,11 +322,11 @@
 
                             {{-- Prerequisite List --}}
                             @if($exam->prerequisites->isNotEmpty())
-                                <div class="bg-azwara-lightest/50 dark:bg-azwara-darker rounded-lg p-4 border border-azwara-lighter dark:border-azwara-medium">
-                                    <p class="text-sm font-medium text-azwara-darkest dark:text-azwara-lighter mb-2">Prerequisite yang ditetapkan:</p>
+                                <div class="bg-ens-lightest/50 dark:bg-ens-darker rounded-lg p-4 border border-ens-lighter dark:border-ens-medium">
+                                    <p class="text-sm font-medium text-ens-darkest dark:text-ens-lighter mb-2">Prerequisite yang ditetapkan:</p>
                                     <div class="flex flex-wrap gap-2">
                                         @foreach($exam->prerequisites as $prereq)
-                                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-primary/10 text-primary dark:text-azwara-lighter">
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-primary/10 text-primary dark:text-ens-lighter">
                                                 <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                                 </svg>
@@ -336,7 +336,7 @@
                                     </div>
                                 </div>
                             @else
-                                <div class="bg-gray-50 dark:bg-azwara-darker rounded-lg p-4 border border-gray-200 dark:border-azwara-medium">
+                                <div class="bg-gray-50 dark:bg-ens-darker rounded-lg p-4 border border-gray-200 dark:border-ens-medium">
                                     <p class="text-sm text-gray-600 dark:text-gray-400 italic">
                                         Tidak memiliki prerequisite (tryout independen)
                                     </p>
@@ -350,9 +350,9 @@
                 @role('siswa')
                     @cannot('view', $exam)
                         {{-- No Access --}}
-                        <div class="bg-azwara-lightest dark:bg-azwara-darkest rounded-xl p-6 border border-gray-200 dark:border-azwara-medium shadow-sm">
+                        <div class="bg-ens-lightest dark:bg-ens-darkest rounded-xl p-6 border border-gray-200 dark:border-ens-medium shadow-sm">
                             <div class="text-center py-8">
-                                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-azwara-darker flex items-center justify-center">
+                                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-ens-darker flex items-center justify-center">
                                     <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                     </svg>
@@ -371,7 +371,7 @@
                     @else
                         {{-- Has Attempted --}}
                         @if($attempt && $attempt->is_submitted)
-                            <div class="bg-azwara-lightest dark:bg-azwara-darkest rounded-xl p-6 border border-gray-200 dark:border-azwara-medium shadow-sm mb-6">
+                            <div class="bg-ens-lightest dark:bg-ens-darkest rounded-xl p-6 border border-gray-200 dark:border-ens-medium shadow-sm mb-6">
                                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div>
                                         <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Status Ujian</p>
@@ -387,7 +387,7 @@
                                     </div>
                                 </div>
 
-                                <div class="mt-6 pt-6 border-t border-gray-200 dark:border-azwara-medium">
+                                <div class="mt-6 pt-6 border-t border-gray-200 dark:border-ens-medium">
                                     <div class="flex flex-wrap gap-3">
                                         <a href="{{ route('exams.result.student', $exam) }}"
                                            class="inline-flex items-center px-4 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors">
@@ -402,7 +402,7 @@
 
                         {{-- Hasn't Attempted --}}
                         @else
-                            <div class="bg-azwara-lightest dark:bg-azwara-darkest rounded-xl p-6 border border-gray-200 dark:border-azwara-medium shadow-sm">
+                            <div class="bg-ens-lightest dark:bg-ens-darkest rounded-xl p-6 border border-gray-200 dark:border-ens-medium shadow-sm">
                                 @if($exam->status === 'active')
                                     @if($unmetPrerequisites->isNotEmpty())
                                         <div class="mb-6">
@@ -413,14 +413,14 @@
                                                     </svg>
                                                 </div>
                                                 <div>
-                                                    <h3 class="font-semibold text-azwara-darkest dark:text-azwara-lighter">Prerequisite Belum Terpenuhi</h3>
+                                                    <h3 class="font-semibold text-ens-darkest dark:text-ens-lighter">Prerequisite Belum Terpenuhi</h3>
                                                     <p class="text-sm text-gray-600 dark:text-gray-400">Anda harus menyelesaikan tryout berikut terlebih dahulu:</p>
                                                 </div>
                                             </div>
 
                                             <div class="space-y-2">
                                                 @foreach($unmetPrerequisites as $req)
-                                                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-azwara-darker rounded-lg">
+                                                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-ens-darker rounded-lg">
                                                         <div class="flex items-center">
                                                             <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
@@ -437,12 +437,12 @@
                                     @elseif(!$attempt)
                                         <div class="text-center py-8">
                                             <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
-                                                <svg class="w-10 h-10 text-primary dark:text-azwara-lighter" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-10 h-10 text-primary dark:text-ens-lighter" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                                 </svg>
                                             </div>
-                                            <h3 class="text-xl font-bold text-azwara-darkest dark:text-azwara-lighter mb-3">Siap Mulai Ujian?</h3>
+                                            <h3 class="text-xl font-bold text-ens-darkest dark:text-ens-lighter mb-3">Siap Mulai Ujian?</h3>
                                             <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
                                                 Ujian ini berdurasi {{ $exam->duration_minutes }} menit dengan {{ $exam->questions->count() }} soal. Pastikan koneksi internet stabil sebelum memulai.
                                             </p>
@@ -465,7 +465,7 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                                 </svg>
                                             </div>
-                                            <h3 class="text-xl font-bold text-azwara-darkest dark:text-azwara-lighter mb-3">Ujian dalam Progres</h3>
+                                            <h3 class="text-xl font-bold text-ens-darkest dark:text-ens-lighter mb-3">Ujian dalam Progres</h3>
                                             <p class="text-gray-600 dark:text-gray-400 mb-6">
                                                 Anda memiliki ujian yang belum diselesaikan.
                                             </p>
@@ -480,7 +480,7 @@
                                     @endif
                                 @else
                                     <div class="text-center py-8">
-                                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-azwara-darker flex items-center justify-center">
+                                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-ens-darker flex items-center justify-center">
                                             <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                             </svg>
@@ -500,16 +500,16 @@
             {{-- ================= SIDEBAR ================= --}}
             <div class="space-y-6">
                 {{-- Quick Stats --}}
-                <div class="bg-azwara-lightest dark:bg-azwara-darkest rounded-xl p-5 border border-gray-200 dark:border-azwara-medium shadow-sm">
-                    <h3 class="font-semibold text-azwara-darkest dark:text-azwara-lighter mb-4">Informasi</h3>
+                <div class="bg-ens-lightest dark:bg-ens-darkest rounded-xl p-5 border border-gray-200 dark:border-ens-medium shadow-sm">
+                    <h3 class="font-semibold text-ens-darkest dark:text-ens-lighter mb-4">Informasi</h3>
                     <div class="space-y-3">
-                        <div class="flex justify-between items-center py-2 border-b border-gray-100 dark:border-azwara-medium">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100 dark:border-ens-medium">
                             <span class="text-sm text-gray-600 dark:text-gray-400">Tipe Ujian</span>
-                            <span class="text-sm font-medium text-azwara-darkest dark:text-azwara-light">{{ $exam->type === 'tryout' ? 'Tryout' : 'Latihan' }}</span>
+                            <span class="text-sm font-medium text-ens-darkest dark:text-ens-light">{{ $exam->type === 'tryout' ? 'Tryout' : 'Latihan' }}</span>
                         </div>
-                        <div class="flex justify-between items-center py-2 border-b border-gray-100 dark:border-azwara-medium">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100 dark:border-ens-medium">
                             <span class="text-sm text-gray-600 dark:text-gray-400">Kategori</span>
-                            <span class="text-sm font-medium text-azwara-darkest dark:text-azwara-light">{{ strtoupper($exam->test_type) }}</span>
+                            <span class="text-sm font-medium text-ens-darkest dark:text-ens-light">{{ strtoupper($exam->test_type) }}</span>
                         </div>
                         <div class="flex justify-between items-center py-2">
                             <span class="text-sm text-gray-600 dark:text-gray-400">Status</span>
@@ -525,29 +525,29 @@
                 </div>
 
                 {{-- Instructions --}}
-                <div class="bg-azwara-lightest dark:bg-azwara-darkest rounded-xl p-5 border border-gray-200 dark:border-azwara-medium shadow-sm">
-                    <h3 class="font-semibold text-azwara-darkest dark:text-azwara-lighter mb-4">Petunjuk</h3>
+                <div class="bg-ens-lightest dark:bg-ens-darkest rounded-xl p-5 border border-gray-200 dark:border-ens-medium shadow-sm">
+                    <h3 class="font-semibold text-ens-darkest dark:text-ens-lighter mb-4">Petunjuk</h3>
                     <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                         <li class="flex items-start">
-                            <svg class="w-4 h-4 text-azwara-medium mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-ens-medium mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
                             <span>Pastikan koneksi internet stabil</span>
                         </li>
                         <li class="flex items-start">
-                            <svg class="w-4 h-4 text-azwara-medium mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-ens-medium mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
                             <span>Waktu akan terus berjalan setelah mulai</span>
                         </li>
                         <li class="flex items-start">
-                            <svg class="w-4 h-4 text-azwara-medium mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-ens-medium mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
                             <span>Jawaban akan otomatis tersimpan</span>
                         </li>
                         <li class="flex items-start">
-                            <svg class="w-4 h-4 text-azwara-medium mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-ens-medium mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
                             <span>Review jawaban sebelum submit</span>
@@ -556,7 +556,7 @@
                 </div>
 
                 {{-- Related Actions --}}
-                <div class="bg-gradient-to-br from-azwara-darkest to-primary rounded-xl p-5 text-white">
+                <div class="bg-gradient-to-br from-ens-darkest to-primary rounded-xl p-5 text-white">
                     <h3 class="font-semibold mb-3">Butuh Bantuan?</h3>
                     <p class="text-sm text-white/80 mb-4">Jika mengalami kendala teknis, hubungi tim support kami.</p>
                     <a href="https://wa.me/6285141339645"

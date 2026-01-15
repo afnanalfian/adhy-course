@@ -6,7 +6,7 @@
     {{-- HEADER --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-azwara-darker dark:text-white">
+            <h1 class="text-2xl font-bold text-ens-darker dark:text-white">
                 Products
             </h1>
             <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -16,7 +16,7 @@
 
         <a href="{{ route('products.create') }}"
            class="inline-flex items-center justify-center
-                  bg-primary hover:bg-azwara-medium
+                  bg-primary hover:bg-ens-medium
                   text-white font-semibold
                   px-5 py-2.5 rounded-xl transition">
             + Tambah Product
@@ -26,8 +26,8 @@
     {{-- MOBILE LIST --}}
     <div class="space-y-4 sm:hidden">
         @forelse($products as $product)
-            <div class="rounded-2xl border dark:border-azwara-darker
-                        bg-azwara-lightest dark:bg-azwara-darkest p-4 space-y-3">
+            <div class="rounded-2xl border dark:border-ens-darker
+                        bg-ens-lightest dark:bg-ens-darkest p-4 space-y-3">
 
                 <div class="flex items-start justify-between gap-3">
                     <div>
@@ -36,7 +36,7 @@
                         </h3>
                         <p class="text-xs uppercase mt-1 inline-block
                             px-2 py-1 rounded-lg
-                            bg-white dark:bg-azwara-darker
+                            bg-white dark:bg-ens-darker
                             text-gray-700 dark:text-gray-300">
                             {{ str_replace('_', ' ', $product->type) }}
                         </p>
@@ -116,12 +116,12 @@
 
     {{-- DESKTOP TABLE --}}
     <div class="hidden sm:block overflow-hidden rounded-2xl border
-                dark:border-azwara-darker
-                bg-azwara-lightest dark:bg-azwara-darkest">
+                dark:border-ens-darker
+                bg-ens-lightest dark:bg-ens-darkest">
 
         <table class="min-w-full text-sm">
-            <thead class="bg-primary dark:bg-azwara-darker">
-                <tr class="text-left text-azwara-lightest dark:text-gray-300">
+            <thead class="bg-primary dark:bg-ens-darker">
+                <tr class="text-left text-ens-lightest dark:text-gray-300">
                     <th class="px-6 py-4">Nama Product</th>
                     <th class="px-6 py-4">Tipe</th>
                     <th class="px-6 py-4">Konten</th>
@@ -130,7 +130,7 @@
                 </tr>
             </thead>
 
-            <tbody class="divide-y dark:divide-azwara-darker">
+            <tbody class="divide-y dark:divide-ens-darker">
                 @forelse($products as $product)
                     <tr class="align-top">
 
@@ -141,7 +141,7 @@
                         <td class="px-6 py-4">
                             <span class="uppercase text-xs font-semibold
                                 px-2.5 py-1 rounded-lg
-                                bg-white dark:bg-azwara-darker
+                                bg-white dark:bg-ens-darker
                                 text-gray-700 dark:text-gray-300">
                                 {{ str_replace('_', ' ', $product->type) }}
                             </span>
