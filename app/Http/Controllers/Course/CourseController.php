@@ -15,7 +15,7 @@ class CourseController extends Controller
         $q = $request->query('q');
 
         $user = auth()->user();
-        $isTentor = $user->hasRole('tentor');
+        $isTentor = $user ? $user->hasRole('tentor') : false;
 
         $courses = Course::with('teachers.user')
             ->when($q, fn($qr) => $qr->where('name', 'like', "%{$q}%"))
