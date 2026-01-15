@@ -81,12 +81,12 @@ class OrderController extends Controller
             ]);
         });
 
-        notify_user(
-            $order->user,
-            "Pembayaran Anda untuk Order #{$order->order_code} telah diverifikasi. Akses telah diberikan.",
-            true,
-            route('my.orders.show', $order)
-        );
+        // notify_user(
+        //     $order->user,
+        //     "Pembayaran Anda untuk Order #{$order->order_code} telah diverifikasi. Akses telah diberikan.",
+        //     true,
+        //     route('my.orders.show', $order)
+        // );
 
         toast('success', 'Pembayaran berhasil diverifikasi dan akses diberikan');
         return redirect()->route('orders.index');
@@ -117,12 +117,12 @@ class OrderController extends Controller
             ]);
         });
 
-        notify_user(
-            $order->user,
-            "Pembayaran Order #{$order->order_code} ditolak. Silakan upload ulang bukti pembayaran.",
-            true,
-            route('checkout.payment', $order)
-        );
+        // notify_user(
+        //     $order->user,
+        //     "Pembayaran Order #{$order->order_code} ditolak. Silakan upload ulang bukti pembayaran.",
+        //     true,
+        //     route('checkout.payment', $order)
+        // );
 
         toast('info', 'Pembayaran telah ditolak');
         return redirect()->route('orders.index');

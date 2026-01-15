@@ -300,7 +300,7 @@
     {{-- FOOTER --}}
     <div class="footer">
         <p>Laporan ini dibuat secara otomatis oleh sistem ENS Makassar Center</p>
-        <p>© {{ date('Y') }} ENS Makassar Center • www.azwaralearning.com</p>
+        <p>© {{ date('Y') }} ENS Makassar Center • www.ens-makassar.com</p>
     </div>
 </body>
 </html>

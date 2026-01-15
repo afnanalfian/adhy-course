@@ -106,7 +106,7 @@ class MeetingController extends Controller
             'scheduled_at' => Carbon::createFromFormat(
                 'Y-m-d\TH:i',
                 $request->scheduled_at,
-                'Asia/Jakarta'
+                'Asia/Makassar'
             ),
             'zoom_link'  => $request->zoom_link,
             'status'     => 'upcoming',
@@ -123,7 +123,7 @@ class MeetingController extends Controller
         return view('meetings.edit', [
             'meeting'     => $meeting,
             'scheduledAt' => optional($meeting->scheduled_at)
-                ->timezone('Asia/Jakarta')
+                ->timezone('Asia/Makassar')
                 ->format('Y-m-d\TH:i'),
         ]);
     }
@@ -144,7 +144,7 @@ class MeetingController extends Controller
             'scheduled_at' => Carbon::createFromFormat(
                 'Y-m-d\TH:i',
                 $request->scheduled_at,
-                'Asia/Jakarta'
+                'Asia/Makassar'
             ),
             'zoom_link'    => $request->zoom_link,
             'is_free'      => $request->boolean('is_free'),
@@ -182,14 +182,14 @@ class MeetingController extends Controller
             'status' => 'done',
         ]);
         /** NOTIFY TEACHERS */
-        foreach ($meeting->course->teachers as $teacher) {
-            notify_user(
-                $teacher->user,
-                "Meeting '{$meeting->title}' telah selesai. Harap upload materi dan video.",
-                false,
-                route('meeting.show', $meeting)
-            );
-        }
+        // foreach ($meeting->course->teachers as $teacher) {
+        //     notify_user(
+        //         $teacher->user,
+        //         "Meeting '{$meeting->title}' telah selesai. Harap upload materi dan video.",
+        //         false,
+        //         route('meeting.show', $meeting)
+        //     );
+        // }
         toast('success', 'Meeting selesai');
         return back();
     }

@@ -13,17 +13,6 @@ class SiswaUserSeeder extends Seeder
     {
         $siswaData = [
             [
-                'name' => 'Muhammad Afnan Alfian, S. Tr. Stat.',
-                'email' => 'afnan.02alf@gmail.com',
-                'password' => Hash::make('password'),
-                'province_id' => 73,
-                'regency_id' => 7309,
-                'phone' => '082169165041',
-                'avatar' => null,
-                'is_active' => true,
-                'email_verified_at' => now(),
-            ],
-            [
                 'name' => 'Afied Akhmad, S. Tr. Stat.',
                 'email' => 'afiedakhmad@gmail.com',
                 'password' => Hash::make('password'),

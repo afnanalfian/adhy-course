@@ -48,14 +48,23 @@ class RegisterController extends Controller
         ]);
 
         $user->assignRole('siswa');
-        $user->sendEmailVerificationNotification();
+        // $user->sendEmailVerificationNotification();
+        // $user->update([
+        //     'last_verification_sent_at' => now(),
+        // ]);
+        // // auto login user
+        // auth()->login($user);
+
+        // TANDAI LANGSUNG VERIFIED
         $user->update([
-            'last_verification_sent_at' => now(),
+            'email_verified_at' => now(),
         ]);
+
         // auto login user
         auth()->login($user);
 
         toast('success','Akun berhasil dibuat. Silakan verifikasi email Anda.');
-        return redirect()->route('verification.notice');
+        // return redirect()->route('verification.notice');
+        return redirect()->route('dashboard.redirect');
     }
 }

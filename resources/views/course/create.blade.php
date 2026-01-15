@@ -84,7 +84,7 @@
             </div>
 
             {{-- FREE COURSE --}}
-            <div class="space-y-1">
+            {{-- <div class="space-y-1">
                 <label class="flex items-center gap-3 cursor-pointer">
                     <input type="checkbox" name="is_free" value="1" {{ old('is_free') ? 'checked' : '' }} class="rounded border-gray-300
                                 text-primary
@@ -98,7 +98,7 @@
                 <p class="text-xs text-gray-500 dark:text-gray-400">
                     Jika dicentang, semua user dapat mengakses course ini tanpa membeli.
                 </p>
-            </div>
+            </div> --}}
 
             {{-- Thumbnail --}}
             <div class="space-y-1">

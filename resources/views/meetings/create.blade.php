@@ -46,7 +46,7 @@
             </div>
 
             {{-- FREE MEETING --}}
-            <div>
+            {{-- <div>
                 <label class="flex items-center gap-3 cursor-pointer">
                     <input type="checkbox" name="is_free" value="1" {{ old('is_free') ? 'checked' : '' }} class="rounded border-gray-300
                                 text-primary
@@ -60,7 +60,7 @@
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     Pertemuan ini dapat diakses tanpa membeli course.
                 </p>
-            </div>
+            </div> --}}
 
             {{-- DATETIME --}}
             <div>
@@ -75,10 +75,6 @@
                             bg-ens-lightest dark:bg-secondary
                             dark:text-white
                             focus:ring-primary focus:border-primary">
-
-                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Waktu menggunakan zona WIB (UTC+7)
-                </p>
             </div>
 
             {{-- ZOOM LINK --}}

@@ -37,15 +37,15 @@
             </svg>
         </button>
 
-        @php
+        {{-- @php
             $notifications = auth()->user()?->unreadNotifications()->latest()->take(5)->get();
             $unreadCount = auth()->user()?->unreadNotifications()->count() ?? 0;
         @endphp
 
-        <div x-data="{ open:false }" class="relative">
+        <div x-data="{ open:false }" class="relative"> --}}
 
             {{-- Bell --}}
-            <button @click="open = !open" class="relative text-ens-darkest dark:text-ens-lighter">
+            {{-- <button @click="open = !open" class="relative text-ens-darkest dark:text-ens-lighter">
 
                 <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 22c1.1 0 2-.9 2-2H10c0 1.1.9 2 2 2Zm6-6v-5a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2Z" />
@@ -58,10 +58,10 @@
                         {{ $unreadCount }}
                     </span>
                 @endif
-            </button>
+            </button> --}}
 
             {{-- Dropdown --}}
-            <div x-show="open" @click.outside="open=false" class="absolute right-0 mt-3 w-80
+            {{-- <div x-show="open" @click.outside="open=false" class="absolute right-0 mt-3 w-80
                         bg-white dark:bg-ens-darker
                         rounded-xl shadow-xl border
                         dark:border-ens-darkest z-50">
@@ -88,7 +88,7 @@
                     Selengkapnya →
                 </a>
             </div>
-        </div>
+        </div> --}}
 
         {{-- User Dropdown --}}
         <div x-data="{ open: false }" class="relative">
@@ -108,10 +108,10 @@
                     class="block px-4 py-2 text-ens-darkest dark:text-ens-lighter hover:bg-ens-lighter/50 dark:hover:bg-ens-medium/20 rounded">
                     Profil
                 </a>
-                <a href="{{ route('home') }}"
+                {{-- <a href="{{ route('home') }}"
                     class="block px-4 py-2 text-ens-darkest dark:text-ens-lighter hover:bg-ens-lighter/50 dark:hover:bg-ens-medium/20 rounded">
                     Home
-                </a>
+                </a> --}}
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button

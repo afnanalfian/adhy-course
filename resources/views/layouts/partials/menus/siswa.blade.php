@@ -1,12 +1,12 @@
 {{-- ================= DASHBOARD ================= --}}
-<a href="{{ route('dashboard.redirect') }}" class="menu-item {{ request()->routeIs('dashboard.*') ? 'active' : '' }}">
+{{-- <a href="{{ route('dashboard.redirect') }}" class="menu-item {{ request()->routeIs('dashboard.*') ? 'active' : '' }}">
     <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
         stroke-width="1.5">
         <path stroke-linecap="round" stroke-linejoin="round"
             d="M3 9.75L12 4.5l9 5.25V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z" />
     </svg>
     Dashboard
-</a>
+</a> --}}
 
 {{-- ================= COURSE ================= --}}
 <a href="{{ route('course.index') }}" class="menu-item {{ request()->routeIs('course.*') ? 'active' : '' }}">
@@ -28,18 +28,27 @@
     </svg>
     Schedule
 </a>
-
+{{-- ================= TRYOUT ================= --}}
+<a href="{{ route('tryouts.index') }}" class="menu-item {{ request()->routeIs('tryouts.*') ? 'active' : '' }}">
+        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6
+                        a2 2 0 012-2h3.5a2 2 0 004 0H17
+                        a2 2 0 012 2v12a2 2 0 01-2 2z" />
+        </svg>
+    Tryout
+</a>
 {{-- ================= TENTOR ================= --}}
-<a href="{{ route('tentor.index') }}" class="menu-item {{ request()->routeIs('tentor.*') ? 'active' : '' }}">
+{{-- <a href="{{ route('tentor.index') }}" class="menu-item {{ request()->routeIs('tentor.*') ? 'active' : '' }}">
     <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
         stroke-width="1.5">
         <path stroke-linecap="round" stroke-linejoin="round"
             d="M17 20h5v-2a4 4 0 00-4-4h-1m-6 6H4v-2a4 4 0 014-4h1m0-4a4 4 0 118 0 4 4 0 01-8 0z" />
     </svg>
     Tentor
-</a>
+</a> --}}
 {{-- ================= EXAMS ================= --}}
-@php
+{{-- @php
     $evaluasiActive = request()->routeIs(
         'tryouts.*',
         'quizzes.*',
@@ -81,11 +90,11 @@
             Daily Quiz
         </a>
     </div>
-</div>
+</div> --}}
 
 
 {{-- ================= PEMBELIAN (DROPDOWN SISWA) ================= --}}
-@php
+{{-- @php
     $purchaseActive = request()->routeIs(
         'browse.*',
         'cart.*',
@@ -133,15 +142,15 @@
             Riwayat Pembelian
         </a>
     </div>
-</div>
+</div> --}}
 
 {{-- ================= SIMPLE GAMES MENU ================= --}}
-<div x-data="{ open: {{ request()->routeIs('game.*') ? 'true' : 'false' }} }" class="relative">
+{{-- <div x-data="{ open: {{ request()->routeIs('game.*') ? 'true' : 'false' }} }" class="relative">
 
     <button @click="open = !open" class="menu-item w-full flex justify-between items-center
                {{ request()->routeIs('game.*') ? 'active' : '' }}">
         <div class="flex items-center gap-2">
-            {{-- Game Console Icon --}}
+
             <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -159,16 +168,15 @@
     <div x-show="open" @click.outside="open = false" x-transition class="ml-6 mt-2 space-y-1 border-l
                border-ens-medium/30
                dark:border-ens-light/20 pl-4">
-        {{-- Math Quiz Game --}}
+
         <a href="{{ route('game.math') }}" class="menu-subitem {{ request()->routeIs('game.math') ? 'active' : '' }}">
             <span class="w-1 h-1 rounded-full bg-current"></span>
             Math Quiz
         </a>
 
-        {{-- Snake Game --}}
         <a href="{{ route('game.snake') }}" class="menu-subitem {{ request()->routeIs('game.snake') ? 'active' : '' }}">
             <span class="w-1 h-1 rounded-full bg-current"></span>
             Snake Game
         </a>
     </div>
-</div>
+</div> --}}

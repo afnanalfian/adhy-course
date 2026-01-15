@@ -24,7 +24,7 @@
             <span class="inline-block px-4 py-1.5 rounded-full
                        bg-white/80 backdrop-blur-sm text-ens-darkest
                        text-sm font-medium border border-ens-lighter">
-                Platform Bimbel Online Terpercaya
+                Platform Bimbel Kedinasan Terpercaya
             </span>
 
             <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl
@@ -36,7 +36,7 @@
 
             <p class="text-base sm:text-lg text-secondary/90 max-w-xl
                        leading-relaxed">
-                Bimbel online dengan materi terstruktur, tentor berpengalaman,
+                Bimbel Kedinasan dengan materi terstruktur, tentor berpengalaman,
                 serta tryout dan pembahasan yang membantu kamu
                 mencapai target belajar dengan lebih efektif.
             </p>

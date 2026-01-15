@@ -213,27 +213,27 @@ class ExamController extends Controller
     {
         $exam->update(['status' => 'active']);
         /** TARGET USERS */
-        $users = collect();
+        // $users = collect();
 
-        if (in_array($exam->type, ['tryout', 'quiz'])) {
-            $users = User::whereHas('entitlements', function ($q) use ($exam) {
-                $q->where('entitlement_type', $exam->type);
-            })->get();
-        }
+        // if (in_array($exam->type, ['tryout', 'quiz'])) {
+        //     $users = User::whereHas('entitlements', function ($q) use ($exam) {
+        //         $q->where('entitlement_type', $exam->type);
+        //     })->get();
+        // }
 
-        if ($exam->type === 'post_test' && $exam->owner_type === Meeting::class) {
-            $meeting = Meeting::find($exam->owner_id);
-            $users = User::usersWithMeetingAccess($meeting);
-        }
+        // if ($exam->type === 'post_test' && $exam->owner_type === Meeting::class) {
+        //     $meeting = Meeting::find($exam->owner_id);
+        //     $users = User::usersWithMeetingAccess($meeting);
+        // }
 
-        foreach ($users as $user) {
-            notify_user(
-                $user,
-                "Ujian '{$exam->title}' telah dibuka. Silakan dikerjakan.",
-                false,
-                route('exams.show', $exam)
-            );
-        }
+        // foreach ($users as $user) {
+        //     notify_user(
+        //         $user,
+        //         "Ujian '{$exam->title}' telah dibuka. Silakan dikerjakan.",
+        //         false,
+        //         route('exams.show', $exam)
+        //     );
+        // }
         return back()->with('success', 'Ujian diaktifkan');
     }
 

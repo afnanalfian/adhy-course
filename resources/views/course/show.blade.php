@@ -126,8 +126,7 @@
                             @if ($meeting->scheduled_at)
                                         <div class="text-sm text-gray-600 dark:text-gray-300">
                                             {{ $meeting->scheduled_at
-                                ->timezone('Asia/Jakarta')
-                                ->translatedFormat('l, d F Y • H:i') }} WIB
+                                ->translatedFormat('l, d F Y • H:i') }} WITA
                                         </div>
                             @endif
                         </div>

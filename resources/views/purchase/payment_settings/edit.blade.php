@@ -65,7 +65,7 @@
                     </option>
 
                     <option value="midtrans" @selected(($settings['active_payment_method'] ?? '') === 'midtrans')>
-                        Midtrans (Online)
+                        Midtrans (Kedinasan)
                     </option>
 
                 </select>

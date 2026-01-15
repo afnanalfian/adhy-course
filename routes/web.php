@@ -64,7 +64,8 @@ use App\Http\Controllers\Marketing\{
 | PUBLIC ROUTES
 |--------------------------------------------------------------------------
 */
-Route::get('/', [LandingController::class, 'index'])->name('home');
+// Route::get('/', [LandingController::class, 'index'])->name('home');
+Route::get('/', [CourseController::class, 'index'])->name('home');
 Route::get('/tutorial', [LandingController::class, 'tutorial'])->name('tutorial');
 
 Route::get('/sitemap.xml', function () {
@@ -92,6 +93,13 @@ Route::get('/sitemap.xml', function () {
 |--------------------------------------------------------------------------
 */
 require __DIR__.'/auth.php';
+// Route::get('/', function () {
+//     if (auth()->check()) {
+//         return redirect()->route('dashboard.redirect');
+//     }
+
+//     return redirect()->route('login');
+// });
 
 /*
 |--------------------------------------------------------------------------
@@ -243,6 +251,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['role:admin|tentor'])->group(function () {
         Route::get('/meetings/{meeting}/attendance',[MeetingAttendanceController::class, 'index'])->name('meeting.attendance.index');
         Route::post('/meetings/{meeting}/attendance',[MeetingAttendanceController::class, 'store'])->name('meeting.attendance.store');
+        Route::post('/meetings/{meeting}/attendance/quick-toggle', [MeetingAttendanceController::class, 'quickToggle'])->name('meeting.attendance.quick-toggle');
+        Route::get('/api/students/search', [MeetingAttendanceController::class, 'searchStudents'])->name('api.students.search');
         Route::get('/reports/course-attendance', [MeetingAttendanceController::class, 'courseAttendanceReport'])->name('reports.course-attendance');
     });
 
@@ -556,6 +566,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');
+    Route::get('/schedule/search', [ScheduleController::class, 'search'])->name('schedule.search');
+    Route::get('/api/schedule/events', [ScheduleController::class, 'apiEvents'])->name('schedule.api.events');
 
     /*
     |--------------------------------------------------------------------------
@@ -569,20 +581,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-Route::get('/test-notif-admin', function () {
+// Route::get('/test-notif-admin', function () {
 
-    $admin = User::role('admin')->first();
+//     $admin = User::role('admin')->first();
 
-    if (! $admin) {
-        return 'Admin tidak ditemukan';
-    }
+//     if (! $admin) {
+//         return 'Admin tidak ditemukan';
+//     }
 
-    notify_user(
-        $admin,
-        'TEST NOTIFIKASI: Ini notifikasi percobaan ke admin',
-        false,
-        'admin/dashboard'
-    );
+//     notify_user(
+//         $admin,
+//         'TEST NOTIFIKASI: Ini notifikasi percobaan ke admin',
+//         false,
+//         'admin/dashboard'
+//     );
 
-    return 'Notif dikirim ke admin: ' . $admin->email;
-});
+//     return 'Notif dikirim ke admin: ' . $admin->email;
+// });

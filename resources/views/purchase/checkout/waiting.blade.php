@@ -166,7 +166,7 @@
                                                 <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Butuh
                                                     Bantuan?</p>
                                                 <p class="text-xs text-gray-600 dark:text-gray-400">
-                                                    Hubungi <a href="https://wa.me/6285141339645"
+                                                    Hubungi <a href="https://wa.me/6282191253023"
                                                         class="text-primary hover:underline">WhatsApp Admin Azwara</a> jika
                                                     ada pertanyaan.
                                                 </p>
@@ -213,7 +213,7 @@
                             d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                     <span class="text-sm text-gray-600 dark:text-gray-400">
-                        Masih ada pertanyaan? Hubungi <a href="mailto:support@azwaralearning.com"
+                        Masih ada pertanyaan? Hubungi <a href="mailto:support@ens-makassar.com"
                             class="text-primary hover:underline font-medium">Tim Support</a>
                     </span>
                 </div>

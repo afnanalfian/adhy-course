@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ENS Makassar</title>
     <meta name="description"
-        content="Bimbel online, tryout beragam, quiz harian, live zoom, materi lengkap, latihan soal terbaru.">
+        content="Bimbel Kedinasan, tryout beragam, quiz harian, live zoom, materi lengkap, latihan soal terbaru.">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <meta name="google-site-verification" content="exlEPP1kFOZJWZ_zxo5Qa-PoW-3oPa-9avX-Xbgcjb4" />
     <meta name="msvalidate.01" content="E0E1D8239606A4386F61EB8D5FC2DED6" />
@@ -45,8 +45,8 @@
         <div class="container mx-auto px-4 flex items-center justify-between">
 
             {{-- Logo --}}
-            <a href="{{ route('home') }}" class="text-xl font-bold text-ens-darker dark:text-white tracking-wide">
-                Azwara<span class="text-primary dark:text-ens-lighter">Learning</span>
+            <a href="#" class="text-xl font-bold text-ens-darker dark:text-white tracking-wide">
+                ENS<span class="text-primary dark:text-ens-lighter">Makassar</span>
             </a>
 
             <div class="flex items-center gap-4">

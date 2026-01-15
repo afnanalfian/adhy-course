@@ -43,7 +43,7 @@ class LoginController extends Controller
         }
 
 
-        return redirect()->route('dashboard.redirect');
+        return redirect()->route('course.index');
     }
 
     public function logout(Request $request)
@@ -52,7 +52,7 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('home');
+        return redirect()->route('login');
     }
     public function forgotPasswordForm()
     {

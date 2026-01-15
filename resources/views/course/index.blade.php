@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Course Online Matematika & SKD | ENS Makassar')
-@section('description', 'Kumpulan berbagai subjek termasuk CPNS dan sekolah kedinasan dengan materi terstruktur, video, dan latihan soal.')
+@section('title', 'Course Kedinasan | ENS Makassar')
+@section('description', 'Bimbingan Persiapan Masuk Sekolah kedinasan dengan materi terstruktur dan latihan soal.')
 @section('content')
     {{-- HEADER --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -120,10 +120,10 @@
                             }
                         @endphp
 
-                        <span class="absolute left-3 top-3 text-xs font-medium
+                        {{-- <span class="absolute left-3 top-3 text-xs font-medium
                                         px-3 py-1 rounded-lg shadow {{ $badgeClass }}">
                             {{ $badgeText }}
-                        </span>
+                        </span> --}}
                     </div>
 
                     {{-- BODY --}}

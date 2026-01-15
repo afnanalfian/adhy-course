@@ -69,10 +69,6 @@
                               bg-ens-lightest dark:bg-secondary
                               dark:text-white
                               focus:ring-primary focus:border-primary">
-
-                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Waktu menggunakan zona WIB (UTC+7)
-                </p>
             </div>
 
             {{-- ZOOM LINK --}}

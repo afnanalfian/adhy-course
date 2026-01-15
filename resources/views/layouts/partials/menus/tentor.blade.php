@@ -1,22 +1,12 @@
 {{-- ================= DASHBOARD ================= --}}
-<a href="{{ route('dashboard.redirect') }}" class="menu-item {{ request()->routeIs('dashboard.*') ? 'active' : '' }}">
+{{-- <a href="{{ route('dashboard.redirect') }}" class="menu-item {{ request()->routeIs('dashboard.*') ? 'active' : '' }}">
     <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
         stroke-width="1.5">
         <path stroke-linecap="round" stroke-linejoin="round"
             d="M3 9.75L12 4.5l9 5.25V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z" />
     </svg>
     Dashboard
-</a>
-
-{{-- ================= SISWA ================= --}}
-<a href="{{ route('siswa.index') }}" class="menu-item {{ request()->routeIs('siswa.*') ? 'active' : '' }}">
-    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-        stroke-width="1.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v7m0-7l-9-5m9 5l9-5" />
-    </svg>
-    Siswa
-</a>
-
+</a> --}}
 {{-- ================= COURSE ================= --}}
 <a href="{{ route('course.index') }}" class="menu-item {{ request()->routeIs('course.*') ? 'active' : '' }}">
     <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -27,6 +17,15 @@
     </svg>
     Course
 </a>
+{{-- ================= SISWA ================= --}}
+<a href="{{ route('siswa.index') }}" class="menu-item {{ request()->routeIs('siswa.*') ? 'active' : '' }}">
+    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+        stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v7m0-7l-9-5m9 5l9-5" />
+    </svg>
+    Siswa
+</a>
+
 {{-- ================= SCHEDULE ================= --}}
 <a href="{{ route('schedule.index') }}" class="menu-item {{ request()->routeIs('schedule.*') ? 'active' : '' }}">
     <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -37,8 +36,18 @@
     </svg>
     Schedule
 </a>
+{{-- ================= TRYOUT ================= --}}
+<a href="{{ route('tryouts.index') }}" class="menu-item {{ request()->routeIs('tryouts.*') ? 'active' : '' }}">
+        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6
+                        a2 2 0 012-2h3.5a2 2 0 004 0H17
+                        a2 2 0 012 2v12a2 2 0 01-2 2z" />
+        </svg>
+    Tryout
+</a>
 {{-- ================= EXAMS ================= --}}
-@php
+{{-- @php
     $evaluasiActive = request()->routeIs(
         'tryouts.*',
         'quizzes.*',
@@ -80,7 +89,7 @@
             Daily Quiz
         </a>
     </div>
-</div>
+</div> --}}
 {{-- ================= BANK SOAL ================= --}}
 <a href="{{ route('bank.category.index') }}"
     class="menu-item {{ request()->routeIs('bank.*', 'questions.*') ? 'active' : '' }}">

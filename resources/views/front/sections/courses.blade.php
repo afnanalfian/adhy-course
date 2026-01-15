@@ -304,7 +304,7 @@
                 {{-- Section Header --}}
                 <div class="text-center mb-10">
                     <h2 class="text-2xl md:text-3xl font-bold text-ens-darkest mb-3">
-                        <span class="text-primary">Tryout</span> Online
+                        <span class="text-primary">Tryout</span> Kedinasan
                     </h2>
                     <p class="text-secondary max-w-2xl mx-auto">
                         Uji kemampuan Anda dengan tryout berkualitas untuk persiapan ujian.

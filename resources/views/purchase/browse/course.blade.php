@@ -225,7 +225,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
-                                            <span>{{ $m->scheduled_at->format('H:i') }} WIB</span>
+                                            <span>{{ $m->scheduled_at->format('H:i') }} WITA</span>
                                         </div>
                                     </div>
 

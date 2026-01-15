@@ -12,12 +12,12 @@
                     </div>
                     <div>
                         <h2 class="text-2xl font-bold">ENS Makassar</h2>
-                        <p class="text-ens-lighter text-sm">Bimbel Online Terpercaya</p>
+                        <p class="text-ens-lighter text-sm">Bimbel Kedinasan Terpercaya</p>
                     </div>
                 </div>
 
                 <p class="text-ens-lighter max-w-lg leading-relaxed">
-                    Platform bimbel online dengan materi terstruktur, tentor berpengalaman,
+                    Platform bimbel Kedinasan dengan materi terstruktur, tentor berpengalaman,
                     serta tryout dan pembahasan yang membantu siswa mencapai target belajar
                     dengan lebih efektif.
                 </p>
@@ -55,16 +55,16 @@
                         </a>
 
                         {{-- YouTube --}}
-                        <a href="https://www.youtube.com/@AzwaraLearning" target="_blank" rel="noopener noreferrer"
+                        <a href="https://www.youtube.com/@ens-makassar" target="_blank" rel="noopener noreferrer"
                             class="h-10 w-10 rounded-full bg-ens-darker flex items-center justify-center hover:bg-[#FF0000] transition duration-300 group relative"
-                            aria-label="YouTube ENS Makassar" title="YouTube @AzwaraLearning">
+                            aria-label="YouTube ENS Makassar" title="YouTube @ens-makassar">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                 <path
                                     d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                             </svg>
                             <span
                                 class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                                @AzwaraLearning
+                                @ens-makassar
                             </span>
                         </a>
                     </div>
@@ -165,7 +165,7 @@
                         <div>
                             <p class="font-medium">Telepon / WhatsApp</p>
                             <p class="text-ens-lighter text-sm mt-1">
-                                (+62) 851-4133-9645
+                                (+62) 821-9125-3023
                                 {{-- 0812-3456-7890 --}}
                             </p>
                         </div>
@@ -181,8 +181,8 @@
                         <div>
                             <p class="font-medium">Email</p>
                             <p class="text-ens-lighter text-sm mt-1">
-                                azwaralearning@gmail.com
-                                {{-- support@azwaralearning.com --}}
+                                ens-makassar@gmail.com
+                                {{-- support@ens-makassar.com --}}
                             </p>
                         </div>
                     </li>

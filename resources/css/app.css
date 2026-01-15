@@ -848,7 +848,7 @@ footer .social-icon span::before {
     box-shadow: 0 25px 50px rgba(11, 31, 51, 0.15);
 }
 
-/* Custom scrollbar dengan warna Azwara */
+/* Custom scrollbar dengan warna ENS */
 #meetingsModal .max-h-\[50vh\] {
     scrollbar-width: thin;
     scrollbar-color: #3a6f8f #f2efe7;

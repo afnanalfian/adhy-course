@@ -113,7 +113,7 @@
             Email ini dikirim otomatis oleh sistem ENS Makassar.
             <br>
             Jika Anda mengalami masalah, hubungi:
-            <a href="mailto:azwaralearning@gmail.com">azwaralearning@gmail.com</a>
+            <a href="mailto:ens-makassar@gmail.com">ens-makassar@gmail.com</a>
         </div>
 
     </div>

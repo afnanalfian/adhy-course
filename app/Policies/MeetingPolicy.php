@@ -9,6 +9,10 @@ class MeetingPolicy
 {
     public function view(User $user, Meeting $meeting): bool
     {
+        // 🔥 GLOBAL OVERRIDE (POLICY OFF)
+        if (! config('app.access_policy_enabled')) {
+            return true;
+        }
         if (! $user->hasRole('siswa')) {
             return true;
         }

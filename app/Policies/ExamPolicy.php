@@ -10,6 +10,10 @@ class ExamPolicy
 {
     public function view(User $user, Exam $exam): bool
     {
+        // 🔥 GLOBAL OVERRIDE (POLICY OFF)
+        if (! config('app.access_policy_enabled')) {
+            return true;
+        }
         // Admin / tentor / dll → bebas
         if (! $user->hasRole('siswa')) {
             return true;

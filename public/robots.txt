@@ -7,4 +7,4 @@ Disallow: /cart/
 Disallow: /checkout/
 Disallow: /my/orders/
 
-Sitemap: https://azwaralearning.com/sitemap.xml
+Sitemap: https://ens-makassar.com/sitemap.xml
