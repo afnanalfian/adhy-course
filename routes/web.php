@@ -65,7 +65,6 @@ use App\Http\Controllers\Marketing\{
 |--------------------------------------------------------------------------
 */
 // Route::get('/', [LandingController::class, 'index'])->name('home');
-Route::get('/', [CourseController::class, 'index'])->name('home');
 Route::get('/tutorial', [LandingController::class, 'tutorial'])->name('tutorial');
 
 Route::get('/sitemap.xml', function () {
@@ -123,6 +122,8 @@ Route::get('/dashboard-redirect', function () {
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
+    Route::get('/', [CourseController::class, 'index'])->name('home');
     Route::get('/get-regencies/{province_id}', function($province_id) {
         return \App\Models\Regency::where('province_id', $province_id)
             ->orderBy('id')
