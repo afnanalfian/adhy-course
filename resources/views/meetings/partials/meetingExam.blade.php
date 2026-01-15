@@ -1,4 +1,4 @@
-<x-toggle-section title="🧪 Evaluasi (Blind Test & Post Test)">
+<x-toggle-section title="🧪 Evaluasi">
     @php
         $blindExam = $meeting->exams->firstWhere('type', 'blind_test');
         $postExam  = $meeting->exams->firstWhere('type', 'post_test');
