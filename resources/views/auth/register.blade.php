@@ -3,194 +3,196 @@
 @section('title', 'Register – ENS Makassar')
 @section('content')
 
-    <div class="w-full py-12 sm:py-20 px-4 flex items-center justify-center">
+<div class="min-h-[80vh] flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl">
+        {{-- Header --}}
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-ens-darker dark:text-white mb-2">
+                Buat Akun Baru
+            </h1>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">
+                Mulai perjalanan belajarmu bersama kami
+            </p>
+        </div>
 
-        <div class="w-full max-w-2xl mx-auto
-                p-6 sm:p-8
-                rounded-3xl shadow-xl
-                bg-ens-lightest dark:bg-ens-darker
-                border border-ens-light/30
-                transition-colors">
+        {{-- Card --}}
+        <div class="bg-ens-lighter dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+            @if ($errors->any())
+                <div class="mb-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800">
+                    <ul class="text-sm text-red-600 dark:text-red-400 space-y-1">
+                        @foreach ($errors->all() as $err)
+                            <li>• {{ $err }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-            {{-- Title --}}
-            <div class="text-center mb-6">
-                <h2 class="text-3xl font-extrabold text-ens-darker dark:text-white">
-                    Buat Akun Baru ✨
-                </h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    Daftar dan mulai perjalanan belajarmu
-                </p>
-            </div>
-
-            {{-- Form --}}
             <form action="{{ route('register.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
 
-                {{-- Errors --}}
-                @if ($errors->any())
-                    <div class="bg-red-100 text-red-700 rounded p-4">
-                        <ul class="text-sm">
-                            @foreach ($errors->all() as $err)
-                                <li>{{ $err }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {{-- Nama --}}
                     <div class="md:col-span-2">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Nama Lengkap
                         </label>
-                        <input type="text" name="name" required placeholder="Nama lengkap" class="mt-1 w-full px-4 py-3 rounded-xl
-                                    bg-white dark:bg-gray-800
-                                    border-gray-300 dark:border-gray-700
-                                    text-gray-800 dark:text-white
-                                    focus:ring-primary focus:border-primary">
+                        <input type="text"
+                               name="name"
+                               required
+                               placeholder="Nama lengkap"
+                               class="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
                     </div>
 
                     {{-- Email --}}
                     <div>
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Email
                         </label>
-                        <input type="email" name="email" required placeholder="Masukkan email..." class="mt-1 w-full px-4 py-3 rounded-xl
-                                    bg-white dark:bg-gray-800
-                                    border-gray-300 dark:border-gray-700
-                                    text-gray-800 dark:text-white
-                                    focus:ring-primary focus:border-primary">
+                        <input type="email"
+                               name="email"
+                               required
+                               placeholder="email@example.com"
+                               class="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
                     </div>
 
                     {{-- Phone --}}
                     <div>
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             No. HP
                         </label>
-                        <input type="text" name="phone" placeholder="08xxxxxxxxxx" class="mt-1 w-full px-4 py-3 rounded-xl
-                                    bg-white dark:bg-gray-800
-                                    border-gray-300 dark:border-gray-700
-                                    text-gray-800 dark:text-white
-                                    focus:ring-primary focus:border-primary">
+                        <input type="text"
+                               name="phone"
+                               placeholder="08xxxxxxxxxx"
+                               class="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
                     </div>
 
                     {{-- Password --}}
                     <div>
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Password
                         </label>
-                        <input type="password" name="password" required placeholder="••••••••" class="mt-1 w-full px-4 py-3 rounded-xl
-                                    bg-white dark:bg-gray-800
-                                    border-gray-300 dark:border-gray-700
-                                    text-gray-800 dark:text-white
-                                    focus:ring-primary focus:border-primary">
+                        <input type="password"
+                               name="password"
+                               required
+                               placeholder="••••••••"
+                               class="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
                     </div>
 
-                    {{-- Confirm --}}
+                    {{-- Confirm Password --}}
                     <div>
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Konfirmasi Password
                         </label>
-                        <input type="password" name="password_confirmation" required placeholder="••••••••" class="mt-1 w-full px-4 py-3 rounded-xl
-                                    bg-white dark:bg-gray-800
-                                    border-gray-300 dark:border-gray-700
-                                    text-gray-800 dark:text-white
-                                    focus:ring-primary focus:border-primary">
+                        <input type="password"
+                               name="password_confirmation"
+                               required
+                               placeholder="••••••••"
+                               class="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
                     </div>
 
-                    {{-- PROVINCE --}}
+                    {{-- Province --}}
                     <div>
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Provinsi
                         </label>
-                        <select id="province_id" name="province_id" class="select2 input-primary">
-                            <option value="">-- pilih provinsi --</option>
+                        <select id="province_id"
+                                name="province_id"
+                                class="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                            <option value="">Pilih provinsi</option>
                             @foreach ($provinces as $prov)
                                 <option value="{{ $prov->id }}">{{ $prov->name }}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    {{-- REGENCY --}}
+                    {{-- Regency --}}
                     <div>
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Kabupaten / Kota
                         </label>
-                        <select id="regency_id" name="regency_id" class="select2 input-primary">
-                            <option value="">-- pilih kab/kota --</option>
+                        <select id="regency_id"
+                                name="regency_id"
+                                class="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                            <option value="">Pilih kabupaten/kota</option>
                         </select>
                     </div>
 
                     {{-- Avatar --}}
                     <div class="md:col-span-2">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Foto Profil (Opsional)
                         </label>
-                        <input type="file" name="avatar" class="mt-1 block w-full text-sm
-                                    file:mr-4 file:py-2 file:px-4
-                                    file:rounded-xl file:border-0
-                                    file:bg-primary file:text-white
-                                    hover:file:bg-ens-medium
-                                    bg-white dark:bg-gray-800
-                                    border border-gray-300 dark:border-gray-700
-                                    rounded-xl cursor-pointer">
+                        <input type="file"
+                               name="avatar"
+                               class="w-full text-sm text-gray-500
+                                      file:mr-4 file:py-2.5 file:px-4
+                                      file:rounded-lg file:border-0
+                                      file:bg-primary file:text-white
+                                      file:hover:bg-ens-medium file:transition
+                                      hover:file:cursor-pointer
+                                      cursor-pointer">
+                        <p class="mt-1 text-xs text-gray-400">Format: JPG, PNG, maks 2MB</p>
                     </div>
-
                 </div>
 
-                {{-- Submit --}}
-                <button class="w-full py-3 rounded-xl font-bold text-white
-                        bg-gradient-to-r from-primary to-ens-medium
-                        hover:shadow-xl hover:scale-[1.02] transition">
+                {{-- Submit Button --}}
+                <button type="submit"
+                        class="w-full py-3 bg-primary text-white font-medium rounded-lg hover:bg-ens-medium transition focus:ring-2 focus:ring-primary/20 focus:outline-none mt-2">
                     Daftar
                 </button>
-
             </form>
 
-            <p class="text-sm text-center mt-6 text-gray-600 dark:text-gray-400">
-                Sudah punya akun?
-                <a href="{{ route('login') }}" class="text-primary font-semibold hover:underline">
-                    Login
-                </a>
-            </p>
+            {{-- Login Link --}}
+            <div class="mt-6 pt-5 border-t border-gray-100 dark:border-gray-700 text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Sudah punya akun?
+                    <a href="{{ route('login') }}"
+                       class="text-primary font-medium hover:text-ens-medium transition">
+                        Masuk
+                    </a>
+                </p>
+            </div>
         </div>
     </div>
+</div>
 
 @endsection
 
 @push('scripts')
-    {{-- jQuery + Select2 --}}
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const provinceSelect = document.getElementById('province_id');
+        const regencySelect = document.getElementById('regency_id');
 
-    <script>
-        $(document).ready(function () {
+        provinceSelect.addEventListener('change', function() {
+            const provinceId = this.value;
+            regencySelect.innerHTML = '<option value="">Loading...</option>';
+            regencySelect.disabled = true;
 
-            $('.select2').select2();
+            if (!provinceId) {
+                regencySelect.innerHTML = '<option value="">Pilih kabupaten/kota</option>';
+                regencySelect.disabled = false;
+                return;
+            }
 
-            $('#province_id').on('change', function () {
-                let provinceId = $(this).val();
-                let regencySelect = $('#regency_id');
-
-                regencySelect.empty().append('<option>Loading...</option>');
-
-                if (!provinceId) {
-                    regencySelect.empty().append('<option value="">-- pilih kab/kota --</option>');
-                    return;
-                }
-
-                $.get(`/api/regencies/${provinceId}`, function (data) {
-                    regencySelect.empty().append('<option value="">-- pilih kab/kota --</option>');
-
-                    data.forEach(function (item) {
-                        regencySelect.append(new Option(item.name, item.id));
+            fetch(`/api/regencies/${provinceId}`)
+                .then(response => response.json())
+                .then(data => {
+                    regencySelect.innerHTML = '<option value="">Pilih kabupaten/kota</option>';
+                    data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.id;
+                        option.textContent = item.name;
+                        regencySelect.appendChild(option);
                     });
-
-                    regencySelect.trigger('change');
+                    regencySelect.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    regencySelect.innerHTML = '<option value="">Gagal memuat data</option>';
+                    regencySelect.disabled = false;
                 });
-            });
-
         });
-    </script>
+    });
+</script>
 @endpush

@@ -16,6 +16,7 @@ class Exam extends Model
 
     protected $fillable = [
         'exam_code',
+        'access_code',
         'type',
         'title',
         'test_type',
@@ -49,17 +50,34 @@ class Exam extends Model
     {
         return self::QUESTION_TYPE_RULES[$this->test_type] ?? [];
     }
+    public static function generateAccessCode(): string
+    {
+        do {
+            // A–Z dan 0–9, uppercase
+            $code = strtoupper(Str::random(7));
+        } while (
+            self::where('access_code', $code)->exists()
+        );
 
+        return $code;
+    }
     //GENERATE EXAM CODE
     protected static function booted()
     {
         static::creating(function (Exam $exam) {
+
+            // Generate exam_code
             if (empty($exam->exam_code)) {
                 $exam->exam_code = self::generateExamCode($exam);
             }
+
+            // Generate access_code
+            if (empty($exam->access_code)) {
+                $exam->access_code = self::generateAccessCode();
+            }
+
         });
     }
-
     public static function generateExamCode(Exam $exam): string
     {
         $prefix = match ($exam->type) {

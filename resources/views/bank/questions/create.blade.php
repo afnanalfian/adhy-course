@@ -26,8 +26,8 @@
                 <option value="tkp">TKP</option>
                 <option value="tpa">TPA</option>
                 <option value="tbi">TBI</option>
-                <option value="mtk_stis">MTK STIS</option>
-                <option value="mtk_tka">MTK TKA</option>
+                {{-- <option value="mtk_stis">MTK STIS</option>
+                <option value="mtk_tka">MTK TKA</option> --}}
             </select>
         </div>
 

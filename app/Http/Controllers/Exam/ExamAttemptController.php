@@ -25,6 +25,21 @@ class ExamAttemptController extends Controller
             toast('error', 'Silakan lakukan pembelian terlebih dahulu');
             return back();
         }
+
+        // ===============================
+        // ACCESS CODE CHECK (KHUSUS SISWA)
+        // ===============================
+        if (auth()->user()->hasRole('siswa')) {
+            request()->validate([
+                'access_code' => ['required', 'string', 'size:7'],
+            ]);
+
+            if (strtoupper(request('access_code')) !== $exam->access_code) {
+                toast('error', 'Access code tidak valid');
+                return back()->withInput();
+            }
+        }
+
         if (!$exam->isActive()) {
             abort(403, 'Ujian belum aktif');
         }
@@ -32,6 +47,7 @@ class ExamAttemptController extends Controller
         if (!$exam->hasTimeWindow()) {
             abort(403, 'Ujian belum tersedia saat ini');
         }
+
         if (
             auth()->user()->hasRole('siswa') &&
             $exam->type === 'tryout' &&
@@ -40,19 +56,16 @@ class ExamAttemptController extends Controller
             abort(403, 'Anda harus menyelesaikan tryout sebelumnya terlebih dahulu');
         }
 
-        $attempt = $exam->attempts()
-            ->firstOrCreate(
-                ['user_id' => auth()->id()],
-                ['started_at' => now(),]
-            );
+        $attempt = $exam->attempts()->firstOrCreate(
+            ['user_id' => auth()->id()],
+            ['started_at' => now()]
+        );
 
-        // kalau sudah submit → dilarang
         if ($attempt->is_submitted) {
             abort(403, 'Ujian sudah disubmit');
         }
 
-        return redirect()
-            ->route('exams.attempt', $exam);
+        return redirect()->route('exams.attempt', $exam);
     }
 
     protected function forceSubmit(ExamAttempt $attempt)

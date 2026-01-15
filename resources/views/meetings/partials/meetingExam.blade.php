@@ -59,6 +59,27 @@
                         </p>
                     </div>
                 </div>
+                @role('admin|tentor')
+                    <div class="mb-3 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-blue-700 font-medium">
+                                Access Code
+                            </span>
+
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono tracking-widest text-blue-900">
+                                    {{ $blindExam->access_code }}
+                                </span>
+
+                                <button type="button"
+                                    onclick="navigator.clipboard.writeText('{{ $blindExam->access_code }}')"
+                                    class="text-xs text-blue-600 hover:underline">
+                                    Copy
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @endrole
 
                 {{-- Admin/Tentor Actions --}}
                 @role('admin|tentor')
@@ -125,21 +146,33 @@
                             @if(!$blindAttempt)
                                 <form method="POST" action="{{ route('exams.start', $blindExam) }}">
                                     @csrf
+
+                                    {{-- Access Code --}}
+                                    <input
+                                        type="text"
+                                        name="access_code"
+                                        required
+                                        maxlength="7"
+                                        placeholder="ACCESS CODE"
+                                        class="w-full mb-3 text-center font-mono uppercase tracking-widest
+                                            rounded-lg border border-gray-300 px-3 py-2
+                                            focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+
                                     <button type="submit"
-                                            class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+                                            class="inline-flex w-full items-center justify-center gap-2 rounded-lg
+                                                bg-blue-600 px-4 py-2.5 text-sm font-medium text-white
+                                                hover:bg-blue-700 transition-colors">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                         Mulai Ujian
                                     </button>
                                 </form>
                             @else
-                                <a href="{{ route('exams.attempt', $blindExam) }}"
-                                   class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                                    </svg>
+                                <a href="{{ route('exams.attempt', $blindExam) }}" class="...">
                                     Lanjutkan Ujian
                                 </a>
                             @endif
@@ -196,7 +229,27 @@
                         </p>
                     </div>
                 </div>
+                @role('admin|tentor')
+                    <div class="mb-3 rounded-lg border border-purple-200 bg-purple-50 px-3 py-2 text-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-purple-700 font-medium">
+                                Access Code
+                            </span>
 
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono tracking-widest text-purple-900">
+                                    {{ $postExam->access_code }}
+                                </span>
+
+                                <button type="button"
+                                    onclick="navigator.clipboard.writeText('{{ $postExam->access_code }}')"
+                                    class="text-xs text-purple-600 hover:underline">
+                                    Copy
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @endrole
                 {{-- Admin/Tentor Actions --}}
                 @role('admin|tentor')
                 <div class="space-y-3">
@@ -262,21 +315,33 @@
                             @if(!$postAttempt)
                                 <form method="POST" action="{{ route('exams.start', $postExam) }}">
                                     @csrf
+
+                                    {{-- Access Code --}}
+                                    <input
+                                        type="text"
+                                        name="access_code"
+                                        required
+                                        maxlength="7"
+                                        placeholder="ACCESS CODE"
+                                        class="w-full mb-3 text-center font-mono uppercase tracking-widest
+                                            rounded-lg border border-gray-300 px-3 py-2
+                                            focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+
                                     <button type="submit"
-                                            class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-purple-700">
+                                            class="inline-flex w-full items-center justify-center gap-2 rounded-lg
+                                                bg-purple-600 px-4 py-2.5 text-sm font-medium text-white
+                                                hover:bg-purple-700 transition-colors">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                         Mulai Ujian
                                     </button>
                                 </form>
                             @else
-                                <a href="{{ route('exams.attempt', $postExam) }}"
-                                   class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-purple-700">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                                    </svg>
+                                <a href="{{ route('exams.attempt', $postExam) }}" class="...">
                                     Lanjutkan Ujian
                                 </a>
                             @endif

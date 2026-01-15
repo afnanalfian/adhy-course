@@ -54,9 +54,9 @@
                     <option value="skd">SKD </option>
                     <option value="tpa">TPA</option>
                     <option value="tbi">TBI</option>
-                    <option value="mtk_stis">MTK STIS</option>
+                    {{-- <option value="mtk_stis">MTK STIS</option>
                     <option value="mtk_tka">MTK TKA</option>
-                    <option value="general">General</option>
+                    <option value="general">General</option> --}}
                 </select>
 
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
