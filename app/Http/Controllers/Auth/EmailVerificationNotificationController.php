@@ -10,7 +10,7 @@ class EmailVerificationNotificationController extends Controller
     public function store(Request $request)
     {
         $user = $request->user();
-        if ($request->user()->hasVerifiedEmail()) {
+        if ($user->hasVerifiedEmail()) {
             return redirect()->route('dashboard.redirect');
         }
 
@@ -21,8 +21,10 @@ class EmailVerificationNotificationController extends Controller
             toast('warning', 'Harap tunggu sebelum mengirim ulang email verifikasi.');
             return back();
         }
-        $request->user()->sendEmailVerificationNotification();
-        session(['last_verification_sent_at' => now()]);
+        $user->sendEmailVerificationNotification();
+        $user->update([
+            'last_verification_sent_at' => now(),
+        ]);
 
         toast('info','Link verifikasi telah dikirim ulang.');
         return back();
