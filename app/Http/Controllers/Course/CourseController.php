@@ -15,16 +15,16 @@ class CourseController extends Controller
         $q = $request->query('q');
 
         $user = auth()->user();
-        $isTentor = $user ? $user->hasRole('tentor') : false;
+        $isTentor = $user->hasRole('tentor');
 
         $courses = Course::with('teachers.user')
             ->when($q, fn($qr) => $qr->where('name', 'like', "%{$q}%"))
-            // ->when($isTentor, function($query) use ($user) {
-            //     // Filter hanya course yang diajari oleh tentor ini
-            //     $query->whereHas('teachers', function($q) use ($user) {
-            //         $q->where('user_id', $user->id);
-            //     });
-            // })
+            ->when($isTentor, function($query) use ($user) {
+                // Filter hanya course yang diajari oleh tentor ini
+                $query->whereHas('teachers', function($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                });
+            })
             ->orderBy('name')
             ->paginate(12)
             ->withQueryString();
