@@ -44,7 +44,61 @@
     </svg>
     Schedule
 </a>
+{{-- ================= EXAMS ================= --}}
+@php
+    $evaluasiActive = request()->routeIs(
+        'tryouts.*',
+        'quizzes.*',
+    );
+@endphp
 
+<div x-data="{ open: {{ $evaluasiActive ? 'true' : 'false' }} }" class="relative">
+
+    <button
+        @click="open = !open"
+        class="menu-item w-full flex justify-between items-center
+               {{ $evaluasiActive ? 'active' : '' }}"
+    >
+        <div class="flex items-center gap-2">
+            <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6
+                         a2 2 0 012-2h3.5a2 2 0 004 0H17
+                         a2 2 0 012 2v12a2 2 0 01-2 2z"/>
+            </svg>
+            Exams
+        </div>
+
+        <svg :class="open ? 'rotate-180' : ''"
+             class="w-4 h-4 transition-transform duration-200"
+             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div
+        x-show="open"
+        @click.outside="open = false"
+        x-transition
+        class="ml-6 mt-2 space-y-1 border-l
+               border-azwara-medium/30
+               dark:border-azwara-light/20 pl-4"
+    >
+        <a href="{{ route('tryouts.index') }}"
+           class="menu-subitem {{ request()->routeIs('tryouts.*') ? 'active' : '' }}">
+            <span class="w-1 h-1 rounded-full bg-current"></span>
+            Tryout
+        </a>
+
+        <a href="{{ route('quizzes.index') }}"
+           class="menu-subitem {{ request()->routeIs('quizzes.*') ? 'active' : '' }}">
+            <span class="w-1 h-1 rounded-full bg-current"></span>
+            Daily Quiz
+        </a>
+    </div>
+</div>
 {{-- ================= BANK SOAL ================= --}}
 <a href="{{ route('bank.category.index') }}"
    class="menu-item {{ request()->routeIs('bank.*','questions.*') ? 'active' : '' }}">

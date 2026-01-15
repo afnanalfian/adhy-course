@@ -35,18 +35,6 @@ class MeetingMaterialController extends Controller
             'original_name' => $file->getClientOriginalName(),
         ]);
 
-        /** NOTIFY STUDENTS */
-        $users = User::usersWithMeetingAccess($meeting);
-
-        foreach ($users as $user) {
-            notify_user(
-                $user,
-                "Materi meeting '{$meeting->title}' telah diupload.",
-                false,
-                route('meeting.show', $meeting)
-            );
-        }
-
         toast('success', 'Materi berhasil diupload');
         return back();
     }

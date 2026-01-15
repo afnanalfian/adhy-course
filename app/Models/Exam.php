@@ -206,7 +206,7 @@ class Exam extends Model
 
     public function getContextTitleAttribute(): string
     {
-        // POST TEST (melekat ke meeting)
+        // BLIND POST TEST (melekat ke meeting)
         if (
             $this->owner_type === \App\Models\Meeting::class &&
             $this->owner

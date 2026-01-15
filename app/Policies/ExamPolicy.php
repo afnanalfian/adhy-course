@@ -10,19 +10,26 @@ class ExamPolicy
 {
     public function view(User $user, Exam $exam): bool
     {
+        // Admin / tentor / dll → bebas
         if (! $user->hasRole('siswa')) {
             return true;
         }
 
         return match ($exam->type) {
 
-            // Tryout → global
+            // ======================
+            // TRYOUT → akses global / paket
+            // ======================
             'tryout' => $user->hasTryoutAccess($exam->id),
 
-            // Quiz harian → global
-            'quiz'   => $user->hasQuizAccess(),
+            // ======================
+            // QUIZ → akses global
+            // ======================
+            'quiz' => $user->hasQuizAccess(),
 
-            // Blind-Post-test → ikut akses meeting
+            // ======================
+            // BLIND & POST TEST
+            // ======================
             'blind_test',
             'post_test' => $this->canAccessMeetingExam($user, $exam),
 
@@ -32,26 +39,12 @@ class ExamPolicy
 
     protected function canAccessMeetingExam(User $user, Exam $exam): bool
     {
-        if ($exam->type !== 'post_test') {
-            return false;
-        }
-
         /**
          * ======================================
-         * 1. Resolve meeting dari exam owner
+         * 1. Exam harus melekat ke Meeting
          * ======================================
          */
-        $meeting = null;
-
-        try {
-            $meeting = $exam->owner;
-        } catch (\Throwable $e) {
-            $meeting = null;
-        }
-
-        if (! $meeting && $exam->owner_id) {
-            $meeting = Meeting::find($exam->owner_id);
-        }
+        $meeting = $exam->owner;
 
         if (! $meeting instanceof Meeting) {
             return false;
@@ -59,16 +52,7 @@ class ExamPolicy
 
         /**
          * ======================================
-         * 2. COURSE GRATIS → POST TEST GRATIS
-         * ======================================
-         */
-        if ($meeting->course && $meeting->course->is_free) {
-            return true;
-        }
-
-        /**
-         * ======================================
-         * 3. MEETING GRATIS → POST TEST GRATIS
+         * 2. MEETING GRATIS → SEMUA BOLEH
          * ======================================
          */
         if ($meeting->is_free) {
@@ -77,20 +61,30 @@ class ExamPolicy
 
         /**
          * ======================================
-         * 4. BELI COURSE
+         * 3. COURSE GRATIS → SEMUA BOLEH
          * ======================================
          */
-        if ($meeting->course_id && $user->hasCourse($meeting->course_id)) {
+        if ($meeting->course && $meeting->course->is_free) {
             return true;
         }
 
         /**
          * ======================================
-         * 5. BELI MEETING SATUAN
+         * 4. USER BELI COURSE
+         * ======================================
+         */
+        if (
+            $meeting->course_id &&
+            $user->hasCourse($meeting->course_id)
+        ) {
+            return true;
+        }
+
+        /**
+         * ======================================
+         * 5. USER BELI MEETING SATUAN
          * ======================================
          */
         return $user->hasEntitlement('meeting', $meeting->id);
     }
-
 }
-
