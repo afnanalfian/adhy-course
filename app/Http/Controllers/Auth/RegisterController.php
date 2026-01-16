@@ -65,6 +65,6 @@ class RegisterController extends Controller
 
         toast('success','Akun berhasil dibuat. Silakan verifikasi email Anda.');
         // return redirect()->route('verification.notice');
-        return redirect()->route('dashboard.redirect');
+        return redirect()->route('course.index');
     }
 }

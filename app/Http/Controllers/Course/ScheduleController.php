@@ -58,7 +58,7 @@ class ScheduleController extends Controller
         // MERGE + GROUP BY DATE
         // ===============================
         $calendarItems = $meetings
-            ->merge($tryouts)
+            // ->merge($tryouts)
             ->sortBy('time')
             ->groupBy('date_key');
 
