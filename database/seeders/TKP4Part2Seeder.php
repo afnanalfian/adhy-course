@@ -16,7 +16,7 @@ class TKP4Part2Seeder extends Seeder
     public function run(): void
     {
         // Data untuk kategori 1 (Blind Test) - soal 1-10 sudah ada, tambah soal 21-25
-        $materialBT = QuestionMaterial::find(18); // ID 18 untuk BT
+        $materialBT = QuestionMaterial::find(32); // ID 18 untuk BT
 
         if (!$materialBT) {
             $this->command->error('Material BT dengan ID 18 tidak ditemukan!');
@@ -122,7 +122,7 @@ class TKP4Part2Seeder extends Seeder
         }
 
         // Data untuk kategori 2 (Post Test) - soal 11-20 sudah ada, tambah soal 26-30
-        $materialPT = QuestionMaterial::find(19); // ID 19 untuk PT
+        $materialPT = QuestionMaterial::find(33); // ID 19 untuk PT
 
         if (!$materialPT) {
             $this->command->error('Material PT dengan ID 19 tidak ditemukan!');
