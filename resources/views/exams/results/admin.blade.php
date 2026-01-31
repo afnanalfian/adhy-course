@@ -353,7 +353,7 @@
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
                                                     bg-ens-lighter text-ens-medium
                                                     dark:bg-ens-medium dark:text-white">
-                                        {{ $testTypeLabels[$examQuestion->question->test_type] ?? '-' }}
+                                        {{ $testTypeLabels[$examQuestion->question?->test_type] ?? '-' }}
                                     </span>
                                 </div>
 
