@@ -92,7 +92,21 @@
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari soal..."
                     class="rounded-lg border p-2 text-sm">
             </div>
-
+            <div>
+                <label class="block text-sm dark:text-azwara-lightest font-medium mb-1">
+                    Tampilkan
+                </label>
+                <select name="per_page"
+                        onchange="this.form.submit()"
+                        class="rounded-lg border p-2 text-sm">
+                    @foreach([10,20,50,100] as $size)
+                        <option value="{{ $size }}"
+                            {{ request('per_page', 10) == $size ? 'selected' : '' }}>
+                            {{ $size }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
             {{-- Actions --}}
             <div>
                 <button type="submit" class="px-4 py-2 bg-ens-medium text-white rounded-lg hover:bg-ens-dark">
@@ -104,23 +118,7 @@
                     Reset
                 </a>
             </div>
-
         </form>
-        <div>
-            <label class="block text-sm dark:text-azwara-lightest font-medium mb-1">
-                Tampilkan
-            </label>
-            <select name="per_page"
-                    onchange="this.form.submit()"
-                    class="rounded-lg border p-2 text-sm">
-                @foreach([10,20,50,100] as $size)
-                    <option value="{{ $size }}"
-                        {{ request('per_page', 10) == $size ? 'selected' : '' }}>
-                        {{ $size }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
     </div>
 
     {{-- QUESTION LIST --}}
