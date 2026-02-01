@@ -106,6 +106,21 @@
             </div>
 
         </form>
+        <div>
+            <label class="block text-sm dark:text-azwara-lightest font-medium mb-1">
+                Tampilkan
+            </label>
+            <select name="per_page"
+                    onchange="this.form.submit()"
+                    class="rounded-lg border p-2 text-sm">
+                @foreach([10,20,50,100] as $size)
+                    <option value="{{ $size }}"
+                        {{ request('per_page', 10) == $size ? 'selected' : '' }}>
+                        {{ $size }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
     </div>
 
     {{-- QUESTION LIST --}}

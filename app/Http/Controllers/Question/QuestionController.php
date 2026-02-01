@@ -18,6 +18,7 @@ class QuestionController extends Controller
 {
     public function index(Request $request, QuestionMaterial $material)
     {
+        $perPage = $request->integer('per_page', 10);
         $questions = Question::with(['options', 'subItems.answers'])
             ->where('material_id', $material->id)
             ->when($request->filled('type'), fn ($q) =>
@@ -29,9 +30,9 @@ class QuestionController extends Controller
             ->when($request->filled('q'), fn ($q) =>
                 $q->where('question_text', 'like', "%{$request->q}%")
             )
-            ->latest()
+            ->oldest()
             ->withCount('examQuestions')
-            ->paginate(10)
+            ->paginate($perPage)
             ->withQueryString();
 
         return view('bank.questions.index', compact('material', 'questions'));
