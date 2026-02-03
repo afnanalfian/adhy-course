@@ -30,7 +30,7 @@ class QuestionController extends Controller
             ->when($request->filled('q'), fn ($q) =>
                 $q->where('question_text', 'like', "%{$request->q}%")
             )
-            ->oldest()
+            ->orderBy('id','asc')
             ->withCount('examQuestions')
             ->paginate($perPage)
             ->withQueryString();
