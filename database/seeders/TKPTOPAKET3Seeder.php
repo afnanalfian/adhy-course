@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class TkpPaket3Seeder extends Seeder
+class TKPTOPAKET3Seeder extends Seeder
 {
     public function run()
     {
