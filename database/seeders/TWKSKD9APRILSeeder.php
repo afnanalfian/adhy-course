@@ -13,19 +13,7 @@ class TWKSKD9APRILSeeder extends Seeder
         $now = Carbon::now();
 
         // Material dengan id = 50 (TWK)
-        $materialId = 50;
-
-        // Update atau insert material
-        DB::table('question_materials')->updateOrInsert(
-            ['id' => $materialId],
-            [
-                'category_id' => 1,
-                'name' => 'TWK - SKD Part 1',
-                'slug' => 'twk-skd-part-1',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ]
-        );
+        $materialId = 53;
 
         $questions = [
             // Soal 1
