@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class TIUSeederPart1 extends Seeder
+class TIUSKD9APRILSeeder extends Seeder
 {
     public function run()
     {
