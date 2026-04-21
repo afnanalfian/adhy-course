@@ -13,19 +13,7 @@ class TWKSeederPaket10 extends Seeder
         $now = Carbon::now();
         
         // Material dengan id = 54 (TWK Paket 10)
-        $materialId = 54;
-        
-        // Update atau insert material
-        DB::table('question_materials')->updateOrInsert(
-            ['id' => $materialId],
-            [
-                'category_id' => 1,
-                'name' => 'TWK - SKD Paket 10',
-                'slug' => 'twk-skd-paket-10',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ]
-        );
+        $materialId = 57;
         
         $questions = [
             // Soal 1
