@@ -623,7 +623,7 @@ class TIUSeederSKD10 extends Seeder
         }
 
         $this->command->info('Seeder TIU Paket 10 (35 soal) berhasil dibuat!');
-        $this->command->info('Material ID: ' . $material->id);
+        $this->command->info('Material ID: ' . 55);
         $this->command->info('Total soal: ' . count($questions));
     }
 }

@@ -319,7 +319,7 @@ class TKPSeederSKD10 extends Seeder
         }
 
         $this->command->info('Seeder TKP Paket 10 (45 soal) berhasil dibuat!');
-        $this->command->info('Material ID: ' . $material->id);
+        $this->command->info('Material ID: ' . 56);
         $this->command->info('Total soal: ' . count($questions));
     }
 }
