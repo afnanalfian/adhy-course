@@ -17,7 +17,7 @@ class PerbandinganSeeder extends Seeder
     {
         // Data untuk kategori 1 (Blind Test) - soal 1-10
         $materialBT = QuestionMaterial::create([
-            'category_id' => 1,
+            'category_id' => 15,
             'name' => 'BT - Perbandingan 3',
             'slug' => 'bt-perbandingan-3',
             'created_at' => now(),
@@ -263,7 +263,7 @@ class PerbandinganSeeder extends Seeder
 
         // Data untuk kategori 2 (Post Test) - soal 11-20
         $materialPT = QuestionMaterial::create([
-            'category_id' => 2,
+            'category_id' => 15,
             'name' => 'PT - Perbandingan 3',
             'slug' => 'pt-perbandingan-3',
             'created_at' => now(),
