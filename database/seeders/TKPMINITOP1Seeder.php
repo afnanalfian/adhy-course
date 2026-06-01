@@ -15,14 +15,7 @@ class TKP2MINITOP1Seeder extends Seeder
     {
         // Cari atau buat material dengan id 75
         $material = QuestionMaterial::firstOrCreate(
-            ['id' => 75],
-            [
-                'category_id' => 2,
-                'name' => 'TKP - 2 Juni',
-                'slug' => 'tkp-2-juni',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]
+            ['id' => 75]
         );
 
         // Data soal TKP 45 nomor dengan kunci bobot
