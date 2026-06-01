@@ -6,7 +6,7 @@ use App\Models\Question;
 use App\Models\QuestionMaterial;
 use Illuminate\Database\Seeder;
 
-class TKP2MINITOP1Seeder extends Seeder
+class TKPMINITOP1Seeder extends Seeder
 {
     /**
      * Run the database seeds.
