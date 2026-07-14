@@ -71,7 +71,7 @@ class ExamController extends Controller
                 $q->whereDate('exam_date', $request->date)
             )
             ->latest('exam_date')
-            ->paginate(10);
+            ->paginate(12);
 
         return view('exams.tryout.index', compact('exams'));
     }
