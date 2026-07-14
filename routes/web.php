@@ -202,7 +202,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/create',            [CourseController::class, 'create'])->name('course.create');
         Route::post('/store',            [CourseController::class, 'store'])->name('course.store');
         Route::get('/{slug}/edit',       [CourseController::class, 'edit'])->name('course.edit');
-        Route::post('/{slug}/update',    [CourseController::class, 'update'])->name('course.update');
+        Route::put('/{slug}/update',     [CourseController::class, 'update'])->name('course.update');
         Route::delete('/{slug}/delete',  [CourseController::class, 'destroy'])->name('course.delete');
     });
 
