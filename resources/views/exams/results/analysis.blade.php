@@ -6,7 +6,7 @@
         {{-- ================= HEADER ================= --}}
         <div class="mb-8">
             <a href="{{ route('exams.results', $exam) }}"
-                class="inline-flex items-center gap-2 text-sm font-medium text-ens-medium hover:text-ens-light dark:text-ens-lighter dark:hover:text-white transition-colors mb-4">
+                class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors mb-4">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
@@ -14,17 +14,22 @@
             </a>
 
             <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-ens-darkest dark:text-white">
-                    Analisis Soal
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                    📊 Analisis Soal
                 </h1>
                 <div class="mt-2 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                     <p class="text-gray-700 dark:text-gray-300 font-medium">
                         {{ $exam->title }}
                     </p>
-                    <span class="hidden sm:inline text-gray-500 dark:text-gray-400">•</span>
-                    <p class="text-gray-600 dark:text-gray-400">
+                    <span class="hidden sm:inline text-gray-400 dark:text-gray-500">•</span>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">
                         Soal #{{ $examQuestion->order ?? '-' }}
                     </p>
+                    @if($isTkp ?? false)
+                        <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                            TKP (Bobot)
+                        </span>
+                    @endif
                 </div>
             </div>
         </div>
@@ -40,51 +45,47 @@
                     'text-red-600 dark:text-red-400');
         @endphp
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
             @php
                 $stats = [
-                    ['label' => 'Total Peserta', 'value' => $total, 'icon' => 'users'],
-                    ['label' => 'Jawaban Benar', 'value' => $summary['correct'], 'icon' => 'check', 'color' => 'text-green-600 dark:text-green-400'],
-                    ['label' => 'Jawaban Salah', 'value' => $summary['wrong'], 'icon' => 'x', 'color' => 'text-red-600 dark:text-red-400'],
-                    ['label' => 'Akurasi', 'value' => $accuracy . '%', 'icon' => 'target', 'color' => $accuracyColor],
+                    ['label' => 'Total Peserta', 'value' => $total, 'icon' => 'users', 'color' => 'blue'],
+                    ['label' => 'Jawaban Benar', 'value' => $summary['correct'], 'icon' => 'check', 'color' => 'green'],
+                    ['label' => 'Jawaban Salah', 'value' => $summary['wrong'], 'icon' => 'x', 'color' => 'red'],
+                    ['label' => 'Akurasi', 'value' => $accuracy . '%', 'icon' => 'target', 'color' => 'purple'],
                 ];
             @endphp
 
             @foreach ($stats as $stat)
-                <div class="rounded-xl border border-ens-lighter dark:border-ens-darker
-                                bg-white dark:bg-ens-darker p-5 shadow-sm">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                     <div class="flex items-center justify-between">
                         <div>
-                            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                            <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 {{ $stat['label'] }}
                             </div>
-                            <div class="text-2xl font-bold {{ $stat['color'] ?? 'text-ens-darkest dark:text-white' }}">
+                            <div class="text-2xl font-bold text-gray-900 dark:text-white mt-1">
                                 {{ $stat['value'] }}
                             </div>
                         </div>
-                        <div class="p-2 bg-ens-lightest dark:bg-ens-medium rounded-lg">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center 
+                            @if($stat['color'] === 'blue') bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400
+                            @elseif($stat['color'] === 'green') bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400
+                            @elseif($stat['color'] === 'red') bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400
+                            @else bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 @endif">
                             @if($stat['icon'] === 'users')
-                                <svg class="w-6 h-6 text-ens-medium dark:text-white" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-8a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z" />
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-8a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z" />
                                 </svg>
                             @elseif($stat['icon'] === 'check')
-                                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7" />
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
                             @elseif($stat['icon'] === 'x')
-                                <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                        d="M6 18L18 6M6 6l12 12" />
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             @else
-                                <svg class="w-6 h-6 text-ens-medium dark:text-white" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                 </svg>
                             @endif
                         </div>
@@ -94,147 +95,157 @@
         </div>
 
         {{-- ================= DETAIL SOAL ================= --}}
-        <div class="rounded-xl border border-ens-lighter dark:border-ens-darker
-                    bg-white dark:bg-ens-darker p-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 mb-8">
             <div class="flex items-center gap-3 mb-5">
-                <div class="p-2 bg-ens-lightest dark:bg-ens-medium rounded-lg">
-                    <svg class="w-5 h-5 text-ens-medium dark:text-white" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <div class="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-bold text-ens-darkest dark:text-white">
-                    Soal
-                </h2>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Detail Soal</h2>
+                @if($isTkp ?? false)
+                    <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                        TKP (Bobot)
+                    </span>
+                @endif
             </div>
 
-            <div class="prose prose-sm dark:prose-invert max-w-none mb-5">
+            <div class="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 text-sm leading-relaxed mb-5 tex2jax_process">
                 {!! $question->question_text !!}
             </div>
 
             @if ($question->image)
-                <div class="mt-4 border border-ens-lighter dark:border-ens-medium rounded-lg overflow-hidden">
-                    <img src="{{ asset('storage/' . $question->image) }}" class="w-full h-auto max-w-2xl mx-auto"
-                        alt="Gambar soal">
+                <div class="mt-4 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                    <img src="{{ asset('storage/' . $question->image) }}" class="w-full h-auto max-w-2xl mx-auto object-contain" alt="Gambar soal">
+                </div>
+            @endif
+            
+            @if($isTkp ?? false)
+                <div class="mt-4 text-xs text-gray-500 dark:text-gray-400 italic bg-blue-50 dark:bg-blue-900/10 p-3 rounded-lg">
+                    💡 Soal TKP menggunakan sistem bobot. Jawaban dengan bobot maksimum dianggap benar.
                 </div>
             @endif
         </div>
 
         {{-- ================= ANALISIS OPSI ================= --}}
-        <div class="space-y-4 mb-10">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="p-2 bg-ens-lightest dark:bg-ens-medium rounded-lg">
-                    <svg class="w-5 h-5 text-ens-medium dark:text-white" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        <div class="mb-10">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-bold text-ens-darkest dark:text-white">
-                    Analisis Pilihan Jawaban
-                </h2>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Analisis Pilihan Jawaban</h2>
             </div>
 
-            @foreach ($question->options as $option)
-                @php
-                    $stat = $optionStats[$option->id] ?? ['count' => 0, 'percentage' => 0];
-                    $isCorrect = $option->is_correct;
-                    $percentageColor = $stat['percentage'] > 50 ? 'bg-green-500' :
-                        ($stat['percentage'] > 25 ? 'bg-yellow-500' : 'bg-red-500');
-                @endphp
+            <div class="space-y-3">
+                @foreach ($question->options as $option)
+                    @php
+                        $stat = $optionStats[$option->id] ?? ['count' => 0, 'percentage' => 0];
+                        $isCorrect = $option->is_correct;
+                        $isTkpOption = $isTkp ?? false;
+                        $optionWeight = $option->weight ?? 0;
+                        $maxWeight = $question->options->max('weight') ?? 0;
+                        $isMaxWeight = $isTkpOption && $optionWeight === $maxWeight && $maxWeight > 0;
+                        
+                        $percentageColor = $stat['percentage'] > 50 ? 'bg-green-500' :
+                            ($stat['percentage'] > 25 ? 'bg-yellow-500' : 'bg-red-500');
+                    @endphp
 
-                <div class="rounded-xl border p-5 transition-all duration-200
-                        {{ $isCorrect
-                ? 'border-green-400 bg-gradient-to-r from-green-50 to-white dark:from-green-900/20 dark:to-ens-darker shadow-sm'
-                : 'border-ens-lighter dark:border-ens-darker bg-white dark:bg-ens-darker hover:shadow-sm'
-                        }}">
-                    <div class="flex flex-col md:flex-row md:items-start gap-4">
-                        {{-- LABEL OPSI --}}
-                        <div class="flex-shrink-0">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-lg flex items-center justify-center font-bold
-                                        {{ $isCorrect
-                ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300'
-                : 'bg-ens-lightest dark:bg-ens-medium text-ens-medium dark:text-white'
-                                        }}">
-                                    {{ $option->label }}
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border p-5 transition-all duration-300
+                        {{ $isTkpOption ? (
+                            $isMaxWeight ? 'border-green-400 dark:border-green-700 shadow-lg shadow-green-500/10' : 
+                            'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                        ) : (
+                            $isCorrect ? 'border-green-400 dark:border-green-700 shadow-lg shadow-green-500/10' : 
+                            'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                        ) }}">
+                        
+                        <div class="flex flex-col md:flex-row md:items-start gap-4">
+                            {{-- LABEL --}}
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm
+                                        {{ $isTkpOption ? (
+                                            $isMaxWeight ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 
+                                            'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                                        ) : (
+                                            $isCorrect ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 
+                                            'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                                        ) }}">
+                                        {{ $option->label }}
+                                    </div>
+                                    @if($isTkpOption)
+                                        @if($isMaxWeight)
+                                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                                                ⭐ Bobot: {{ $optionWeight }} (Maksimal)
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+                                                Bobot: {{ $optionWeight }}
+                                            </span>
+                                        @endif
+                                    @elseif($isCorrect)
+                                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                                            ✅ Benar
+                                        </span>
+                                    @endif
                                 </div>
-                                @if ($isCorrect)
-                                    <span
-                                        class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300">
-                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd"
-                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                        Jawaban Benar
-                                    </span>
+                            </div>
+
+                            {{-- CONTENT --}}
+                            <div class="flex-1 min-w-0">
+                                <div class="text-gray-800 dark:text-gray-200 text-sm mb-3 tex2jax_process">
+                                    {!! $option->option_text !!}
+                                </div>
+
+                                @if ($option->image)
+                                    <div class="mt-3 mb-4 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden max-w-xs">
+                                        <img src="{{ asset('storage/' . $option->image) }}" class="w-full h-auto object-contain" alt="Gambar opsi {{ $option->label }}" loading="lazy">
+                                    </div>
                                 @endif
-                            </div>
-                        </div>
 
-                        {{-- KONTEN OPSI --}}
-                        <div class="flex-1">
-                            <div class="text-gray-800 dark:text-gray-200 mb-3">
-                                {!! $option->option_text !!}
-                            </div>
-
-                            @if ($option->image)
-                                <div
-                                    class="mt-3 mb-4 border border-ens-lighter dark:border-ens-medium rounded-lg overflow-hidden max-w-xs">
-                                    <img src="{{ asset('storage/' . $option->image) }}" class="w-full h-auto"
-                                        alt="Gambar opsi {{ $option->label }}">
-                                </div>
-                            @endif
-
-                            {{-- STATISTIK PEMILIHAN --}}
-                            <div class="mt-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="text-sm text-gray-600 dark:text-gray-400">
-                                        <span class="font-medium">{{ $stat['count'] }}</span> dari {{ $totalAnswered }} peserta
+                                {{-- STATISTIK --}}
+                                <div class="mt-3">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                                            <span class="font-semibold text-gray-700 dark:text-gray-300">{{ $stat['count'] }}</span> dari {{ $totalAnswered }} peserta
+                                        </span>
+                                        <span class="text-sm font-bold text-gray-900 dark:text-white">
+                                            {{ $stat['percentage'] }}%
+                                        </span>
                                     </div>
-                                    <div class="text-sm font-semibold text-ens-darkest dark:text-white">
-                                        {{ $stat['percentage'] }}%
-                                    </div>
-                                </div>
-                                <div class="h-2 bg-ens-lighter dark:bg-ens-medium rounded-full overflow-hidden">
-                                    <div class="h-full {{ $percentageColor }} rounded-full transition-all duration-500"
-                                        style="width: {{ min($stat['percentage'], 100) }}%">
+                                    <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                        <div class="h-full {{ $percentageColor }} rounded-full transition-all duration-700" style="width: {{ min($stat['percentage'], 100) }}%">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
 
         {{-- ================= PEMBAHASAN ================= --}}
         @if ($question->explanation)
-            <div x-data="{ open: false }" class="rounded-xl border border-ens-lighter dark:border-ens-darker
-                            bg-white dark:bg-ens-darker p-6 mb-10">
+            <div x-data="{ open: false }" class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 mb-10">
                 <button @click="open = !open" class="w-full flex items-center justify-between text-left focus:outline-none">
                     <div class="flex items-center gap-3">
-                        <div class="p-2 bg-ens-lightest dark:bg-ens-medium rounded-lg">
-                            <svg class="w-5 h-5 text-ens-medium dark:text-white" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <div class="w-9 h-9 rounded-xl bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h3 class="text-lg font-semibold text-ens-darkest dark:text-white">
-                            Pembahasan
-                        </h3>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Pembahasan</h3>
                     </div>
-                    <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 transform transition-transform duration-200"
-                        :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-300" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
 
-                <div x-show="open" x-collapse class="mt-6 pt-6 border-t border-ens-lighter dark:border-ens-medium">
-                    <div class="prose prose-sm dark:prose-invert max-w-none">
+                <div x-show="open" x-collapse class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <div class="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 text-sm leading-relaxed tex2jax_process">
                         {!! $question->explanation !!}
                     </div>
                 </div>
@@ -243,88 +254,72 @@
 
         {{-- ================= STATUS JAWABAN PESERTA ================= --}}
         <div>
-            <div class="flex items-center gap-3 mb-6">
-                <div class="p-2 bg-ens-lightest dark:bg-ens-medium rounded-lg">
-                    <svg class="w-5 h-5 text-ens-medium dark:text-white" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-8a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z" />
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-9 h-9 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-8a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-bold text-ens-darkest dark:text-white">
-                    Status Jawaban Peserta
-                </h2>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Status Jawaban Peserta</h2>
+                <span class="text-xs text-gray-500 dark:text-gray-400">(Klik nama untuk melihat detail)</span>
             </div>
 
-            <div class="rounded-xl border border-ens-lighter dark:border-ens-darker overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-ens-lighter dark:divide-ens-medium">
-                        <thead class="bg-ens-lightest dark:bg-ens-darkest">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-b border-gray-200 dark:border-gray-700">
                             <tr>
-                                <th scope="col"
-                                    class="px-6 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    Nama Peserta
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-4 text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    Status Jawaban
-                                </th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Nama Peserta</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Jawaban</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white dark:bg-ens-darker divide-y divide-ens-lighter dark:divide-ens-medium">
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                             @forelse ($attemptRows as $row)
-                                <tr class="hover:bg-ens-lightest/50 dark:hover:bg-ens-medium/20 transition-colors">
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $row['user']->name }}
-                                        </div>
+                                <tr class="hover:bg-purple-50 dark:hover:bg-purple-900/10 transition">
+                                    <td class="px-4 py-3">
+                                        <span class="font-medium text-gray-900 dark:text-white">{{ $row['user']->name }}</span>
                                     </td>
-                                    <td class="px-6 py-4 text-center">
-                                        @if($row['status'] === 'correct')
-                                            <span
-                                                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
-                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd"
-                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                        clip-rule="evenodd" />
-                                                </svg>
-                                                Benar
-                                            </span>
-                                        @elseif($row['status'] === 'wrong')
-                                            <span
-                                                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
-                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd"
-                                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                                        clip-rule="evenodd" />
-                                                </svg>
-                                                Salah
-                                            </span>
+                                    <td class="px-4 py-3">
+                                        @if($row['status'] === 'empty')
+                                            <span class="text-gray-400 dark:text-gray-500 text-sm">Tidak menjawab</span>
                                         @else
-                                            <span
-                                                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd"
-                                                        d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm0 1h12v12H3V4z"
-                                                        clip-rule="evenodd" />
-                                                </svg>
-                                                Kosong
-                                            </span>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                @foreach($row['selected_options'] as $index => $option)
+                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium
+                                                        {{ $row['is_tkp'] ? (
+                                                            $option->weight === $row['max_weight'] && $row['max_weight'] > 0 ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
+                                                            'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                                                        ) : (
+                                                            $option->is_correct ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
+                                                            'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                                                        ) }}">
+                                                        {{ $option->label }}
+                                                        @if($row['is_tkp'])
+                                                            <span class="text-xs opacity-75">({{ $option->weight }})</span>
+                                                        @endif
+                                                    </span>
+                                                @endforeach
+                                                @if($row['is_tkp'] && $row['status'] !== 'empty')
+                                                    <span class="text-xs text-gray-400 dark:text-gray-500">
+                                                        Bobot: {{ $row['selected_weight'] }}/{{ $row['max_weight'] }}
+                                                    </span>
+                                                @endif
+                                            </div>
                                         @endif
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium {{ $row['status_color'] }}">
+                                            {{ $row['status_icon'] }} {{ $row['status_label'] }}
+                                        </span>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="2" class="px-6 py-8 text-center">
-                                        <div class="text-gray-500 dark:text-gray-400">
-                                            <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
-                                            <p class="text-lg font-medium">Belum ada data peserta</p>
-                                            <p class="text-sm mt-1">Data akan muncul setelah peserta mengikuti ujian</p>
-                                        </div>
+                                    <td colspan="3" class="px-4 py-12 text-center">
+                                        <span class="text-4xl mb-3 block">📭</span>
+                                        <p class="text-gray-500 dark:text-gray-400">Belum ada data peserta</p>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Data akan muncul setelah peserta mengikuti ujian</p>
                                     </td>
                                 </tr>
                             @endforelse

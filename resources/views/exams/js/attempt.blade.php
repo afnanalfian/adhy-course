@@ -1,4 +1,12 @@
 @push('script')
+    <!-- 🔥 INDICATOR PAUSE -->
+    <div id="pauseIndicator" class="hidden fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2">
+        <svg class="animate-pulse w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>Timer Dijeda</span>
+    </div>
+
     <script>
         /* =====================================================
            FULLSCREEN FUNCTION
@@ -29,10 +37,19 @@
         });
 
         /* =====================================================
-           TIMER
+           TIMER WITH PAUSE - FIXED (HANYA PAUSE SAAT TAB HIDDEN)
         ===================================================== */
         const timerEl = document.getElementById('timer');
         let remaining = parseInt(timerEl.dataset.remaining, 10);
+        let isTabVisible = true;
+        let isTimerPaused = false;
+        let timerInterval = null;
+        let syncInterval = null;
+        let pauseSyncInterval = null;
+        const ATTEMPT_ID = '{{ $attempt->id }}';
+        let isPausing = false;
+        let isInitialized = false;
+        let isManualPause = false; // 🔥 Track manual pause
 
         function formatTime(seconds) {
             const h = Math.floor(seconds / 3600);
@@ -45,24 +62,364 @@
 
         timerEl.innerText = formatTime(remaining);
 
-        const timerInterval = setInterval(() => {
-            if (remaining <= 0) {
+        // ==== FUNGSI UNTUK MENJALANKAN TIMER ====
+        function startTimer() {
+            if (timerInterval) {
                 clearInterval(timerInterval);
-                document.getElementById('auto-submit-form')?.submit();
+            }
+            
+            timerInterval = setInterval(() => {
+                // 🔥 PERBAIKAN: Timer berhenti jika paused
+                if (isTimerPaused) {
+                    return;
+                }
+                
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    if (syncInterval) {
+                        clearInterval(syncInterval);
+                    }
+                    if (pauseSyncInterval) {
+                        clearInterval(pauseSyncInterval);
+                    }
+                    forceSubmitNow();
+                    return;
+                }
+                
+                remaining--;
+                timerEl.innerText = formatTime(remaining);
+
+                // Warning colors
+                if (remaining <= 300) {
+                    timerEl.classList.add('text-red-400');
+                    timerEl.classList.remove('text-white');
+                } else if (remaining <= 600) {
+                    timerEl.classList.add('text-yellow-400');
+                    timerEl.classList.remove('text-white');
+                }
+            }, 1000);
+        }
+
+        // ==== FUNGSI PAUSE DI SERVER ====
+        async function pauseExamOnServer() {
+            try {
+                const response = await fetch("{{ route('exams.pause', $attempt->exam) }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Exam paused on server, remaining: ' + data.remaining_seconds);
+                    
+                    if (data.remaining_seconds !== undefined) {
+                        remaining = data.remaining_seconds;
+                        timerEl.innerText = formatTime(remaining);
+                    }
+                    return true;
+                }
+                return false;
+            } catch (e) {
+                console.warn('Failed to pause exam on server:', e);
+                return false;
+            }
+        }
+
+        // ==== FUNGSI RESUME DI SERVER ====
+        async function resumeExamOnServer() {
+            try {
+                const response = await fetch("{{ route('exams.resume', $attempt->exam) }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.remaining_seconds !== undefined) {
+                        remaining = data.remaining_seconds;
+                        timerEl.innerText = formatTime(remaining);
+                    }
+                    console.log('✅ Exam resumed on server, remaining: ' + remaining);
+                    return true;
+                }
+                return false;
+            } catch (e) {
+                console.warn('Failed to resume exam on server:', e);
+                return false;
+            }
+        }
+
+        // ==== AUTO-RESUME SAAT KLIK DI MANA SAJA ====
+        document.addEventListener('click', async function(e) {
+            // 🔥 Jangan resume jika klik di tombol submit atau elemen form
+            if (e.target.closest('button[type="submit"]') || e.target.closest('#auto-submit-form')) {
                 return;
             }
-            remaining--;
-            timerEl.innerText = formatTime(remaining);
+            
+            if (isTimerPaused) {
+                console.log('🔄 Auto-resume on click');
+                const success = await resumeExamOnServer();
+                if (success) {
+                    isTimerPaused = false;
+                    isManualPause = false;
+                    timerEl.classList.remove('opacity-50');
+                    timerEl.title = '';
+                    document.getElementById('pauseIndicator')?.classList.add('hidden');
+                    console.log('▶️ Timer resumed');
+                }
+            }
+        }, { once: false });
 
-            // Warning colors
-            if (remaining <= 300) { // 5 minutes
+        // ==== FUNGSI CEK STATUS PAUSE DARI SERVER ====
+        async function checkPauseStatus() {
+            try {
+                const res = await fetch("{{ route('exams.time.sync', $attempt->exam) }}", {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    
+                    if (data.remaining_seconds !== undefined) {
+                        remaining = data.remaining_seconds;
+                        timerEl.innerText = formatTime(remaining);
+                    }
+                    
+                    // 🔥 PERBAIKAN: Update status pause dari server
+                    if (data.is_paused && !isTimerPaused) {
+                        isTimerPaused = true;
+                        timerEl.classList.add('opacity-50');
+                        timerEl.title = 'Timer dijeda';
+                        document.getElementById('pauseIndicator')?.classList.remove('hidden');
+                        console.log('⏸️ Timer status: PAUSED (from server)');
+                    } else if (!data.is_paused && isTimerPaused) {
+                        isTimerPaused = false;
+                        isManualPause = false;
+                        timerEl.classList.remove('opacity-50');
+                        timerEl.title = '';
+                        document.getElementById('pauseIndicator')?.classList.add('hidden');
+                        console.log('▶️ Timer status: RESUMED (from server)');
+                    }
+                    
+                    return data;
+                }
+            } catch (e) {
+                console.warn('Failed to sync:', e);
+            }
+            return null;
+        }
+
+        // ==== 🔥 PERBAIKAN: DETEKSI PERUBAHAN VISIBILITAS TAB ====
+        document.addEventListener('visibilitychange', () => {
+            // 🔥 HANYA PAUSE JIKA TAB BENAR-BENAR HIDDEN
+            if (document.hidden) {
+                // Tab disembunyikan - PAUSE TIMER (HANYA JIKA BELUM PAUSE)
+                if (!isPausing && !isTimerPaused) {
+                    isPausing = true;
+                    isTabVisible = false;
+                    
+                    console.log('🔄 Tab hidden, pausing exam...');
+                    
+                    // Pause di server
+                    pauseExamOnServer().then(() => {
+                        isTimerPaused = true;
+                        isManualPause = true; // 🔥 Tandai sebagai pause dari tab
+                        timerEl.classList.add('opacity-50');
+                        timerEl.title = 'Timer dijeda karena tab tidak aktif';
+                        document.getElementById('pauseIndicator')?.classList.remove('hidden');
+                        isPausing = false;
+                        console.log('⏸️ Timer paused - tab tidak aktif, sisa waktu: ' + remaining);
+                    });
+                    
+                    // Simpan waktu pause ke localStorage
+                    localStorage.setItem('exam_paused_at_' + ATTEMPT_ID, Date.now().toString());
+                }
+            } else {
+                // 🔥 Tab kembali aktif - RESUME TIMER (HANYA JIKA PAUSE DARI TAB)
+                isTabVisible = true;
+                
+                // Cek apakah pause terjadi karena tab
+                if (isManualPause) {
+                    console.log('🔄 Tab active, resuming exam...');
+                    
+                    // Cek localStorage
+                    const pausedKey = 'exam_paused_at_' + ATTEMPT_ID;
+                    const pausedAt = localStorage.getItem(pausedKey);
+                    
+                    if (pausedAt) {
+                        const pausedTime = parseInt(pausedAt, 10);
+                        const elapsedPause = Math.floor((Date.now() - pausedTime) / 1000);
+                        
+                        // Resume di server
+                        resumeExamOnServer().then(() => {
+                            isTimerPaused = false;
+                            isManualPause = false;
+                            timerEl.classList.remove('opacity-50');
+                            timerEl.title = '';
+                            document.getElementById('pauseIndicator')?.classList.add('hidden');
+                            console.log('▶️ Timer resumed - tab aktif kembali, sisa waktu: ' + remaining);
+                        });
+                        
+                        localStorage.removeItem(pausedKey);
+                    } else {
+                        // Jika tidak ada localStorage, cek status dari server
+                        checkPauseStatus().then((data) => {
+                            if (!data?.is_paused) {
+                                isTimerPaused = false;
+                                isManualPause = false;
+                                timerEl.classList.remove('opacity-50');
+                                timerEl.title = '';
+                                document.getElementById('pauseIndicator')?.classList.add('hidden');
+                                console.log('▶️ Timer resumed - tab aktif kembali, sisa waktu: ' + remaining);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+
+        // ==== FUNGSI SINKRONISASI WAKTU DENGAN SERVER ====
+        async function syncTimeWithServer() {
+            try {
+                const res = await fetch("{{ route('exams.time.sync', $attempt->exam) }}", {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const serverRemaining = data.remaining_seconds;
+                    
+                    // 🔥 PERBAIKAN: Update status pause dari server
+                    if (data.is_paused && !isTimerPaused) {
+                        isTimerPaused = true;
+                        timerEl.classList.add('opacity-50');
+                        timerEl.title = 'Timer dijeda (server)';
+                        document.getElementById('pauseIndicator')?.classList.remove('hidden');
+                    } else if (!data.is_paused && isTimerPaused) {
+                        isTimerPaused = false;
+                        isManualPause = false;
+                        timerEl.classList.remove('opacity-50');
+                        timerEl.title = '';
+                        document.getElementById('pauseIndicator')?.classList.add('hidden');
+                    }
+                    
+                    // Koreksi waktu dengan server
+                    if (serverRemaining < remaining) {
+                        remaining = serverRemaining;
+                        timerEl.innerText = formatTime(remaining);
+                        
+                        if (remaining <= 300) {
+                            timerEl.classList.add('text-red-400');
+                            timerEl.classList.remove('text-white');
+                        } else if (remaining <= 600) {
+                            timerEl.classList.add('text-yellow-400');
+                            timerEl.classList.remove('text-white');
+                        }
+                    }
+                }
+            } catch (e) { /* biarkan, coba lagi nanti */ }
+        }
+
+        // ==== START TIMER ====
+        startTimer();
+
+        // ==== SYNC DENGAN SERVER SETIAP 30 DETIK ====
+        syncInterval = setInterval(() => {
+            if (!isTimerPaused) {
+                syncTimeWithServer();
+            }
+        }, 30000);
+
+        // ==== SYNC PAUSE STATUS SETIAP 10 DETIK ====
+        pauseSyncInterval = setInterval(() => {
+            if (isTimerPaused) {
+                checkPauseStatus();
+            }
+        }, 10000);
+
+        // ==== CEK PAUSE TIME SAAT LOAD ====
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (isInitialized) return;
+            isInitialized = true;
+            
+            console.log('🔄 Initializing exam...');
+            
+            // 🔥 CEK STATUS PAUSE DARI SERVER PERTAMA
+            const data = await checkPauseStatus();
+            
+            // Jika server menyatakan paused, pause timer lokal
+            if (data?.is_paused) {
+                isTimerPaused = true;
+                isManualPause = true;
+                timerEl.classList.add('opacity-50');
+                timerEl.title = 'Timer dijeda';
+                document.getElementById('pauseIndicator')?.classList.remove('hidden');
+                console.log('⏸️ Exam is paused on server');
+            } else {
+                isTimerPaused = false;
+                isManualPause = false;
+                timerEl.classList.remove('opacity-50');
+                timerEl.title = '';
+                document.getElementById('pauseIndicator')?.classList.add('hidden');
+                console.log('▶️ Exam is running');
+            }
+            
+            // Cek localstorage untuk resume
+            const pausedKey = 'exam_paused_at_' + ATTEMPT_ID;
+            const pausedAt = localStorage.getItem(pausedKey);
+            
+            if (pausedAt) {
+                const pausedTime = parseInt(pausedAt, 10);
+                const elapsedPause = Math.floor((Date.now() - pausedTime) / 1000);
+                
+                console.log('📦 Found paused_at in localStorage: ' + elapsedPause + 's ago');
+                
+                // Jika paused lebih dari 3 detik dan server tidak paused, resume
+                if (elapsedPause > 3 && !data?.is_paused) {
+                    console.log('🔄 Resuming from localStorage...');
+                    await resumeExamOnServer();
+                    isTimerPaused = false;
+                    isManualPause = false;
+                    timerEl.classList.remove('opacity-50');
+                    timerEl.title = '';
+                    document.getElementById('pauseIndicator')?.classList.add('hidden');
+                }
+                
+                localStorage.removeItem(pausedKey);
+            }
+            
+            // Update warning colors
+            if (remaining <= 300) {
                 timerEl.classList.add('text-red-400');
                 timerEl.classList.remove('text-white');
-            } else if (remaining <= 600) { // 10 minutes
+            } else if (remaining <= 600) {
                 timerEl.classList.add('text-yellow-400');
                 timerEl.classList.remove('text-white');
             }
-        }, 1000);
+            
+            console.log('✅ Exam initialized, remaining: ' + remaining + 's');
+        });
+
+        // ==== DETEKSI KETIKA USER MENUTUP TAB ====
+        window.addEventListener('beforeunload', function (e) {
+            // Pause di server sebelum tab ditutup
+            if (!document.hidden && !isTimerPaused) {
+                const formData = new FormData();
+                formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+                
+                navigator.sendBeacon(
+                    "{{ route('exams.pause', $attempt->exam) }}",
+                    formData
+                );
+                
+                localStorage.setItem('exam_paused_at_' + ATTEMPT_ID, Date.now().toString());
+                console.log('📤 Sending pause via beacon before unload');
+            }
+        });
 
         /* =====================================================
            SIDEBAR MANAGEMENT
@@ -94,7 +451,6 @@
         const navButtons = document.querySelectorAll('.nav-btn');
         const totalQuestions = slides.length;
 
-        // Show submit button only on last question
         function updateSubmitButtonVisibility() {
             const submitForm = document.getElementById('auto-submit-form');
             const nextBtn = document.getElementById('nextBtn');
@@ -136,7 +492,6 @@
             updateSubmitButtonVisibility();
             hideSidebar();
 
-            // Update button states
             document.getElementById('prevBtn').disabled = index === 0;
         }
 
@@ -161,30 +516,68 @@
         /* =====================================================
            ANSWER HANDLING
         ===================================================== */
+        let pendingSaves = [];
+
         async function saveAnswer(payload) {
+            let resolveSave, rejectSave;
+            const savePromise = new Promise((resolve, reject) => {
+                resolveSave = resolve;
+                rejectSave = reject;
+            });
+            
+            pendingSaves.push(savePromise);
+            
             try {
                 const response = await fetch("{{ route('exams.answer.save', $attempt->exam) }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     },
                     body: JSON.stringify(payload)
                 });
-
+                
                 if (!response.ok) {
                     const err = await response.json().catch(() => ({}));
-                    console.error('Save answer failed:', err);
-
                     if (response.status === 403 && err.expired) {
                         clearInterval(timerInterval);
-                        document.getElementById('auto-submit-form')?.submit();
+                        if (syncInterval) {
+                            clearInterval(syncInterval);
+                        }
+                        await forceSubmitNow();
                     }
+                    resolveSave(false);
+                    return false;
                 }
+                
+                resolveSave(true);
+                return true;
             } catch (e) {
                 console.error('Save answer error:', e);
+                resolveSave(false);
+                return false;
+            } finally {
+                pendingSaves = pendingSaves.filter(p => p !== savePromise);
             }
+        }
+
+        async function forceSubmitNow() {
+            if (pendingSaves.length > 0) {
+                const timeout = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Timeout')), 3000)
+                );
+                
+                try {
+                    await Promise.race([
+                        Promise.allSettled(pendingSaves),
+                        timeout
+                    ]);
+                } catch (e) {
+                    console.warn('Force submit timeout, proceeding anyway');
+                }
+            }
+            
+            document.getElementById('auto-submit-form')?.submit();
         }
 
         function markAnswered(questionId, answered = true) {
@@ -205,7 +598,7 @@
         }
 
         /* =====================================================
-           MCQ / MCMA / TRUEFALSE - BUTTON STYLE
+           MCQ / MCMA / TRUEFALSE
         ===================================================== */
         document.querySelectorAll('.option-button').forEach(container => {
             const input = container.querySelector('input[type="radio"], input[type="checkbox"]');
@@ -216,9 +609,8 @@
 
             if (!input || !label) return;
 
-            label.addEventListener('click', (e) => {
+            label.addEventListener('click', async (e) => {
                 if (input.type === 'radio') {
-                    // Deselect all other options in this question
                     questionSlide?.querySelectorAll('.option-button input[type="radio"]').forEach(otherInput => {
                         if (otherInput !== input) {
                             otherInput.checked = false;
@@ -227,30 +619,25 @@
                     });
                 }
 
-                // Toggle current option
                 input.checked = !input.checked;
 
-                // Update visual state
                 if (input.checked) {
                     container.classList.add('selected');
                 } else {
                     container.classList.remove('selected');
                 }
 
-                // Collect selected options
                 const selected = Array.from(
                     questionSlide?.querySelectorAll('.answer-section input:checked') || []
                 ).map(i => parseInt(i.value));
 
-                // Save answer
                 if (selected.length > 0 || input.type === 'radio') {
-                    saveAnswer({
+                    const success = await saveAnswer({
                         question_id: questionId,
                         answer_type: questionType,
                         selected_options: selected
                     });
-
-                    markAnswered(questionId, true);
+                    markAnswered(questionId, success);
                 } else {
                     markAnswered(questionId, false);
                 }
@@ -266,45 +653,59 @@
             textarea.addEventListener('input', function () {
                 clearTimeout(timeout);
 
-                timeout = setTimeout(() => {
+                timeout = setTimeout(async () => {
                     const slide = this.closest('.question-slide');
                     const questionId = slide?.dataset.questionId;
                     const value = this.value.trim();
 
                     if (value) {
-                        saveAnswer({
+                        const success = await saveAnswer({
                             question_id: questionId,
                             answer_type: 'short_answer',
                             short_answer_value: value
                         });
-                        markAnswered(questionId, true);
+                        markAnswered(questionId, success);
                     } else {
                         markAnswered(questionId, false);
                     }
-                }, 800);
+                }, 500);
+            });
+
+            textarea.addEventListener('blur', async function () {
+                clearTimeout(timeout);
+                const slide = this.closest('.question-slide');
+                const questionId = slide?.dataset.questionId;
+                const value = this.value.trim();
+
+                if (value) {
+                    const success = await saveAnswer({
+                        question_id: questionId,
+                        answer_type: 'short_answer',
+                        short_answer_value: value
+                    });
+                    markAnswered(questionId, success);
+                } else {
+                    markAnswered(questionId, false);
+                }
             });
         });
 
         /* =====================================================
-           COMPOUND QUESTION HANDLING
+           COMPOUND QUESTION
         ===================================================== */
-        // True/False buttons
         document.querySelectorAll('.truefalse-btn').forEach(button => {
-            button.addEventListener('click', function () {
+            button.addEventListener('click', async function () {
                 const subId = this.dataset.subId;
                 const questionSlide = this.closest('.question-slide');
                 const questionId = questionSlide?.dataset.questionId;
                 const isTrue = this.textContent.includes('Benar');
-                const value = isTrue ? 1 : 0;
 
-                // Deselect other button in same group
                 const otherBtn = questionSlide?.querySelector(`.truefalse-btn[data-sub-id="${subId}"]:not(:disabled)`);
                 if (otherBtn && otherBtn !== this) {
                     otherBtn.classList.remove('border-green-500', 'bg-green-50', 'dark:bg-green-900/20', 'text-green-700', 'dark:text-green-300',
                         'border-red-500', 'bg-red-50', 'dark:bg-red-900/20', 'text-red-700', 'dark:text-red-300');
                 }
 
-                // Toggle current button
                 const isSelected = this.classList.contains('border-green-500') || this.classList.contains('border-red-500');
                 if (isSelected) {
                     this.classList.remove(isTrue ? 'border-green-500' : 'border-red-500',
@@ -320,29 +721,33 @@
                         isTrue ? 'dark:text-green-300' : 'dark:text-red-300');
                 }
 
-                collectAndSaveCompoundAnswers(questionSlide);
+                await collectAndSaveCompoundAnswers(questionSlide);
             });
         });
 
-        // Short answer in compound
         document.querySelectorAll('.compound-short-answer').forEach(textarea => {
             let timeout;
 
             textarea.addEventListener('input', function () {
                 clearTimeout(timeout);
 
-                timeout = setTimeout(() => {
+                timeout = setTimeout(async () => {
                     const slide = this.closest('.question-slide');
-                    collectAndSaveCompoundAnswers(slide);
-                }, 800);
+                    await collectAndSaveCompoundAnswers(slide);
+                }, 500);
+            });
+
+            textarea.addEventListener('blur', async function () {
+                clearTimeout(timeout);
+                const slide = this.closest('.question-slide');
+                await collectAndSaveCompoundAnswers(slide);
             });
         });
 
-        function collectAndSaveCompoundAnswers(slide) {
+        async function collectAndSaveCompoundAnswers(slide) {
             const questionId = slide?.dataset.questionId;
             const answers = [];
 
-            // Collect true/false answers
             slide?.querySelectorAll('.truefalse-btn').forEach(btn => {
                 const subId = btn.dataset.subId;
                 const isSelected = btn.classList.contains('border-green-500') || btn.classList.contains('border-red-500');
@@ -356,7 +761,6 @@
                 }
             });
 
-            // Collect short answers
             slide?.querySelectorAll('.compound-short-answer').forEach(textarea => {
                 const subId = textarea.dataset.subId;
                 const value = textarea.value.trim();
@@ -370,14 +774,13 @@
                 }
             });
 
-            // Save if any answers exist
             if (answers.length > 0) {
-                saveAnswer({
+                const success = await saveAnswer({
                     question_id: questionId,
                     answer_type: 'compound',
                     compound_answers: answers
                 });
-                markAnswered(questionId, true);
+                markAnswered(questionId, success);
             } else {
                 markAnswered(questionId, false);
             }
@@ -401,12 +804,10 @@
         /* =====================================================
            INITIALIZATION
         ===================================================== */
-        // Initialize MathJax if available
         if (typeof MathJax !== 'undefined') {
             MathJax.typesetPromise();
         }
 
-        // Mark initial answered questions
         document.querySelectorAll('.question-slide').forEach(slide => {
             const questionId = slide.dataset.questionId;
             const hasAnswer = slide.querySelector('input:checked') ||

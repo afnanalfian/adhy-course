@@ -21,7 +21,38 @@
                 {{ $question ? 'Edit' : 'Buat' }} soal dengan teks, gambar, dan rumus matematika.
             </p>
         </div>
-
+        {{-- =========================
+        | INDIKATOR PERINGATAN (TAMBAHKAN DI SINI)
+        ========================= --}}
+        @if($question && $question->usedInExamsCount() > 0)
+            <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 rounded-r-xl">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-300">
+                            Perhatian!
+                        </h3>
+                        <div class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+                            <p>
+                                <strong>Soal ini sudah digunakan di {{ $question->usedInExamsCount() }} ujian.</strong>
+                                @if($question->usedInExamsCount() > 0)
+                                    <br>
+                                    <span class="text-xs opacity-75">
+                                        ⚠️ Jika Anda mengubah kunci jawaban (<strong>is_correct</strong> atau <strong>weight</strong>), 
+                                        nilai semua siswa yang mengerjakan soal ini akan dihitung ulang secara otomatis.
+                                        Proses ini mungkin memakan waktu beberapa saat.
+                                    </span>
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
         {{-- =========================
         | TIPE TEST (EDIT)
         ========================= --}}

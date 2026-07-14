@@ -2,79 +2,79 @@
 
 @section('content')
 
-    {{-- HEADER --}}
-    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 class="text-2xl font-bold text-ens-darker dark:text-ens-lighter">
-            Daftar Tentor
-        </h1>
+{{-- HEADER --}}
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        Daftar Tentor
+    </h1>
 
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <form method="GET" action="{{ route('tentor.index') }}" class="flex gap-2 w-full sm:w-auto">
-                <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari nama / course" class="w-full sm:w-80 px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-700
-                              bg-ens-lightest dark:bg-ens-darkest
-                              text-gray-700 dark:text-gray-200
-                              focus:ring-2 focus:ring-primary focus:outline-none" />
-
-                <button class="px-4 py-2 bg-primary text-white rounded-xl hover:opacity-90 transition">
-                    Cari
-                </button>
-            </form>
-            @role('admin')
-            <a href="{{ route('tentor.create') }}"
-                class="px-4 py-2 bg-ens-darker text-white rounded-xl hover:bg-ens-medium transition">
-                Tambah Tentor
-            </a>
-            @endrole
-        </div>
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <form method="GET" action="{{ route('tentor.index') }}" class="flex gap-2 w-full sm:w-auto">
+            <input type="text" 
+                   name="q" 
+                   value="{{ $q ?? '' }}" 
+                   placeholder="Cari nama / course" 
+                   class="flex-1 sm:w-72 px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition text-sm">
+            <button type="submit" 
+                    class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl transition">
+                Cari
+            </button>
+        </form>
+        @role('admin')
+        <a href="{{ route('tentor.create') }}"
+           class="px-5 py-2.5 bg-gray-900 dark:bg-gray-700 text-white font-medium rounded-xl hover:bg-gray-800 dark:hover:bg-gray-600 transition text-center">
+            + Tambah Tentor
+        </a>
+        @endrole
     </div>
+</div>
 
-
-    {{-- GRID --}}
-    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-
-        @foreach ($tentor as $t)
-            <a href="{{ route('tentor.show', $t->id) }}" class="group block rounded-2xl bg-ens-lightest dark:bg-ens-darker border border-gray-200 dark:border-gray-700
-                          p-5 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200">
-
-                {{-- FOTO + NAMA --}}
-                <div class="flex items-center gap-4 mb-3">
-                    <img src="{{ $t->user->avatar_url }}"
-                        class="w-14 h-14 rounded-full object-cover ring-2 ring-primary/40 shadow-sm">
-
-                    <div class="min-w-0">
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 truncate">
-                            {{ $t->user->name }}
-                        </h3>
-
-                        <span class="text-xs px-2 py-0.5 rounded-full mt-1 inline-block
-                                {{ $t->user->is_active
-                ? 'bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200'
-                : 'bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-200' }}">
-                            {{ $t->user->is_active ? 'Aktif' : 'Nonaktif' }}
-                        </span>
-                    </div>
+{{-- GRID --}}
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    @forelse ($tentor as $t)
+        <a href="{{ route('tentor.show', $t->id) }}" 
+           class="group block bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 hover:border-purple-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            
+            {{-- Profile --}}
+            <div class="flex items-center gap-3 mb-3">
+                <img src="{{ $t->user->avatar_url }}"
+                     class="w-12 h-12 rounded-full object-cover border-2 border-purple-500/30">
+                <div class="min-w-0">
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white truncate">
+                        {{ $t->user->name }}
+                    </h3>
+                    <span class="text-xs px-2.5 py-0.5 rounded-full inline-block mt-0.5
+                                {{ $t->user->is_active 
+                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                                    : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' }}">
+                        {{ $t->user->is_active ? 'Aktif' : 'Nonaktif' }}
+                    </span>
                 </div>
+            </div>
 
-                {{-- BIO --}}
-                <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2 mb-3">
-                    {{ $t->bio ?: 'Tidak ada bio.' }}
-                </p>
+            {{-- Bio --}}
+            <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">
+                {{ $t->bio ?: 'Tidak ada bio.' }}
+            </p>
 
-                {{-- MENGAJAR --}}
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                    <span class="font-semibold text-gray-700 dark:text-gray-200">Mengajar:</span>
-                    {{ $t->courses->pluck('name')->join(', ') ?: '-' }}
-                </p>
+            {{-- Courses --}}
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+                <span class="font-medium text-gray-700 dark:text-gray-300">Mengajar:</span>
+                {{ $t->courses->pluck('name')->join(', ') ?: '-' }}
+            </p>
+        </a>
+    @empty
+        <div class="col-span-full text-center py-12 text-gray-500 dark:text-gray-400">
+            Belum ada tentor
+        </div>
+    @endforelse
+</div>
 
-            </a>
-        @endforeach
-
-    </div>
-
-
-    {{-- PAGINATION --}}
-    <div class="mt-10">
+{{-- PAGINATION --}}
+@if($tentor->hasPages())
+    <div class="mt-6">
         {{ $tentor->links() }}
     </div>
+@endif
 
 @endsection

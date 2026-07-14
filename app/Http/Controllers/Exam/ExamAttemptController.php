@@ -125,7 +125,81 @@ class ExamAttemptController extends Controller
             'questions'
         ));
     }
+    public function pause(Exam $exam)
+    {
+        $attempt = $exam->attempts()
+            ->where('user_id', auth()->id())
+            ->where('is_submitted', false)
+            ->firstOrFail();
 
+        $attempt->pause();
+
+        return response()->json([
+            'paused' => true,
+            'remaining_seconds' => $attempt->remainingSeconds(),
+        ]);
+    }
+
+    /**
+     * RESUME EXAM - Ketika tab aktif kembali
+     */
+    public function resume(Exam $exam)
+    {
+        $attempt = $exam->attempts()
+            ->where('user_id', auth()->id())
+            ->where('is_submitted', false)
+            ->firstOrFail();
+
+        $attempt->resume();
+
+        return response()->json([
+            'resumed' => true,
+            'remaining_seconds' => $attempt->remainingSeconds(),
+        ]);
+    }
+
+    /**
+     * SYNC TIME - Cek sisa waktu dan status pause
+     */
+    public function timeSync(Exam $exam)
+    {
+        $attempt = $exam->attempts()
+            ->where('user_id', auth()->id())
+            ->where('is_submitted', false)
+            ->firstOrFail();
+
+        return response()->json([
+            'remaining_seconds' => $attempt->remainingSeconds(),
+            'is_paused' => $attempt->isPaused(),
+            'total_paused_seconds' => $attempt->total_paused_seconds ?? 0,
+            'paused_at' => $attempt->paused_at, // Tambahkan ini
+        ]);
+    }
+    /**
+     * CEK STATUS LENGKAP
+     */
+    public function checkStatus(Exam $exam)
+    {
+        $attempt = $exam->attempts()
+            ->where('user_id', auth()->id())
+            ->first();
+            
+        if (!$attempt) {
+            return response()->json([
+                'exists' => false
+            ]);
+        }
+        
+        return response()->json([
+            'exists' => true,
+            'is_submitted' => $attempt->is_submitted,
+            'is_paused' => $attempt->isPaused(),
+            'remaining_seconds' => $attempt->remainingSeconds(),
+            'total_paused_seconds' => $attempt->total_paused_seconds,
+            'paused_at' => $attempt->paused_at,
+            'started_at' => $attempt->started_at,
+        ]);
+    }
     public function submit(Exam $exam, ExamScoringService $scoring)
     {
         if (
@@ -139,7 +213,7 @@ class ExamAttemptController extends Controller
 
         $attempt = $exam->attempts()
             ->where('user_id', auth()->id())
-            ->where('is_submitted', false)
+            // ->where('is_submitted', false)
             ->firstOrFail();
 
         if ($attempt->is_submitted) {

@@ -1,130 +1,77 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen">
-
-        <div class="max-w-3xl mx-auto">
-
-            {{-- Card --}}
-            <div class="relative bg-ens-lightest dark:bg-ens-darker
-                       rounded-3xl shadow-xl dark:shadow-black/30
-                       border border-gray-200 dark:border-ens-darkest
-                       p-6 sm:p-8">
-
-                {{-- Header --}}
-                <div class="mb-8">
-                    <h1 class="text-2xl sm:text-3xl font-bold
-                               text-ens-darkest dark:text-ens-lighter">
-                        Profil Saya
-                    </h1>
-
-                    <p class="text-sm mt-1 text-ens-medium dark:text-ens-light">
-                        Informasi akun pribadi Anda
-                    </p>
-                </div>
-
-                {{-- Profile Row --}}
-                <div class="flex flex-col sm:flex-row items-center gap-6">
-
-                    {{-- Avatar --}}
-                    <div class="relative shrink-0">
-                        <img src="{{ auth()->user()->avatar_url }}" alt="Avatar" class="w-24 h-24 rounded-full object-cover
-                            border-4 border-primary
-                            shadow-lg" />
-                    </div>
-
-                    {{-- Identity --}}
-                    <div class="text-center sm:text-left">
-                        <p class="text-xl font-semibold
-                                  text-ens-darkest dark:text-white">
-                            {{ auth()->user()->name }}
-                        </p>
-
-                        <p class="text-sm text-gray-500 dark:text-gray-300">
-                            {{ auth()->user()->email }}
-                        </p>
-                    </div>
-
-                </div>
-
-                {{-- Divider --}}
-                <hr class="my-8 border-gray-200 dark:border-ens-darkest">
-
-                {{-- Info Grid --}}
-                <div class="grid sm:grid-cols-2 gap-4 text-sm">
-
-                    <div class="p-4 rounded-xl
-                                bg-gray-50 dark:bg-ens-darkest/50
-                                border border-gray-200 dark:border-ens-darkest">
-                        <p class="text-xs uppercase tracking-wide
-                                  text-gray-500 dark:text-ens-light">
-                            Phone
-                        </p>
-                        <p class="font-medium text-ens-darkest dark:text-white">
-                            {{ auth()->user()->phone ?? '-' }}
-                        </p>
-                    </div>
-
-                    <div class="p-4 rounded-xl
-                                bg-gray-50 dark:bg-ens-darkest/50
-                                border border-gray-200 dark:border-ens-darkest">
-                        <p class="text-xs uppercase tracking-wide
-                                  text-gray-500 dark:text-ens-light">
-                            Provinsi
-                        </p>
-                        <p class="font-medium text-ens-darkest dark:text-white">
-                            {{ auth()->user()->province->name ?? '-' }}
-                        </p>
-                    </div>
-
-                    <div class="p-4 rounded-xl
-                                bg-gray-50 dark:bg-ens-darkest/50
-                                border border-gray-200 dark:border-ens-darkest">
-                        <p class="text-xs uppercase tracking-wide
-                                  text-gray-500 dark:text-ens-light">
-                            Kabupaten / Kota
-                        </p>
-                        <p class="font-medium text-ens-darkest dark:text-white">
-                            {{ auth()->user()->regency->name ?? '-' }}
-                        </p>
-                    </div>
-
-                </div>
-
-                {{-- Actions --}}
-                <div class="flex flex-wrap gap-3 mt-10">
-
-                    <a href="{{ route('profile.edit') }}" class="inline-flex items-center justify-center gap-2
-                              px-5 py-3 rounded-xl font-semibold
-                              text-white
-                              bg-gradient-to-r from-primary to-ens-medium
-                              hover:shadow-lg hover:scale-[1.02]
-                              transition">
-                        Edit Profil
-                    </a>
-
-                    <a href="{{ route('profile.password') }}" class="inline-flex items-center justify-center gap-2
-                              px-5 py-3 rounded-xl font-semibold
-                              text-white
-                              bg-ens-darker hover:bg-ens-medium
-                              transition">
-                        Ganti Password
-                    </a>
-
-                    <a href="{{ route('profile.delete') }}" class="inline-flex items-center justify-center gap-2
-                              px-5 py-3 rounded-xl font-semibold
-                              text-red-700 dark:text-red-400
-                              bg-red-100 dark:bg-red-950/30
-                              hover:bg-red-200 dark:hover:bg-red-950/60
-                              transition">
-                        Hapus Akun
-                    </a>
-
-                </div>
-
-            </div>
-            {{-- End Card --}}
-
+<div class="max-w-3xl mx-auto">
+    {{-- Card --}}
+    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
+        
+        {{-- Header --}}
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Profil Saya</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Informasi akun pribadi Anda</p>
         </div>
+
+        {{-- Profile --}}
+        <div class="flex items-center gap-5 pb-6 border-b border-gray-200 dark:border-gray-700">
+            <img src="{{ auth()->user()->avatar_url }}" 
+                 alt="Avatar" 
+                 class="w-20 h-20 rounded-full object-cover border-2 border-purple-500/30">
+
+            <div>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white">
+                    {{ auth()->user()->name }}
+                </p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ auth()->user()->email }}
+                </p>
+                <span class="inline-block mt-1 text-xs px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400">
+                    {{ auth()->user()->roles->first()->name ?? 'User' }}
+                </span>
+            </div>
+        </div>
+
+        {{-- Info Grid --}}
+        <div class="grid sm:grid-cols-2 gap-4 mt-6">
+            <div>
+                <p class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">No. HP</p>
+                <p class="text-sm font-medium text-gray-800 dark:text-gray-200 mt-1">
+                    {{ auth()->user()->phone ?? '-' }}
+                </p>
+            </div>
+
+            <div>
+                <p class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">Provinsi</p>
+                <p class="text-sm font-medium text-gray-800 dark:text-gray-200 mt-1">
+                    {{ auth()->user()->province->name ?? '-' }}
+                </p>
+            </div>
+
+            <div class="sm:col-span-2">
+                <p class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">Kabupaten / Kota</p>
+                <p class="text-sm font-medium text-gray-800 dark:text-gray-200 mt-1">
+                    {{ auth()->user()->regency->name ?? '-' }}
+                </p>
+            </div>
+        </div>
+
+        {{-- Actions --}}
+        <div class="flex flex-wrap gap-3 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <a href="{{ route('profile.edit') }}" 
+               class="px-5 py-2.5 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition duration-300">
+                Edit Profil
+            </a>
+
+            <a href="{{ route('profile.password') }}" 
+               class="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300">
+                Ganti Password
+            </a>
+
+            <a href="{{ route('profile.delete') }}" 
+               class="px-5 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition duration-300">
+                Hapus Akun
+            </a>
+        </div>
+
     </div>
+</div>
 @endsection

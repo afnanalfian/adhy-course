@@ -43,17 +43,56 @@ class CourseController extends Controller
             'name'        => 'required|max:255',
             'slug'        => 'required|max:255|unique:courses,slug',
             'description' => 'required|max:1000',
-            'thumbnail'   => 'required|image',
+            'thumbnail'   => 'nullable|image|max:2048',
             'is_free'     => 'nullable|boolean',
         ]);
 
-        $data = $request->only('name','slug','description');
+        $data = $request->only('name', 'slug', 'description');
         $data['is_free'] = $request->boolean('is_free');
-        $data['thumbnail'] = $request->file('thumbnail')->store('courses','public');
+        
+        // Handle thumbnail
+        if ($request->hasFile('thumbnail')) {
+            $data['thumbnail'] = $request->file('thumbnail')->store('courses', 'public');
+        } else {
+            $data['thumbnail'] = null;
+        }
 
         Course::create($data);
 
-        toast('success','Course berhasil dibuat.');
+        toast('success', 'Course berhasil dibuat.');
+
+        return redirect()->route('course.index');
+    }
+
+    public function update(Request $request, $slug)
+    {
+        $course = Course::where('slug', $slug)->firstOrFail();
+
+        $request->validate([
+            'name'        => 'required|max:255',
+            'slug'        => 'required|max:255|unique:courses,slug,' . $course->id,
+            'description' => 'required|max:1000',
+            'thumbnail'   => 'nullable|image|max:2048',
+            'is_free'     => 'nullable|boolean',
+        ]);
+
+        $data = $request->only('name', 'slug', 'description');
+        $data['is_free'] = $request->boolean('is_free');
+        
+        // Handle thumbnail
+        if ($request->hasFile('thumbnail')) {
+            // Hapus thumbnail lama jika ada
+            if ($course->thumbnail && Storage::disk('public')->exists($course->thumbnail)) {
+                Storage::disk('public')->delete($course->thumbnail);
+            }
+            
+            $data['thumbnail'] = $request->file('thumbnail')->store('courses', 'public');
+        }
+        // Jika tidak upload thumbnail, pertahankan thumbnail lama
+
+        $course->update($data);
+
+        toast('info', 'Course berhasil diperbarui.');
 
         return redirect()->route('course.index');
     }
@@ -74,35 +113,6 @@ class CourseController extends Controller
         return view('course.edit', compact('course'));
     }
 
-    public function update(Request $request, $slug)
-    {
-        $course = Course::where('slug', $slug)->firstOrFail();
-
-        $request->validate([
-            'name'        => 'required|max:255',
-            'slug'        => 'required|max:255|unique:courses,slug,' . $course->id,
-            'description' => 'required|max:1000',
-            'thumbnail'   => 'nullable|image',
-            'is_free'     => 'nullable|boolean',
-        ]);
-
-        $data = $request->only('name','slug','description');
-        $data['is_free'] = $request->boolean('is_free');
-        if ($request->hasFile('thumbnail')) {
-
-            if ($course->thumbnail && file_exists(storage_path('app/public/'.$course->thumbnail))) {
-                unlink(storage_path('app/public/'.$course->thumbnail));
-            }
-
-            $data['thumbnail'] = $request->file('thumbnail')->store('courses','public');
-        }
-
-        $course->update($data);
-
-        toast('info','Course berhasil diperbarui.');
-
-        return redirect()->route('course.index');
-    }
 
     public function destroy($slug)
     {

@@ -371,6 +371,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->name('exams.start');
 
             Route::get('attempt', [ExamAttemptController::class, 'attempt'])
+                ->name('exams.attempt')
+                ->middleware('exam.pause'); // Auto-pause saat refresh
+
+            Route::get('attempt', [ExamAttemptController::class, 'attempt'])
                 ->name('exams.attempt');
 
             Route::post('submit', [ExamAttemptController::class, 'submit'])
@@ -384,9 +388,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('/ranking',[ExamResultController::class, 'studentRanking'])
                 ->name('exams.ranking.student');
+            
+            Route::post('pause', [ExamAttemptController::class, 'pause'])
+                ->name('exams.pause');
+                
+            Route::post('resume', [ExamAttemptController::class, 'resume'])
+                ->name('exams.resume');
         });
     });
-
+    Route::get('/exams/{exam}/time-sync', [ExamAttemptController::class, 'timeSync'])
+        ->name('exams.time.sync');
+    Route::get('/exams/{exam}/status', [ExamAttemptController::class, 'checkStatus'])
+        ->name('exams.status');
     /*
     |--------------------------------------------------------------------------
     | BANK SOAL (AJAX)

@@ -19,6 +19,8 @@ class ExamAttempt extends Model
         'correct_count',
         'wrong_count',
         'is_submitted',
+        'paused_at',
+        'total_paused_seconds',
     ];
 
     protected $casts = [
@@ -26,6 +28,8 @@ class ExamAttempt extends Model
         'submitted_at' => 'datetime',
         'is_submitted' => 'boolean',
         'is_passed' => 'boolean',
+        'paused_at' => 'datetime',
+        'total_paused_seconds' => 'integer',
     ];
 
     /* ================= RELATIONS ================= */
@@ -56,31 +60,83 @@ class ExamAttempt extends Model
     {
         return $this->is_submitted;
     }
+    /**
+     * MODIFIKASI: Hitung sisa waktu dengan memperhitungkan pause
+     */
     public function getRemainingSecondsAttribute()
     {
         if ($this->is_submitted) {
             return 0;
         }
 
-        $startedAt = $this->started_at;
-        $duration  = $this->exam->duration_minutes * 60;
+        $duration = $this->exam->duration_minutes * 60;
 
-        if (!$startedAt) {
+        if (!$this->started_at) {
             return $duration;
         }
 
-        $elapsed = now()->diffInSeconds($startedAt);
+        // Jika sedang pause, hitung sampai paused_at
+        $endTime = $this->isPaused() ? $this->paused_at : now();
+        
+        $elapsed = $endTime->diffInSeconds($this->started_at) - ($this->total_paused_seconds ?? 0);
 
         return max($duration - $elapsed, 0);
     }
+
+    /**
+     * MODIFIKASI: Hitung sisa waktu dengan memperhitungkan pause
+     */
     public function remainingSeconds(): int
     {
+        if ($this->is_submitted) {
+            return 0;
+        }
+
         $duration = $this->exam->duration_minutes * 60;
+        
+        // Jika sedang pause, gunakan paused_at sebagai batas waktu
+        $endTime = $this->isPaused() ? $this->paused_at : now();
+        
         $elapsed = $this->started_at
-            ? $this->started_at->diffInSeconds(now())
+            ? $this->started_at->diffInSeconds($endTime) - ($this->total_paused_seconds ?? 0)
             : 0;
 
         return max(0, $duration - $elapsed);
+    }
+
+    /**
+     * CEK APAKAH SEDANG PAUSE
+     */
+    public function isPaused(): bool
+    {
+        return !is_null($this->paused_at);
+    }
+
+    /**
+     * PAUSE EXAM
+     */
+    public function pause(): void
+    {
+        if (!$this->isPaused() && !$this->is_submitted) {
+            $this->update([
+                'paused_at' => now(),
+            ]);
+        }
+    }
+
+    /**
+     * RESUME EXAM
+     */
+    public function resume(): void
+    {
+        if ($this->isPaused() && !$this->is_submitted) {
+            $pausedDuration = $this->paused_at->diffInSeconds(now());
+            
+            $this->update([
+                'paused_at' => null,
+                'total_paused_seconds' => ($this->total_paused_seconds ?? 0) + $pausedDuration,
+            ]);
+        }
     }
 
     public function isExpired(): bool
